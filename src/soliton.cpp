@@ -1,51 +1,51 @@
 #include <math.h>
 #include "soliton.h"
 
-double getrho(int K, int d){
-	double rho;
-
-	if(d > 1) {
-		rho = 1. / (d * (d - 1));
-	}
-	else {
-		rho = 1. / K;
-	}
-	return rho;
+IdealSoliton::IdealSoliton() {
+	K = 1000;
 }
 
-double gettau(int K, double R, int d){
-	double tau;
-
-	if(d>=1 && d<K/R) {
-		tau = R / (d * K);
-	}
-	else if(d == K/R) {
-		tau = R * log(R / delta) / K;
-	}
-	else {
-		tau = 0;
-	}
-	return tau;
+IdealSoliton::IdealSoliton(int _K) {
+	K = _K;
 }
 
-double getmu(int K, double R, int d){
-	double rho;
-	double tau;
-	double beta = 0;
-	double mu;
-
-	// compute ro
-	rho = getrho(K, d);
-
-	// compute tau
-	tau = gettau(K, R, d);
-
-	// compute beta
-	for(int i=1; i<=K; i++) {
-		beta += getrho(K, i) + gettau(K, R, i);
+double IdealSoliton::get(int degree) {
+	if(degree > 1) {
+		return 1. / (degree * (degree - 1));
 	}
+	else {
+		return 1. / K;
+	}
+}
 
-	// compute mu
-	mu = (rho + tau) / beta;
-	return mu;
+RobustSoliton::RobustSoliton(double _c, double _delta, int _K) {
+	// save parameters
+	c = _c;
+	delta = _delta;
+	K = _K;
+
+	// generate related Ideal Soliton distribution
+	rho = IdealSoliton(_K);
+
+	// compute relevant quantities, beta and R) and store them
+	R = c * log(K / delta) * sqrt(K);
+	for(int d=1; d<=K; d++) {
+		beta += rho.get(d) + get_tau(d);
+	}
+}
+
+double RobustSoliton::get(int degree){
+	return (rho.get(degree) + get_tau(degree)) / beta;
+}
+
+double RobustSoliton::get_tau(int degree) {
+	if (degree >= 1 && degree < K/R) {
+		return R / (degree * K);
+	}
+	else if (degree == K/R) {
+		return R * log(R / delta) / K;
+	}
+	else {
+		return 0;
+	}
 }

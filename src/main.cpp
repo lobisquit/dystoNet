@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <iostream>
 #include "soliton.h"
 
 /** \file */
@@ -7,14 +7,14 @@
 * Online repository for this code can be found at https://github.com/lobisquit/dystoNet
 */
 
-const int N = 2000; /** Number of nodes */
-const int K = 1000; /** Number of sensing nodes */
-const double deltad = 0.05; /** Violation probability */
-const double R = c * log(K / delta) * sqrt(K);
-
-main() {
-	int d = 1; // Node-degree
-	double mu = getmu(K, R, d);
-	printf("%f\n", mu);
+int main() {
+	// setting c = 0.01, deltad = 0.05, K = 1000 in the constructor
+	RobustSoliton s = RobustSoliton(0.01, 0.05, 1000);
+	double cumulative_sum = 0;
+	for (int d=0; d<=120; d++) {
+		std::cout << "mu(" << d << ")   = " << s.get(d) << "\n";
+		cumulative_sum += s.get(d);
+	}
+	std::cout << "Sum = " << cumulative_sum << "\n";
 	return 0;
 }
