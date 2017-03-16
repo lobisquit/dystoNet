@@ -10,7 +10,7 @@ const double c = 0.01;
 const double delta = 0.05;
 const double R = c*log(K/delta)*sqrt(K);
 
-double getmu(double R, int d);
+double getmu(double R, int d);asdasdasd
 double getro(int d);
 double gettau(double R, int d);
 
