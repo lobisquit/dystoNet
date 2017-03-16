@@ -10,12 +10,13 @@ IdealSoliton::IdealSoliton(int _K) {
 }
 
 double IdealSoliton::get(int degree) {
-	if(degree > 1) {
-		return 1. / (degree * (degree - 1));
-	}
-	else {
+	if (degree == 1) {
 		return 1. / K;
 	}
+	if (degree > 1 && degree <=K) {
+		return 1. / (degree * (degree - 1));
+	}
+	return 0;
 }
 
 RobustSoliton::RobustSoliton(double _c, double _delta, int _K) {
@@ -35,17 +36,18 @@ RobustSoliton::RobustSoliton(double _c, double _delta, int _K) {
 }
 
 double RobustSoliton::get(int degree){
-	return (rho.get(degree) + get_tau(degree)) / beta;
+	if (degree >= 1 && degree <= K ) {
+		return (rho.get(degree) + get_tau(degree)) / beta;
+	}
+	return 0;
 }
 
 double RobustSoliton::get_tau(int degree) {
-	if (degree >= 1 && degree < K/R) {
+	if (degree >= 1 && degree <= K/R - 1) {
 		return R / (degree * K);
 	}
-	else if (degree == K/R) {
+	if (degree == K/R) {
 		return R * log(R / delta) / K;
 	}
-	else {
-		return 0;
-	}
+	return 0;
 }
