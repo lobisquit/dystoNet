@@ -16,13 +16,6 @@ double getmu(double R, int d);
 double getrho(int d);
 double gettau(double R, int d);
 
-main() {
-	int d = 1; // Node-degree
-	double mu = getmu(R, d);
-	printf("%f\n", mu);
-	return 0;
-}
-
 /**
 * Get Ideal Soliton distribution
 * @param d node degree
