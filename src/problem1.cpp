@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <math.h>
 
-const int N = 2000; // Number of nodes
-const int K = 1000; // Number of sensing nodes
-const double deltad = 0.05; // Violation probability
+const int N = 2000; /** Number of nodes */
+const int K = 1000; /** Number of sensing nodes */
+const double deltad = 0.05; /** Violation probability */
 
 // Constants for Robust Soliton Distribution
 const double c = 0.01;
