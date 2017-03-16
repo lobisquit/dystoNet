@@ -1,27 +1,7 @@
-#include <stdio.h>
 #include <math.h>
+#include "soliton.h"
 
-/** \file */
-
-const int N = 2000; /** Number of nodes */
-const int K = 1000; /** Number of sensing nodes */
-const double deltad = 0.05; /** Violation probability */
-
-// Constants for Robust Soliton Distribution
-const double c = 0.01;
-const double delta = 0.05;
-const double R = c * log(K / delta) * sqrt(K);
-
-double getmu(double R, int d);
-double getrho(int d);
-double gettau(double R, int d);
-
-/**
-* Get Ideal Soliton distribution
-* @param d node degree
-* @return Robust Soliton probabilit
-*/
-double getrho(int d){
+double getrho(int K, int d){
 	double rho;
 
 	if(d > 1) {
@@ -33,13 +13,7 @@ double getrho(int d){
 	return rho;
 }
 
-/**
-* Tau weighting function for Robust Soliton
-* @param R Robust soliton parameter
-* @param d node degree
-* @return Robust Soliton probability for d
-*/
-double gettau(double R, int d){
+double gettau(int K, double R, int d){
 	double tau;
 
 	if(d>=1 && d<K/R) {
@@ -54,27 +28,21 @@ double gettau(double R, int d){
 	return tau;
 }
 
-/**
-* Compute Robust Soliton Distribution for a node-degree d
-* @param R Robust soliton parameter
-* @param d node degree
-* @return Robust Soliton probability for d
-*/
-double getmu(double R, int d){
+double getmu(int K, double R, int d){
 	double rho;
 	double tau;
 	double beta = 0;
 	double mu;
 
 	// compute ro
-	rho = getrho(d);
+	rho = getrho(K, d);
 
 	// compute tau
-	tau = gettau(R, d);
+	tau = gettau(K, R, d);
 
 	// compute beta
 	for(int i=1; i<=K; i++) {
-		beta += getrho(i) + gettau(R, i);
+		beta += getrho(K, i) + gettau(K, R, i);
 	}
 
 	// compute mu
