@@ -10,10 +10,10 @@ const double deltad = 0.05; /** Violation probability */
 // Constants for Robust Soliton Distribution
 const double c = 0.01;
 const double delta = 0.05;
-const double R = c*log(K/delta)*sqrt(K);
+const double R = c * log(K / delta) * sqrt(K);
 
 double getmu(double R, int d);
-double getro(int d);
+double getrho(int d);
 double gettau(double R, int d);
 
 main() {
@@ -28,16 +28,16 @@ main() {
 * @param d node degree
 * @return Robust Soliton probabilit
 */
-double getro(int d){
-	double ro;
+double getrho(int d){
+	double rho;
 
 	if(d > 1) {
-		ro = 1./(d*(d-1));
+		rho = 1. / (d * (d - 1));
 	}
 	else {
-		ro = 1./K;
+		rho = 1. / K;
 	}
-	return ro;
+	return rho;
 }
 
 /**
@@ -50,10 +50,10 @@ double gettau(double R, int d){
 	double tau;
 
 	if(d>=1 && d<K/R) {
-		tau = R/(d*K);
+		tau = R / (d * K);
 	}
 	else if(d == K/R) {
-		tau = R*log(R/delta)/K;
+		tau = R * log(R / delta) / K;
 	}
 	else {
 		tau = 0;
@@ -68,23 +68,23 @@ double gettau(double R, int d){
 * @return Robust Soliton probability for d
 */
 double getmu(double R, int d){
-	double ro;
+	double rho;
 	double tau;
 	double beta = 0;
 	double mu;
 
 	// compute ro
-	ro = getro(d);
+	rho = getrho(d);
 
 	// compute tau
 	tau = gettau(R, d);
 
 	// compute beta
 	for(int i=1; i<=K; i++) {
-		beta += getro(i) + gettau(R, i);
+		beta += getrho(i) + gettau(R, i);
 	}
 
 	// compute mu
-	mu = (ro+tau)/beta;
+	mu = (rho + tau) / beta;
 	return mu;
 }
