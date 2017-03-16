@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <math.h>
 
+/** \file */
+
 const int N = 2000; /** Number of nodes */
 const int K = 1000; /** Number of sensing nodes */
 const double deltad = 0.05; /** Violation probability */
