@@ -1,34 +1,80 @@
-#include <math.h>
 #ifndef _SOLITON_H_
 #define _SOLITON_H_
 
-/**
-* Constants for Robust Soliton Distribution
-*/
-const double c = 0.01;
-const double delta = 0.05;
+class IdealSoliton {
+	public:
+		/**
+			Ideal Soliton parameter: distribution is defined then in [0, K]
+		*/
+		int K;
 
-/**
-* Get Ideal Soliton distribution
-* @param d node degree
-* @return Robust Soliton probabilit
-*/
-double getrho(int K, int d);
+		/**
+		* Build Ideal Soliton generator object
+		* @param _K highest integer for which the distribution is defined
+		*/
+		IdealSoliton(int _K);
 
-/**
-* Tau weighting function for Robust Soliton
-* @param R Robust soliton parameter
-* @param d node degree
-* @return Robust Soliton probability for d
-*/
-double gettau(int K, double R, int d);
+		/**
+		* Default constructor, with K set to 1000
+		*/
+		IdealSoliton();
 
-/**
-* Compute Robust Soliton Distribution for a node-degree d
-* @param R Robust soliton parameter
-* @param d node degree
-* @return Robust Soliton probability for d
-*/
-double getmu(int K, double R, int d);
+		/**
+		* Compute probability distribution given parameters
+		* @param degree node degree
+		* @return probability of having given degree
+		*/
+		double get(int degree);
+};
+
+class RobustSoliton {
+	private:
+		/**
+		* Related Ideal Soliton distribution, employed in Robust Soliton computation
+		*/
+		IdealSoliton rho;
+
+		/**
+		* Normalization factor for Robust Soliton distribution
+		*/
+		double beta = 0;
+
+		/**
+		* Parameter precomputed and stored at creation given c, delta, K
+		*/
+		double R;
+
+		/**
+		* Compute function tau
+		* @param degree node degree
+		* @return tau function computed in given input integer
+		*/
+		double get_tau(int degree);
+
+	public:
+		/** Robust Soliton constant */
+		double c;
+
+		/** Robust Soliton maximal failure probability */
+		double delta;
+
+		/** Ideal Soliton parameter: distribution is defined then in [0, K] */
+		int K;
+
+		/**
+		* Build Robust Soliton generator object
+		* @param _c constant
+		* @param _delta maximal failure probability
+		* @param _K highest integer for which the distribution is defined
+		*/
+		RobustSoliton(double _c, double _delta, int _K);
+
+		/**
+		* Compute probability distribution given parameters
+		* @param degree node degree
+		* @return probability of having given degree
+		*/
+		double get(int degree);
+};
 
 #endif
