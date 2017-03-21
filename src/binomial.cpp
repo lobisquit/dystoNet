@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stdexcept>
 #include "binomial.h"
 
 double ln_gamma(double x) {
