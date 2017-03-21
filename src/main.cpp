@@ -1,5 +1,5 @@
 #include <iostream>
-#include "soliton.h"
+#include "EDFC.h"
 
 /** \file */
 
@@ -8,5 +8,9 @@
 */
 
 int main() {
-	std::cout << "Compile and run test files for library functionalities.";
+	int K = 1000;
+	double d = 10;
+	double xd = 1.9;
+	double prob = getViolationProb(d,xd,K);
+	std::cout << prob;
 }

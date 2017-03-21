@@ -4,7 +4,7 @@
 class IdealSoliton {
 	public:
 		/**
-			Ideal Soliton parameter: distribution is defined then in [0, K]
+		* Ideal Soliton parameter: distribution is defined then in [0, K]
 		*/
 		int K;
 
