@@ -59,7 +59,7 @@ double betai(double a, double b, double x);
 * Comulative distribution function for a binomial random variable, evaluated in integer \f$ k \f$.
 *
 * To perform the actual computation, the incomplete beta function is employed, given that, <br>
-* for \f$ X \sim Bin(n, p), ~ CDF_X(k) = P[X \ge k] = \sum_{j=k}^n p^j (1-p)^{n-j} = I_x(a, b) \f$
+* for \f$ X \sim Bin(n, p), ~ CDF_X(k) = P[X \ge k] = \sum_{j=k}^n {n \choose j} p^j (1-p)^{n-j} = I_x(a, b) \f$
 *
 * @param n total number of trials
 * @param k number of successful trials
