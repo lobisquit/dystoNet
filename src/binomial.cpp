@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include <math.h>
 #include <stdexcept>
 #include "binomial.h"
