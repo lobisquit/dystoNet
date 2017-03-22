@@ -1,6 +1,7 @@
 #include <math.h>
 #include "binomial.h"
 
+
 double getp(int d, double xd, int K){
 	return 1-exp(-xd*d/K);
 }
