@@ -5,7 +5,7 @@
 * Provides a set of function useful to implement Exact Decentralized Fountain Codes
 */
 
-#include <math.h>
+#include <cmath>
 
 #ifndef _EDFC_H_
 #define _EDFC_H_

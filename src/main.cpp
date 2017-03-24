@@ -21,9 +21,9 @@
 * Online repository for this code can be found at https://github.com/lobisquit/dystoNet
 */
 #include <iostream>
-#include <math.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
 #include "EDFC.h"
 #include "soliton.h"
 
