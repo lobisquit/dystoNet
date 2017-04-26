@@ -61,67 +61,91 @@ int main() {
 	std::cout << bestx << "\n";
 }
 
-double acceptanceProbability(int currentS, int newS, double temp){
-	if(newS < currentS){
+double acceptanceProbability(double F, double FNew, double T){
+	double delta = F - Fnew;
+	if(delta <= 0){
 		return 1.0;
 	}
-	return exp((currentS-newS)/temp);
+	return exp(-delta/T);
 }
 
-double getL(int K, int d, double x){
-	double lambda = 1;
-	double eta = 1;
+double objectiveFunction(int K, double[] x){
 	double c = 0.01;
 	double delta = 0.05;
-	double deltad = 0.05;
 
 	RobustSoliton mu = RobustSoliton(c, delta, K);
-	double first_term = 0;
-	for(int i = 1; i<=K; i++){
-		first_term += x*i*mu.get(i);
+	double objF = 0;
+	for(int d = 1; d <= K; d++){
+		objF += x[d] * d * mu.get(d);
 	}
-	double newL = first_term + eta*(1-x) + lambda*(deltad - getViolationProb(d,x,K));
-
-	return newL;
+	return objF;
 }
 
-double simulatedAnnealing(int K, int d){
-	double Tmax = 10000;
-	double Tmin = 0.01;
-	double coolingRate = 0.003;
-	/** -# Set the best solution for L to an high value. */
-	double bestL = 10000;
-	double bestx = 0;
-	double T;
-	double currentx = 0;
-	double currentL = 0;
-	srand (time(NULL));
-	for(int i = 0; i < 20; i++){
-		/** -# Set temperature T to an initial value \f$ T_{max} \f$ and pick randomly a value for \f$ x_d \f$ */
-		T = Tmax;
-		currentx = (rand() % 5000)/1000.0;
-		/** -# Compute the value of \f$ L(x_d,\eta,\lambda) \f$. */
-		currentL = getL(K, d, currentx);
-		while(T>Tmin){
-			/** -# Add to the current \f$ x_d \f$ a randomly (but little enough) number and compute \f$ L(x_d,\eta,\lambda) \f$ for the new \f$ x_d \f$.*/
-			double newx = currentx +(rand() % 10000)/10000.0;
-			double newL = getL(K, d, newx);
-			/** -# Decide if the new solution is valid through the function acceptanceProbability */
-			/** -# If new solution is accepted then update the current solution, otherwise discard the new solution */
-			if (acceptanceProbability(currentL, newL, T) > rand()){
-				currentL = newL;
-				currentx = newx;
-			}
-			/** -# Decrement T of a little value coolingRate. */
-			T *= 1 - coolingRate;
-			/** -# Repeat this process from 4) until T is close enough to 0 */
-		}
-		/** -# If the final \f$ L(x_d,\eta,\lambda) \f$ is better (less then) the best one, update the best solution */
-		if(currentL < bestL){
-			bestL = currentL;
-			bestx = currentx;
-		}
-		/** -# Repeat the process from 2) for a fixed number of iteration */
+double[] getInitialSolution();
+
+double[] getNeighbor(double[] xd, double T, int K) {
+	// check base case: worrysome infinite recursion
+	double newXd[K];
+
+	for(int d=0, d<K; d++){
+		newXd[K] = xd[K] + rand(-1, 1); // put real function, not pseudocode
 	}
+	if(respectConstraints(newXd)) {
+		return newXd;
+	}
+	// repeat search if constraints are not met
+	return respectConstraints(newXd);
+}
+
+boolean respectConstraints(double[] candidateXd, int K, int N, double deltad) {
+	double E = objectiveFunction(candidateXd);
+	for (int d=0; d++; d<K) {
+		// check xd >= 1
+		if(candidateXd[d] < 1) {
+			return false;
+		}
+		// check violation probability > delta
+		double p = 1 - (1 - candidateXd[d] * d / (N * E))^(N * E / K);
+		failureProb = 1 - binomial_CDF(K, d, p); // check d (start from 0)
+		if(failureProb>deltad) {
+			return false;
+		}
+	}
+	return true;
+}
+
+
+double simulatedAnnealing(int K, int N, int d){
+	srand (time(NULL));
+	int TI = 1500;
+	double xd[] = getInitialSolution();
+	double F = objectiveFunction(xd);
+	double T = TI;
+	int numIteration = 0;
+	int maxIteration = 100000;
+	double coolingRate = 0.99;
+	double bestx = 0;
+	double bestF = 10000000;
+	int TL;
+	double xdNew[K], FNew, deltaCost, q;
+	while(numIteration < maxIteration){
+		TL = (int) 750000/T;
+		for(int i = 0; i < TL; i++){
+			xdNew = getNeighbor(xd, T);
+			FNew = objectiveFunction(xDNew);
+
+			if(FNew < bestF){
+				bestx = xdNew;
+				bestF = FNew;
+			}
+
+			if (acceptanceProbability(F, FNew, T) >= (rand() % 1000)/1000.0){
+				xd = xdNew;
+			}
+			numIteration++;
+		}
+		T = coolingRate*T;
+	}
+
 	return bestx;
 }
