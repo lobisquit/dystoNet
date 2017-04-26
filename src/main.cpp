@@ -20,12 +20,13 @@
 /** \mainpage
 * Online repository for this code can be found at https://github.com/lobisquit/dystoNet
 */
+#include <random>
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
-#include "EDFC.h"
 #include "soliton.h"
+#include "binomial.h"
 
 /**
 * Probability to accept the new solution calculated in the last step of the Simulated Annealing.
@@ -34,42 +35,36 @@
 * otherwise accept the new solution w.p. \f$ e^{(S_{new} - S_{current})/T} \f$.
 * In this last case the \f$ S_{new} \f$ will be worse (greater then) or equal to \f$ S_{current} \f$
 */
-double acceptanceProbability(int currentS, int newS, double temp);
-/**
-* Lagrangian function just described.
-* We have used as parameters of the Lagrangian function \f$ \lambda = 1 \f$ and \f$ \delta_d = 0.05 \f$,
-* while, as parameters of the Robust Soliton Distribution \f$ c = 0.01 \f$ and \f$ \delta = 0.05 \f$.
-*
-* @param K number of sensing nodes
-* @param d degree chosen from Robust Soliton Distribution
-* @return L Lagrangian function computed for K and d given.
-*/
-double getL(int K, int d);
+double acceptanceProbability(double F, double FNew, double T);
+double objectiveFunction(int K, double* x);
+double* getInitialSolution(int K);
+double* getNeighbor(double* xd, int K, int N);
+bool respectConstraints(double* candidateXd, int K, int N);
 /**
 * Algorithm to approximate the global minimum of the function \f$ L(x_d,\eta,\lambda) \f$.
 * ### Step of the algorithm
 */
-double simulatedAnnealing(int K, int d);
+double simulatedAnnealing(int K, int N);
+
+std::random_device rd;  //Will be used to obtain a seed for the random number engine
+std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
 
 int main() {
 	int K = 1000;
-	double d = 10;
-	double xd = 1.9;
-	srand (time(NULL));
-	double violProb = getViolationProb(d,xd,K);
-	double bestx = simulatedAnnealing(K,d);
+	int N = 2000;
+	double bestx = simulatedAnnealing(K,N);
 	std::cout << bestx << "\n";
 }
 
 double acceptanceProbability(double F, double FNew, double T){
-	double delta = F - Fnew;
+	double delta = F - FNew;
 	if(delta <= 0){
 		return 1.0;
 	}
 	return exp(-delta/T);
 }
 
-double objectiveFunction(int K, double[] x){
+double objectiveFunction(int K, double* x){
 	double c = 0.01;
 	double delta = 0.05;
 
@@ -81,31 +76,41 @@ double objectiveFunction(int K, double[] x){
 	return objF;
 }
 
-double[] getInitialSolution();
-
-double[] getNeighbor(double[] xd, double T, int K) {
-	// check base case: worrysome infinite recursion
-	double newXd[K];
-
-	for(int d=0, d<K; d++){
-		newXd[K] = xd[K] + rand(-1, 1); // put real function, not pseudocode
+double* getInitialSolution(int K){
+	double x[K];
+	for(int d = 0; d < K; d++){
+		x[d] = 10;
 	}
-	if(respectConstraints(newXd)) {
-		return newXd;
-	}
-	// repeat search if constraints are not met
-	return respectConstraints(newXd);
+
+	return x;
 }
 
-boolean respectConstraints(double[] candidateXd, int K, int N, double deltad) {
-	double E = objectiveFunction(candidateXd);
+double* getNeighbor(double* xd, int K, int N) {
+	// check base case: worrysome infinite recursion
+	double newXd[K];
+	std::uniform_real_distribution<> increment(-1, 1);
+
+	for(int d=0; d<K; d++){
+		newXd[K] = xd[K] + increment(gen);
+	}
+
+	if(respectConstraints(newXd, K, N)) {
+		return newXd;
+	}
+	// repeat search if constraints are not mets
+	return getNeighbor(xd, K, N);
+}
+
+bool respectConstraints(double* candidateXd, int K, int N) {
+	double deltad = 0.05, failureProb;
+	double E = objectiveFunction(K, candidateXd);
 	for (int d=0; d++; d<K) {
 		// check xd >= 1
 		if(candidateXd[d] < 1) {
 			return false;
 		}
 		// check violation probability > delta
-		double p = 1 - (1 - candidateXd[d] * d / (N * E))^(N * E / K);
+		double p = 1 - pow((1 - candidateXd[d] * d / (N * E)),(N * E / K));
 		failureProb = 1 - binomial_CDF(K, d, p); // check d (start from 0)
 		if(failureProb>deltad) {
 			return false;
@@ -115,31 +120,31 @@ boolean respectConstraints(double[] candidateXd, int K, int N, double deltad) {
 }
 
 
-double simulatedAnnealing(int K, int N, int d){
-	srand (time(NULL));
+double simulatedAnnealing(int K, int N){
+  std::uniform_real_distribution<> randU(0, 1);
+
 	int TI = 1500;
-	double xd[] = getInitialSolution();
-	double F = objectiveFunction(xd);
+	double *xd = getInitialSolution(K);
+	double F = objectiveFunction(K, xd);
 	double T = TI;
 	int numIteration = 0;
 	int maxIteration = 100000;
 	double coolingRate = 0.99;
-	double bestx = 0;
 	double bestF = 10000000;
 	int TL;
-	double xdNew[K], FNew, deltaCost, q;
-	while(numIteration < maxIteration){
+	double *xdNew, *bestx, FNew, deltaCost, q;
+	while(numIteration <= maxIteration){
 		TL = (int) 750000/T;
 		for(int i = 0; i < TL; i++){
-			xdNew = getNeighbor(xd, T);
-			FNew = objectiveFunction(xDNew);
+			xdNew = getNeighbor(xd, K, N);
+			FNew = objectiveFunction(K, xdNew);
 
 			if(FNew < bestF){
 				bestx = xdNew;
 				bestF = FNew;
 			}
 
-			if (acceptanceProbability(F, FNew, T) >= (rand() % 1000)/1000.0){
+			if (randU(gen) < acceptanceProbability(F, FNew, T)){
 				xd = xdNew;
 			}
 			numIteration++;
@@ -147,5 +152,5 @@ double simulatedAnnealing(int K, int N, int d){
 		T = coolingRate*T;
 	}
 
-	return bestx;
+	return *bestx;
 }
