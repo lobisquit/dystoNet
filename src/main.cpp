@@ -121,7 +121,7 @@ bool respectConstraints(double* candidateXd, int K, int N) {
 
 
 double simulatedAnnealing(int K, int N){
-  std::uniform_real_distribution<> randU(0, 1);
+	std::uniform_real_distribution<> randU(0, 1);
 
 	int TI = 1500;
 	double *xd = getInitialSolution(K);
