@@ -24,9 +24,11 @@
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
+#include <string>
 #include <ctime>
 #include "soliton.h"
 #include "binomial.h"
+#include "heuristicSearch.h"
 
 /**
 * Probability to accept the new solution calculated in the last step of the Simulated Annealing.
@@ -35,122 +37,129 @@
 * otherwise accept the new solution w.p. \f$ e^{(S_{new} - S_{current})/T} \f$.
 * In this last case the \f$ S_{new} \f$ will be worse (greater then) or equal to \f$ S_{current} \f$
 */
-double acceptanceProbability(double F, double FNew, double T);
-double objectiveFunction(int K, double* x);
-double* getInitialSolution(int K);
-double* getNeighbor(double* xd, int K, int N);
-bool respectConstraints(double* candidateXd, int K, int N);
+// double acceptanceProbability(double F, double FNew, double T);
+// double objectiveFunction(int K, double* x);
+// double* getInitialSolution(int K);
+// double* getNeighbor(double* xd, int K, int N);
+// bool respectConstraints(double* candidateXd, int K, int N);
 /**
 * Algorithm to approximate the global minimum of the function \f$ L(x_d,\eta,\lambda) \f$.
 * ### Step of the algorithm
 */
-double simulatedAnnealing(int K, int N);
-
-std::random_device rd;  //Will be used to obtain a seed for the random number engine
-std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+// double simulatedAnnealing(int K, int N);
+//
+// std::random_device rd;  //Will be used to obtain a seed for the random number engine
+// std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
 
 int main() {
-	int K = 1000;
-	int N = 2000;
-	double bestx = simulatedAnnealing(K,N);
-	std::cout << bestx << "\n";
+	int K = 10;
+	RobustSoliton rs = RobustSoliton(0.01, 0.05, K);
+	SimulatedAnnealing SA = SimulatedAnnealing(
+								K,
+								100,
+								1500,
+								0.99,
+								1000,
+								&rs,
+								0.05);
+	std::cout << SA << "\n";
 }
-
-double acceptanceProbability(double F, double FNew, double T){
-	double delta = F - FNew;
-	if(delta <= 0){
-		return 1.0;
-	}
-	return exp(-delta/T);
-}
-
-double objectiveFunction(int K, double* x){
-	double c = 0.01;
-	double delta = 0.05;
-
-	RobustSoliton mu = RobustSoliton(c, delta, K);
-	double objF = 0;
-	for(int d = 1; d <= K; d++){
-		objF += x[d] * d * mu.get(d);
-	}
-	return objF;
-}
-
-double* getInitialSolution(int K){
-	double x[K];
-	for(int d = 0; d < K; d++){
-		x[d] = 10;
-	}
-
-	return x;
-}
-
-double* getNeighbor(double* xd, int K, int N) {
-	// check base case: worrysome infinite recursion
-	double newXd[K];
-	std::uniform_real_distribution<> increment(-1, 1);
-
-	for(int d=0; d<K; d++){
-		newXd[K] = xd[K] + increment(gen);
-	}
-
-	if(respectConstraints(newXd, K, N)) {
-		return newXd;
-	}
-	// repeat search if constraints are not mets
-	return getNeighbor(xd, K, N);
-}
-
-bool respectConstraints(double* candidateXd, int K, int N) {
-	double deltad = 0.05, failureProb;
-	double E = objectiveFunction(K, candidateXd);
-	for (int d=0; d++; d<K) {
-		// check xd >= 1
-		if(candidateXd[d] < 1) {
-			return false;
-		}
-		// check violation probability > delta
-		double p = 1 - pow((1 - candidateXd[d] * d / (N * E)),(N * E / K));
-		failureProb = 1 - binomial_CDF(K, d, p); // check d (start from 0)
-		if(failureProb>deltad) {
-			return false;
-		}
-	}
-	return true;
-}
-
-
-double simulatedAnnealing(int K, int N){
-	std::uniform_real_distribution<> randU(0, 1);
-
-	int TI = 1500;
-	double *xd = getInitialSolution(K);
-	double F = objectiveFunction(K, xd);
-	double T = TI;
-	int numIteration = 0;
-	int maxIteration = 100000;
-	double coolingRate = 0.99;
-	double bestF = 10000000;
-	int TL;
-	double *xdNew, *bestx, FNew, deltaCost, q;
-	while(numIteration <= maxIteration){
-		TL = (int) 750000/T;
-		for(int i = 0; i < TL; i++){
-			xdNew = getNeighbor(xd, K, N);
-			FNew = objectiveFunction(K, xdNew);
-
-			if(FNew < bestF){
-				bestx = xdNew;
-				bestF = FNew;
-			}
-
-			if (randU(gen) < acceptanceProbability(F, FNew, T)){
-				xd = xdNew;
-			}
-			numIteration++;
-		}
-		T = coolingRate*T;
-	}
-
-	return *bestx;
-}
+//
+// double acceptanceProbability(double F, double FNew, double T){
+// 	double delta = F - FNew;
+// 	if(delta <= 0){
+// 		return 1.0;
+// 	}
+// 	return exp(-delta/T);
+// }
+//
+// double objectiveFunction(int K, double* x){
+// 	double c = 0.01;
+// 	double delta = 0.05;
+//
+// 	RobustSoliton mu = RobustSoliton(c, delta, K);
+// 	double objF = 0;
+// 	for(int d = 1; d <= K; d++){
+// 		objF += x[d] * d * mu.get(d);
+// 	}
+// 	return objF;
+// }
+//
+// double* getInitialSolution(int K){
+// 	double x[K];
+// 	for(int d = 0; d < K; d++){
+// 		x[d] = 10;
+// 	}
+//
+// 	return x;
+// }
+//
+// double* getNeighbor(double* xd, int K, int N) {
+// 	// check base case: worrysome infinite recursion
+// 	double newXd[K];
+// 	std::uniform_real_distribution<> increment(-1, 1);
+//
+// 	for(int d=0; d<K; d++){
+// 		newXd[K] = xd[K] + increment(gen);
+// 	}
+//
+// 	if(respectConstraints(newXd, K, N)) {
+// 		return newXd;
+// 	}
+// 	// repeat search if constraints are not mets
+// 	return getNeighbor(xd, K, N);
+// }
+//
+// bool respectConstraints(double* candidateXd, int K, int N) {
+// 	double deltad = 0.05, failureProb;
+// 	double E = objectiveFunction(K, candidateXd);
+// 	for (int d=0; d++; d<K) {
+// 		// check xd >= 1
+// 		if(candidateXd[d] < 1) {
+// 			return false;
+// 		}
+// 		// check violation probability > delta
+// 		double p = 1 - pow((1 - candidateXd[d] * d / (N * E)),(N * E / K));
+// 		failureProb = 1 - binomial_CDF(K, d, p); // check d (start from 0)
+// 		if(failureProb>deltad) {
+// 			return false;
+// 		}
+// 	}
+// 	return true;
+// }
+//
+//
+// double simulatedAnnealing(int K, int N){
+// 	std::uniform_real_distribution<> randU(0, 1);
+//
+// 	int TI = 1500;
+// 	double *xd = getInitialSolution(K);
+// 	double F = objectiveFunction(K, xd);
+// 	double T = TI;
+// 	int numIteration = 0;
+// 	int maxIteration = 100000;
+// 	double coolingRate = 0.99;
+// 	double bestF = 10000000;
+// 	int TL;
+// 	double *xdNew, *bestx, FNew, deltaCost, q;
+// 	while(numIteration <= maxIteration){
+// 		TL = (int) 750000/T;
+// 		for(int i = 0; i < TL; i++){
+// 			xdNew = getNeighbor(xd, K, N);
+// 			FNew = objectiveFunction(K, xdNew);
+//
+// 			if(FNew < bestF){
+// 				bestx = xdNew;
+// 				bestF = FNew;
+// 			}
+//
+// 			if (randU(gen) < acceptanceProbability(F, FNew, T)){
+// 				xd = xdNew;
+// 			}
+// 			numIteration++;
+// 		}
+// 		T = coolingRate*T;
+// 	}
+//
+// 	return *bestx;
+// }
