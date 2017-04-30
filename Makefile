@@ -1,7 +1,6 @@
 PROGRAM=src/program.out
 TEST-PROGRAM=test/program.out
 
-# @ before commands prevents print of commands to console
 all: build run clean
 
 build:
@@ -15,5 +14,5 @@ clean:
 	@ rm -f $(TEST-PROGRAM)
 
 tests:
-	@ g++ test/*.cpp -o $(TEST-PROGRAM)
+	@ g++ -std=c++0x test/*.cpp -o $(TEST-PROGRAM)
 	@ $(TEST-PROGRAM)

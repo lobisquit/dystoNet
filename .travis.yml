@@ -5,12 +5,8 @@ language: cpp
 
 # Compiler selection
 compiler:
-  - gcc-6
+  - gcc
 
 # Build steps
 script:
   - make tests
-
-# travis specific parameters
-before_install:
-  - sudo apt-get install -qq -y g++-6
