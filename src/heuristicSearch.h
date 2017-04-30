@@ -67,6 +67,9 @@ class HeuristicSearch {
 
 class SimulatedAnnealing : public HeuristicSearch {
 	public:
+		/** random numbers generator */
+		std::mt19937 my_rng;
+
 		/** problem specific parameters */
 		int K;
 		int N;

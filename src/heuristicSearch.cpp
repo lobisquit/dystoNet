@@ -27,6 +27,9 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 	max_iterations = _max_iterations;
 	robust_soliton = _robust_soliton;
 	max_failure_probability = _max_failure_probability;
+
+	// random seed is set to a default value, for reproducibility
+	my_rng.seed(1);
 }
 
 double SimulatedAnnealing::objective_function(double* x) {
@@ -78,9 +81,9 @@ void SimulatedAnnealing::get_neighbour(double* x, double* new_x) {
 	*  Find new point candidate modifying previous solution with random
 	* quantities, performing the so called _perturbation_.
 	*/
+	std::uniform_real_distribution<double> perturbation(-1, 1);
 	for(int d=0; d<K; d++){
-		new_x[d] = x[d] - 0.1;
-		// std::cout << new_x[d] << "\n";
+		new_x[d] = x[d] - perturbation(my_rng);
 	}
 
 	/** Return candidate if it is a valid solution,
