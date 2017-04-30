@@ -30,6 +30,7 @@ RobustSoliton::RobustSoliton(double _c, double _delta, int _K) {
 
 	// compute relevant quantities, beta and R) and store them
 	R = c * log(K / delta) * sqrt(K);
+	beta = 0;
 	for(int d=1; d<=K; d++) {
 		beta += rho.get(d) + get_tau(d);
 	}

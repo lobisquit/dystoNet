@@ -39,7 +39,7 @@ class RobustSoliton {
 		/**
 		* Normalization factor for Robust Soliton distribution
 		*/
-		double beta = 0;
+		double beta;
 
 		/**
 		* Parameter precomputed and stored at creation given c, delta, K
