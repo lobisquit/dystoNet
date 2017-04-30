@@ -3,6 +3,7 @@
 * Author: Davide Peron, Enrico Lovisotto
 */
 #include <limits>
+#include <iostream>
 #include <stdexcept>
 #include <math.h>
 #include <random>
@@ -78,13 +79,15 @@ void SimulatedAnnealing::get_neighbour(double* x, double* new_x) {
 	* quantities, performing the so called _perturbation_.
 	*/
 	for(int d=0; d<K; d++){
-		new_x[K] = x[K] + 0.1;
+		new_x[d] = x[d] - 0.1;
+		// std::cout << new_x[d] << "\n";
 	}
 
-	/** Return candidate if it is a valid solution, */
-	if( respect_constraints(new_x) ) {}
-	/** else perturb previous point again */
-	get_neighbour(x, new_x);
+	/** Return candidate if it is a valid solution,
+		else perturb previous point again */
+	if( !respect_constraints(new_x) ) {
+		get_neighbour(x, new_x);
+	}
 }
 
 double SimulatedAnnealing::acceptance_probability(double* old_x, double* new_x) {
