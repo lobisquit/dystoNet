@@ -71,6 +71,7 @@ class RobustSoliton {
 				"c="		<< obj.c		<< ", " <<
 				"delta="	<< obj.delta	<< ", " <<
 				"K="		<< obj.K 		<< ")>";
+			return strm;
 		}
 
 		/**
