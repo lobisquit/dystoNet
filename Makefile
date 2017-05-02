@@ -1,7 +1,7 @@
 PROGRAM=src/program.out
 TEST-PROGRAM=test/program.out
 
-all: build run clean
+all: build run
 
 build:
 	@ g++ -Wall src/*.cpp -o $(PROGRAM)

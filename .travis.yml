@@ -1,5 +1,3 @@
-sudo: required
-
 # Enable C++ support
 language: cpp
 
