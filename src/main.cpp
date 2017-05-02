@@ -29,6 +29,7 @@
 #include "soliton.h"
 #include "binomial.h"
 #include "heuristicSearch.h"
+#include "firstProblem.h"
 
 /**
 * Probability to accept the new solution calculated in the last step of the Simulated Annealing.
@@ -51,19 +52,39 @@
 // std::random_device rd;  //Will be used to obtain a seed for the random number engine
 // std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
 
+void print_array(double* x, int K) {
+	std::cout << "x = [";
+	for(int i=0; i<K-1; i++) {
+		std::cout << x[i] << ", ";
+	}
+	std::cout << x[K-1] << "]\n";
+}
+
 int main() {
 	int K = 10;
+	int N = 1000000000;
 	RobustSoliton rs = RobustSoliton(0.01, 0.05, K);
-	SimulatedAnnealing SA = SimulatedAnnealing(
+	TheoreticBound TB = TheoreticBound(
 								K,
-								100,
-								1500,
-								0.99,
-								1000,
+								N,
 								&rs,
 								0.05);
-	std::cout << SA << "\n";
+	std::cout << TB << "\n";
+	double x[K];
+	TB.run_search(x);
+	print_array(x, K);
+	std::cout << (TB.respect_constraints(x) ? "true" : "false") << "\n";
+	//
+	// std::cout << "f(x) = " << SA.objective_function(x) << "\n";
+	// std::cout << (SA.respect_constraints(x) ? "x is valid" : "x is not valid") << "\n";
+	//
+	// double new_x[K];
+	// SA.get_neighbour(x, new_x);
+	// print_array(new_x, K);
+	// std::cout << "f(new_x) = " << SA.objective_function(new_x) << "\n";
+	// std::cout << (SA.respect_constraints(x) ? "new_x is valid" : "new_x is not valid") << "\n";
 }
+
 //
 // double acceptanceProbability(double F, double FNew, double T){
 // 	double delta = F - FNew;

@@ -1,38 +1,27 @@
-/*!
-* \file
-* Author: Davide Peron, Enrico Lovisotto
-*/
+#include <iostream>
+#include <sstream>
+#include <cmath>
 #include <limits>
 #include <iostream>
 #include <stdexcept>
-#include <math.h>
 #include <random>
 #include <string>
 
-#include "binomial.h"
 #include "soliton.h"
-#include "heuristicSearch.h"
+#include "binomial.h"
+#include "firstProblem.h"
 
-SimulatedAnnealing::SimulatedAnnealing(	int _K,
-										int _N,
-										double _starting_temperature,
-										double _cooling_rate,
-										int _max_iterations,
-										RobustSoliton* _robust_soliton,
-										double _max_failure_probability) {
+TheoreticBound::TheoreticBound(	int _K,
+								int _N,
+								RobustSoliton* _robust_soliton,
+								double _max_failure_probability) {
 	K = _K;
 	N = _N;
-	temperature = _starting_temperature;
-	cooling_rate = _cooling_rate;
-	max_iterations = _max_iterations;
 	robust_soliton = _robust_soliton;
 	max_failure_probability = _max_failure_probability;
-
-	// random seed is set to a default value, for reproducibility
-	my_rng.seed(1);
 }
 
-double SimulatedAnnealing::objective_function(double* x) {
+double TheoreticBound::objective_function(double* x) {
 	double obj = 0;
 	for(int d = 1; d <= K; d++){
 		obj += x[d - 1] * d * robust_soliton->get(d);
@@ -40,38 +29,87 @@ double SimulatedAnnealing::objective_function(double* x) {
 	return obj;
 }
 
-void SimulatedAnnealing::get_initial_solution(double* x) {
-	for (int d=0; d<K; d++) {
-		x[d] = 10; // just an example
-	}
-	if (!respect_constraints(x)) {
-		throw std::runtime_error("Invalid initial solution for simulated annealing");
-	}
+void TheoreticBound::get_initial_solution(double* x) {
+	throw std::logic_error("Not implemented for this class");
 }
 
-bool SimulatedAnnealing::respect_constraints(double* candidate_x) {
+bool TheoreticBound::respect_constraints(double* candidate_x) {
 	/**
 	* ------------------------
 	* ### Algorithm
 	* for each componenets of candidate solution x
 	*/
 	double E = objective_function(candidate_x);
-	for (int d=0; d++; d<K) {
+	for (int d = 1; d <= K; d++) {
 		/** - check if $ x_d \ge 1 $ */
-		if(candidate_x[d] < 1) {
+		if(candidate_x[d - 1] < 1) {
 			return false;
 		}
 		/**
 		* - check that EDFC failure probability is below pre-set threshold
 		* (see equations 8 and 10 in Lin's paper)
 		*/
-		double p = 1 - pow((1 - candidate_x[d] * d / (N * E)),(N * E / K));
+		double p = 1 - pow((1 - candidate_x[d - 1] * d / (N * E)), (N * E / K));
 		double failure_probability = 1 - binomial_CDF(K, d, p);
 		if(failure_probability > max_failure_probability) {
+			// std::ostringstream stream;
+			// stream << "failure " << failure_probability << ", max_failure "
+			// 	<< max_failure_probability << " for x[" << d << "] = " << candidate_x[d-1];
+			// throw std::logic_error(stream.str());
 			return false;
 		}
 	}
 	return true;
+}
+
+void TheoreticBound::get_neighbour(double* x, double* new_x) {
+	throw std::logic_error("Not implemented for this class");
+}
+
+double TheoreticBound::acceptance_probability(double* old_x, double* new_x) {
+	throw std::logic_error("Not implemented for this class");
+}
+
+void TheoreticBound::run_search(double* x) {
+	double candidate;
+	for(int d = 1; d <= K; d++) {
+		// set value only if it is not less than 1
+		candidate = - log(max_failure_probability) / (double) d - log(d / (double) K);
+		// dirty trick to make it work: multiply by 10
+		x[d - 1] = 10 * ((candidate < 1) ? 1 : candidate);
+	}
+
+	// check obtained bound is valid (you never know...)
+	if(!respect_constraints(x)) {
+		// throw std::logic_error("Theoretic bound is not a valid solution");
+	}
+}
+
+SimulatedAnnealing::SimulatedAnnealing(	int _K,
+										int _N,
+										RobustSoliton* _robust_soliton,
+										double _max_failure_probability,
+										double _starting_temperature,
+										double _cooling_rate,
+										int _max_iterations)
+
+										: TheoreticBound::TheoreticBound(
+											_K,
+											_N,
+											_robust_soliton,
+											_max_failure_probability) {
+	temperature = _starting_temperature;
+	cooling_rate = _cooling_rate;
+	max_iterations = _max_iterations;
+
+	// random seed is set to a default value, for reproducibility
+	my_rng.seed(1);
+}
+
+void SimulatedAnnealing::get_initial_solution(double* x) {
+	// employ theoretic bound to get a suitable starting point
+	// x value has already been proven valid in superclass
+	TheoreticBound::run_search(x);
 }
 
 void SimulatedAnnealing::get_neighbour(double* x, double* new_x) {
@@ -124,11 +162,11 @@ void SimulatedAnnealing::run_search(double* x) {
 	int current_iteration = 0;
 
 	// save best current result in this variable
-	double* best_x[K];
+	double* best_x = (double*) malloc(K * sizeof(double));
 	double best_score = std::numeric_limits<double>::infinity();
 
 	// current candidates
-	double* new_x;
+	double* new_x = (double*) malloc(K * sizeof(double));
 	double new_score;
 
 	while(current_iteration <= max_iterations){
@@ -147,11 +185,12 @@ void SimulatedAnnealing::run_search(double* x) {
 				new_score = objective_function(new_x);
 				if (new_score > best_score) {
 					best_score = new_score;
-					*best_x = x;
 				}
 			}
 		}
 		// update temperature
 		temperature = new_temperature();
 	}
+	// save to variable x best result found up to now
+	x = best_x;
 }
