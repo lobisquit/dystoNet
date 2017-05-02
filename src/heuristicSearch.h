@@ -24,7 +24,7 @@ class HeuristicSearch {
 		* @param x coordinate in solution space
 		* @returns objective function computed in x
 		*/
-		double objective_function(double* x);
+		double objective_function(double x[]);
 
 		/**
 		* Retrieve an initial suitable starting point for heuristic search

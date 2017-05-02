@@ -23,9 +23,9 @@ class TheoreticBound : public HeuristicSearch {
 		RobustSoliton* robust_soliton;
 
 		TheoreticBound(	int _K,
-							int _N,
-							RobustSoliton* _robust_soliton,
-							double _max_failure_probability);
+						int _N,
+						RobustSoliton* _robust_soliton,
+						double _max_failure_probability);
 
 		/**
 		* Custom overload of << operator, to print debug info
@@ -40,17 +40,17 @@ class TheoreticBound : public HeuristicSearch {
 			return strm;
 		}
 
-		double objective_function(double* x);
+		double objective_function(double x[]);
 
-		void get_initial_solution(double* x);
+		void get_initial_solution(double x[]);
 
-		bool respect_constraints(double* candidate_x);
+		bool respect_constraints(double candidate_x[]);
 
-		void get_neighbour(double* x, double* new_x);
+		void get_neighbour(double x[], double new_x[]);
 
-		double acceptance_probability(double* old_x, double* new_x);
+		double acceptance_probability(double old_x[], double new_x[]);
 
-		void run_search(double* best_x);
+		void run_search(double best_x[]);
 };
 
 
@@ -88,17 +88,18 @@ class SimulatedAnnealing : public TheoreticBound {
 							double _cooling_rate,
 							int _max_iterations);
 
+		// function taken as they are from upper class
 		using TheoreticBound::objective_function;
-
-		void get_initial_solution(double* x);
 
 		using TheoreticBound::respect_constraints;
 
-		void get_neighbour(double* x, double* new_x);
+		void get_initial_solution(double x[]);
 
-		double acceptance_probability(double* old_x, double* new_x);
+		void get_neighbour(double x[], double new_x[]);
 
-		void run_search(double* x);
+		double acceptance_probability(double old_x[], double new_x[]);
+
+		void run_search(double x[]);
 
 		/**
 		* Compute temperature for next round of search
@@ -108,9 +109,11 @@ class SimulatedAnnealing : public TheoreticBound {
 
 		/**
 		* Search steps to perform for current temperature value
-		* @return temperature value
+		* @return real number whose floor is the number of steps
 		*/
 		double temperature_steps();
 };
+
+void print_array(double x[], int K);
 
 #endif

@@ -52,17 +52,17 @@
 // std::random_device rd;  //Will be used to obtain a seed for the random number engine
 // std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
 
-void print_array(double* x, int K) {
-	std::cout << "x = [";
-	for(int i=0; i<K-1; i++) {
-		std::cout << x[i] << ", ";
-	}
-	std::cout << x[K-1] << "]\n";
-}
+// void print_array(double* x, int K) {
+// 	std::cout << "x = [";
+// 	for(int i=0; i<K-1; i++) {
+// 		std::cout << x[i] << ", ";
+// 	}
+// 	std::cout << x[K-1] << "]\n";
+// }
 
 int main() {
 	int K = 10;
-	int N = 1000000000;
+	int N = 3000;
 	RobustSoliton rs = RobustSoliton(0.01, 0.05, K);
 	TheoreticBound TB = TheoreticBound(
 								K,
@@ -71,18 +71,28 @@ int main() {
 								0.05);
 	std::cout << TB << "\n";
 	double x[K];
-	TB.run_search(x);
-	print_array(x, K);
-	std::cout << (TB.respect_constraints(x) ? "true" : "false") << "\n";
-	//
-	// std::cout << "f(x) = " << SA.objective_function(x) << "\n";
-	// std::cout << (SA.respect_constraints(x) ? "x is valid" : "x is not valid") << "\n";
-	//
+	// TB.run_search(x);
+	// print_array(x, K);
+
+	SimulatedAnnealing SA = SimulatedAnnealing(
+				/* K 						*/ K,
+				/* N 						*/ N,
+				/* robust_soliton 			*/ &rs,
+				/* max_failure_probability 	*/ 0.05,
+				/* starting_temperature 	*/ 50.0,
+				/* cooling_rate 			*/ 0.99,
+				/* max_iterations 			*/ 100000);
+
 	// double new_x[K];
-	// SA.get_neighbour(x, new_x);
-	// print_array(new_x, K);
-	// std::cout << "f(new_x) = " << SA.objective_function(new_x) << "\n";
-	// std::cout << (SA.respect_constraints(x) ? "new_x is valid" : "new_x is not valid") << "\n";
+
+
+	SA.run_search(x);
+	std::cout << "Arriving to   score " << SA.objective_function(x) << " with point ";
+	print_array(x, K);
+
+	SA.get_initial_solution(x);
+	std::cout << "Starting from score " << SA.objective_function(x) << " with point ";
+	print_array(x, K);
 }
 
 //
