@@ -16,3 +16,6 @@ clean:
 tests:
 	@ g++ -Wall -std=c++0x test/*.cpp -o $(TEST-PROGRAM)
 	@ $(TEST-PROGRAM)
+
+docs:
+	doxygen doc/Doxyfile

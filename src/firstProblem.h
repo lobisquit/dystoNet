@@ -57,7 +57,7 @@ class TheoreticBound : public HeuristicSearch {
 class SimulatedAnnealing : public TheoreticBound {
 	public:
 		/** random numbers generator */
-		std::mt19937 my_rng;
+		std::mt19937 rng;
 
 		/** specific parameters */
 		double temperature;
@@ -113,7 +113,5 @@ class SimulatedAnnealing : public TheoreticBound {
 		*/
 		double temperature_steps();
 };
-
-void print_array(double x[], int K);
 
 #endif

@@ -1,11 +1,8 @@
-#include <iostream>
 #include <sstream>
 #include <cmath>
 #include <limits>
-#include <iostream>
 #include <stdexcept>
 #include <random>
-#include <string>
 
 #include "soliton.h"
 #include "binomial.h"
@@ -37,11 +34,11 @@ bool TheoreticBound::respect_constraints(double* candidate_x) {
 	/**
 	* ------------------------
 	* ### Algorithm
-	* for each componenets of candidate solution x
+	* for each componenets of candidate solution \f$ \vec{x} \f$,
 	*/
 	double E = objective_function(candidate_x);
 	for (int d = 1; d <= K; d++) {
-		/** - check if $ x_d \ge 1 $ */
+		/** - check if \f$ x_d \ge 1 \f$ */
 		if(candidate_x[d - 1] < 1) {
 			return false;
 		}
@@ -52,10 +49,6 @@ bool TheoreticBound::respect_constraints(double* candidate_x) {
 		double p = 1 - pow((1 - candidate_x[d - 1] * d / (N * E)), (N * E / K));
 		double failure_probability = 1 - binomial_CDF(K, d, p);
 		if(failure_probability > max_failure_probability) {
-			// std::ostringstream stream;
-			// stream << "failure " << failure_probability << ", max_failure "
-			// 	<< max_failure_probability << " for x[" << d << "] = " << candidate_x[d-1];
-			// throw std::logic_error(stream.str());
 			return false;
 		}
 	}
@@ -104,7 +97,7 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 	max_iterations = _max_iterations;
 
 	// random seed is set to a default value, for reproducibility
-	my_rng.seed(1);
+	rng.seed(1);
 }
 
 void SimulatedAnnealing::get_initial_solution(double x[]) {
@@ -114,37 +107,27 @@ void SimulatedAnnealing::get_initial_solution(double x[]) {
 }
 
 void SimulatedAnnealing::get_neighbour(double x[], double new_x[]) {
-	/**
-	* ------------------------
-	* ### Algorithm
-	*  Find new point candidate modifying previous solution with random
-	* quantities, performing the so called _perturbation_.
-	*/
-	// copy x
+	// copy x to new array before perturbation
 	for(int d=0; d<K; d++) {
 		new_x[d] = x[d];
 	}
 
+	/**
+	* ------------------------
+	* ### Algorithm
+	* Find new point candidate modifying previous solution.
+	* component \f$ d \sim \mathcal{U}[1, K] \f$ of \f$ \vec{x} \f$ is perturbed
+	* summing it a quantity \f$ \xi \sim \mathcal{U}[-1, 1] \f$
+	*/
 	std::uniform_real_distribution<double> perturbation(-1, 1);
-	//ALT for(int d=0; d<K; d++) {
-	//ALT 	new_x[d] = x[d] + perturbation(my_rng);
-	//ALT }
-	std::uniform_int_distribution<int> index_choice(0, K - 1);
+	std::uniform_int_distribution<int> index_choice(0, K-1);
 
-	int chosen_d = index_choice(my_rng);
-	//DEBUG std::cout << "d = " << chosen_d << "\n";
-	double asd = perturbation(my_rng);
+	int chosen_d = index_choice(rng);
+	new_x[chosen_d] = x[chosen_d] + perturbation(rng);
 
-	//DEBUG std::cout << "Before " << (new_x[chosen_d] - x[chosen_d]) << "\n";
-	new_x[chosen_d] = x[chosen_d] + asd;
-
-	//DEBUG std::cout << "After " << (new_x[chosen_d] - x[chosen_d]) << "\n";
-	//DEBUG std::cout << "Variation of " << asd << "\n";
-
-	/** Return candidate if it is a valid solution,
-		else perturb previous point again */
+	/** Stop if perturbation jumps inside valid solutions space,
+		otherwise perturb \f$ \vec{x} \f$ again */
 	if( !respect_constraints(new_x) ) {
-		//DEBUG std::cout << "Failed neighbour, trying again\n";
 		get_neighbour(x, new_x);
 	}
 }
@@ -154,16 +137,14 @@ double SimulatedAnnealing::acceptance_probability(double x[], double new_x[]) {
 	/**
 	* ---------------
 	* ### Algorithm
-	* - accept better solutions w.p. 1
+	* - accept better solutions with probability 1
 	*/
 	if(delta <= 0){
 		return 1.0;
-		//DEBUG std::cout << "\n";
 	}
 	/**
-	* - accept worse solutions w.p. $e^{- \frac{\Delta}{T} }$
+	* - accept worse solutions with probability \f$ e^{- \frac{\Delta}{T} } \f$
 	*/
-	//DEBUG std::cout << "proposing suboptimal with probability " << exp(-delta / temperature) << "\n";
 	return exp(-delta / temperature);
 }
 
@@ -174,20 +155,6 @@ double SimulatedAnnealing::new_temperature() {
 
 double SimulatedAnnealing::temperature_steps() {
 	return 750000.0/temperature;
-}
-
-void copy_to(double new_location[], double array[], int len) {
-	for(int i=0; i<len; i++) {
-		new_location[i] = array[i];
-	}
-}
-
-void print_array(double x[], int K) {
-	std::cout << "[";
-	for(int i=0; i<K-1; i++) {
-		std::cout << x[i] << ", ";
-	}
-	std::cout << x[K-1] << "]\n";
 }
 
 void SimulatedAnnealing::run_search(double x[]) {
@@ -210,22 +177,13 @@ void SimulatedAnnealing::run_search(double x[]) {
 		for(int i = 0; i < temperature_steps(); i++) {
 			// better organization of cycles needed
 			current_iteration++;
-			std::cout << "Iteration " << current_iteration << "\n";
-
-			// if (current_iteration > max_iterations) break;
-			//DEBUG std::cout << "iteration " << current_iteration << ": ";
 
 			// search new candidate, save it to new_x
-
 			get_neighbour(x, new_x);
-			//DEBUG print_array(new_x, K);
-			//HERE new_x is overwritten
 
 			// accept or reject according to acceptance probability
 			if( acceptance_probability(x, new_x) > 0.9999 ) {
-				//DEBUG std::cout << "new point accepted at " << current_iteration << "\n";
-
-				//HERE x and new_x are swapped
+				// subistitute x with new value
 				tmp = x;
 				x = new_x;
 				new_x = tmp;
@@ -234,16 +192,16 @@ void SimulatedAnnealing::run_search(double x[]) {
 				new_score = objective_function(new_x);
 				if (new_score < best_score) {
 					best_score = new_score;
-					std::cout << "New best score is " << best_score << "\n";
 					// save current x to best_x location
-					copy_to(best_x, x, K);
-					// print_array(best_x, K);
+					for(int i=0; i<K; i++) {
+						best_x[i] = x[i];
+					}
 				}
 			}
 		}
 		// update temperature
 		temperature = new_temperature();
 	}
-	// save to variable x best result found up to now
+	// save to variable x the best result found up to now
 	x = best_x;
 }
