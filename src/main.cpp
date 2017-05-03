@@ -61,7 +61,7 @@ void print_array(double* x, int K) {
 }
 
 int main() {
-	int K = 10;
+	int K = 1000;
 	int N = 3000;
 	RobustSoliton rs = RobustSoliton(0.01, 0.05, K);
 	TheoreticBound TB = TheoreticBound(
@@ -69,7 +69,7 @@ int main() {
 								N,
 								&rs,
 								0.05);
-	std::cout << TB << "\n";
+	// std::cout << TB << "\n";
 	double x[K];
 	// TB.run_search(x);
 	// print_array(x, K);
@@ -81,11 +81,13 @@ int main() {
 				/* max_failure_probability 	*/ 0.05,
 				/* starting_temperature 	*/ 50.0,
 				/* cooling_rate 			*/ 0.99,
-				/* max_iterations 			*/ 100000);
+				/* max_iterations 			*/ 100000,
+				/* acceptance_threshold		*/ 0.9999,
+				/* steps_coefficient 		*/ 5e5);
 
 	// double new_x[K];
 
-
+	std::cout << SA << "\n";
 	SA.run_search(x);
 	std::cout << "Arriving to   score " << SA.objective_function(x) << " with point ";
 	print_array(x, K);

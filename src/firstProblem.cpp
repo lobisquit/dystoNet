@@ -1,4 +1,5 @@
 #include <sstream>
+#include <iostream>
 #include <cmath>
 #include <limits>
 #include <stdexcept>
@@ -84,7 +85,9 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 										double _max_failure_probability,
 										double _starting_temperature,
 										double _cooling_rate,
-										int _max_iterations)
+										int _max_iterations,
+										double _acceptance_threshold,
+										double _steps_coefficient)
 										// constructor of upper class to trigger
 										: TheoreticBound::TheoreticBound(
 											_K,
@@ -95,6 +98,8 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 	temperature = _starting_temperature;
 	cooling_rate = _cooling_rate;
 	max_iterations = _max_iterations;
+	acceptance_threshold = _acceptance_threshold;
+	steps_coefficient = _steps_coefficient; 
 
 	// random seed is set to a default value, for reproducibility
 	rng.seed(1);
@@ -154,7 +159,7 @@ double SimulatedAnnealing::new_temperature() {
 }
 
 double SimulatedAnnealing::temperature_steps() {
-	return 750000.0/temperature;
+	return steps_coefficient / temperature;
 }
 
 void SimulatedAnnealing::run_search(double x[]) {
@@ -177,12 +182,13 @@ void SimulatedAnnealing::run_search(double x[]) {
 		for(int i = 0; i < temperature_steps(); i++) {
 			// better organization of cycles needed
 			current_iteration++;
+			std::cout << current_iteration << "\r";
 
 			// search new candidate, save it to new_x
 			get_neighbour(x, new_x);
 
 			// accept or reject according to acceptance probability
-			if( acceptance_probability(x, new_x) > 0.9999 ) {
+			if( acceptance_probability(x, new_x) > acceptance_threshold ) {
 				// subistitute x with new value
 				tmp = x;
 				x = new_x;

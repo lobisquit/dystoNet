@@ -4,7 +4,7 @@ TEST-PROGRAM=test/program.out
 all: build run
 
 build:
-	@ g++ -Wall src/*.cpp -o $(PROGRAM)
+	@ g++ -Wall -std=c++0x src/*.cpp -o $(PROGRAM)
 
 run:
 	@ $(PROGRAM)
