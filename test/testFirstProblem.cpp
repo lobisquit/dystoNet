@@ -51,7 +51,7 @@ TEST_CASE( "Test simulated annealing", "[SimulatedAnnealing]" ) {
 		SA.get_initial_solution(x);
 
 		double new_x[K];
-		// get_neighbour throws std::logic_error if x is not valid
+		// get_neighbour triggers a segmentation fault if no neighbour can be found
 		REQUIRE_NOTHROW( SA.get_neighbour(x, new_x) );
 	}
 
@@ -69,7 +69,7 @@ TEST_CASE( "Test simulated annealing", "[SimulatedAnnealing]" ) {
 
 	SECTION( "Solution obtained with the bound is a valid one" ) {
 		double x[K];
-		// run_search throws std::logic_error if x is not valid after research
+		// run_search throws std::logic_error if bound is not a valid point
 		REQUIRE_NOTHROW( SA.run_search(x) );
 	}
 }
