@@ -99,7 +99,7 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 	cooling_rate = _cooling_rate;
 	max_iterations = _max_iterations;
 	acceptance_threshold = _acceptance_threshold;
-	steps_coefficient = _steps_coefficient; 
+	steps_coefficient = _steps_coefficient;
 
 	// random seed is set to a default value, for reproducibility
 	rng.seed(1);
@@ -124,7 +124,7 @@ void SimulatedAnnealing::get_neighbour(double x[], double new_x[]) {
 	* component \f$ d \sim \mathcal{U}[1, K] \f$ of \f$ \vec{x} \f$ is perturbed
 	* summing it a quantity \f$ \xi \sim \mathcal{U}[-1, 1] \f$
 	*/
-	std::uniform_real_distribution<double> perturbation(-1, 1);
+	std::uniform_real_distribution<double> perturbation(-temperature, temperature);
 	std::uniform_int_distribution<int> index_choice(0, K-1);
 
 	int chosen_d = index_choice(rng);
@@ -174,15 +174,18 @@ void SimulatedAnnealing::run_search(double x[]) {
 	// current candidates
 	double* tmp = (double*) malloc(K * sizeof(double));
 
+	// double new_x[K];
 	double* new_x = (double*) malloc(K * sizeof(double));
 	double new_score;
 
 	while(current_iteration <= max_iterations) {
+		int steps = (int) floor(temperature_steps());
+
 		// round of search for current temperature
-		for(int i = 0; i < temperature_steps(); i++) {
+		for(int i = 0; i < steps; i++) {
 			// better organization of cycles needed
 			current_iteration++;
-			std::cout << current_iteration << "\r";
+			std::cout << current_iteration << "/" << steps << "\r";
 
 			// search new candidate, save it to new_x
 			get_neighbour(x, new_x);
@@ -195,7 +198,7 @@ void SimulatedAnnealing::run_search(double x[]) {
 				new_x = tmp;
 
 				// update best result (up to now) if needed
-				new_score = objective_function(new_x);
+				new_score = objective_function(x);
 				if (new_score < best_score) {
 					best_score = new_score;
 					// save current x to best_x location
