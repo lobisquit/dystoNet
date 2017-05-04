@@ -37,7 +37,6 @@ TEST_CASE( "Test simulated annealing", "[SimulatedAnnealing]" ) {
 				/* starting_temperature 	*/ 1500.0,
 				/* cooling_rate 			*/ 0.99,
 				/* max_iterations 			*/ 5,
-				/* acceptance_threshold		*/ 0.9999,
 				/* steps_coefficient 		*/ 5e5);
 
 	SECTION( "Test starting point" ) {
