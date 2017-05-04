@@ -124,9 +124,10 @@ void SimulatedAnnealing::get_neighbour(double x[], double new_x[]) {
 	*/
 	std::uniform_real_distribution<double> perturbation(-temperature, temperature);
 	std::uniform_int_distribution<int> index_choice(0, K-1);
-
+	double pert = perturbation(rng);
+	//std::cout << pert << '\n';
 	int chosen_d = index_choice(rng);
-	new_x[chosen_d] = x[chosen_d] + perturbation(rng);
+	new_x[chosen_d] = x[chosen_d] + pert;
 
 	/** Stop if perturbation jumps inside valid solutions space,
 		otherwise perturb \f$ \vec{x} \f$ again */
@@ -146,9 +147,10 @@ double SimulatedAnnealing::acceptance_probability(double x[], double new_x[]) {
 		return 1.0;
 	}
 	/**
-	* - accept worse solutions with probability \f$ e^{- \frac{\Delta}{T} } \f$
+	* - accept worse solutions with probability \f$ e^{- \frac{200\Delta}{T} } \f$, where \f$ 200\Delta \f$ is to make this probability
+	* uniformely distributed in (0,1)
 	*/
-	return exp(-delta / temperature);
+	return exp(-200*delta / temperature);
 }
 
 double SimulatedAnnealing::new_temperature() {
@@ -164,6 +166,7 @@ void SimulatedAnnealing::run_search(double x[]) {
 	get_initial_solution(x);
 
 	int current_iteration = 0;
+	std::uniform_real_distribution<double> die(0,1);
 
 	// save best current result in this variable
 	double* best_x = (double*) malloc(K * sizeof(double));
@@ -176,9 +179,10 @@ void SimulatedAnnealing::run_search(double x[]) {
 	double* new_x = (double*) malloc(K * sizeof(double));
 	double new_score;
 
-	while(current_iteration <= max_iterations) {
+	while(current_iteration <= max_iterations && temperature > 0) {
 		std::cout << "Temperature " << temperature << " at iteration " <<
-			current_iteration << "/" << max_iterations << "\n";
+		current_iteration << "/" << max_iterations << "\n";
+		std::cout << "Best score: " << best_score << "\n";
 
 		// round of search for current temperature
 		for(int i = 0; i < temperature_steps(); i++) {
@@ -189,7 +193,7 @@ void SimulatedAnnealing::run_search(double x[]) {
 			get_neighbour(x, new_x);
 
 			// accept or reject according to acceptance probability
-			if( acceptance_probability(x, new_x) >= 0.9999 ) {
+			if( acceptance_probability(x, new_x) >= die(rng) ) {
 				// subistitute x with new value
 				tmp = x;
 				x = new_x;
@@ -198,11 +202,11 @@ void SimulatedAnnealing::run_search(double x[]) {
 				// update best result (up to now) if needed
 				new_score = objective_function(x);
 				if (new_score < best_score) {
-					std::cout << "New best " << new_score << " at iteration " << current_iteration << "\n";
+					//std::cout << "New best " << new_score << " at iteration " << current_iteration << "\n";
 					best_score = new_score;
 					// save current x to best_x location
-					for(int i=0; i<K; i++) {
-						best_x[i] = x[i];
+					for(int j=0; j<K; j++) {
+						best_x[j] = x[j];
 					}
 				}
 			}

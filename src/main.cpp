@@ -85,7 +85,7 @@ int main() {
 				/* max_failure_probability 	*/ 0.05,
 				/* starting_temperature 	*/ 100.0,
 				/* cooling_rate 			*/ 0.8,
-				/* max_iterations 			*/ 500000,
+				/* max_iterations 			*/ 100000,
 				/* steps_coefficient 		*/ 5e5);
 
 	// double new_x[K];
