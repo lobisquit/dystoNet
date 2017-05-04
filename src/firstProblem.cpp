@@ -122,12 +122,10 @@ void SimulatedAnnealing::get_neighbour(double x[], double new_x[]) {
 	* component \f$ d \sim \mathcal{U}[1, K] \f$ of \f$ \vec{x} \f$ is perturbed
 	* summing it a quantity \f$ \xi \sim \mathcal{U}[-1, 1] \f$
 	*/
-	std::uniform_real_distribution<double> perturbation(-temperature, temperature);
+	std::uniform_real_distribution<double> perturbation(-50, 50);
 	std::uniform_int_distribution<int> index_choice(0, K-1);
-	double pert = perturbation(rng);
-	//std::cout << pert << '\n';
 	int chosen_d = index_choice(rng);
-	new_x[chosen_d] = x[chosen_d] + pert;
+	new_x[chosen_d] = x[chosen_d] + perturbation(rng);
 
 	/** Stop if perturbation jumps inside valid solutions space,
 		otherwise perturb \f$ \vec{x} \f$ again */
@@ -150,6 +148,7 @@ double SimulatedAnnealing::acceptance_probability(double x[], double new_x[]) {
 	* - accept worse solutions with probability \f$ e^{- \frac{200\Delta}{T} } \f$, where \f$ 200\Delta \f$ is to make this probability
 	* uniformely distributed in (0,1)
 	*/
+	//std::cout << exp(-200*delta / temperature) << '\n';
 	return exp(-200*delta / temperature);
 }
 
@@ -179,12 +178,14 @@ void SimulatedAnnealing::run_search(double x[]) {
 	double* new_x = (double*) malloc(K * sizeof(double));
 	double new_score;
 
-	while(current_iteration <= max_iterations && temperature > 0) {
+	while(current_iteration <= max_iterations && temperature > 0.5) {
 		std::cout << "Temperature " << temperature << " at iteration " <<
 		current_iteration << "/" << max_iterations << "\n";
 		std::cout << "Best score: " << best_score << "\n";
 
 		// round of search for current temperature
+		double mean = 0;
+		int acc = 0;
 		for(int i = 0; i < temperature_steps(); i++) {
 			// better organization of cycles needed
 			current_iteration++;
@@ -193,6 +194,10 @@ void SimulatedAnnealing::run_search(double x[]) {
 			get_neighbour(x, new_x);
 
 			// accept or reject according to acceptance probability
+			if(acceptance_probability(x, new_x) != 1){
+				mean += acceptance_probability(x, new_x);
+				acc++;
+			}
 			if( acceptance_probability(x, new_x) >= die(rng) ) {
 				// subistitute x with new value
 				tmp = x;
@@ -211,6 +216,8 @@ void SimulatedAnnealing::run_search(double x[]) {
 				}
 			}
 		}
+		mean /= acc;
+		std::cout << "acceptanceProbability mean = " << mean << '\n';
 		// update temperature
 		temperature = new_temperature();
 	}
