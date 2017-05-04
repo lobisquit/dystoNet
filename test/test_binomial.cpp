@@ -23,7 +23,7 @@ TEST_CASE( "Test log_gamma values", "[ln_gamma]" ) {
 	}
 
 	SECTION( "Test Gamma(1/2) = sqrt(pi)" ) {
-		REQUIRE( (ln_gamma(0.5) - 0.5*log(M_PI) <= 1e-9) );
+		REQUIRE( (ln_gamma(0.5) - 0.5*log(3.14159265358979323846) <= 1e-9) );
 	}
 }
 
