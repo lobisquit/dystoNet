@@ -86,7 +86,6 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 										double _starting_temperature,
 										double _cooling_rate,
 										int _max_iterations,
-										double _acceptance_threshold,
 										double _steps_coefficient)
 										// constructor of upper class to trigger
 										: TheoreticBound::TheoreticBound(
@@ -98,7 +97,6 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 	temperature = _starting_temperature;
 	cooling_rate = _cooling_rate;
 	max_iterations = _max_iterations;
-	acceptance_threshold = _acceptance_threshold;
 	steps_coefficient = _steps_coefficient;
 
 	// random seed is set to a default value, for reproducibility
@@ -179,19 +177,19 @@ void SimulatedAnnealing::run_search(double x[]) {
 	double new_score;
 
 	while(current_iteration <= max_iterations) {
-		int steps = (int) floor(temperature_steps());
+		std::cout << "Temperature " << temperature << " at iteration " <<
+			current_iteration << "/" << max_iterations << "\n";
 
 		// round of search for current temperature
-		for(int i = 0; i < steps; i++) {
+		for(int i = 0; i < temperature_steps(); i++) {
 			// better organization of cycles needed
 			current_iteration++;
-			std::cout << current_iteration << "/" << steps << "\r";
 
 			// search new candidate, save it to new_x
 			get_neighbour(x, new_x);
 
 			// accept or reject according to acceptance probability
-			if( acceptance_probability(x, new_x) > acceptance_threshold ) {
+			if( acceptance_probability(x, new_x) >= 0.9999 ) {
 				// subistitute x with new value
 				tmp = x;
 				x = new_x;
@@ -200,6 +198,7 @@ void SimulatedAnnealing::run_search(double x[]) {
 				// update best result (up to now) if needed
 				new_score = objective_function(x);
 				if (new_score < best_score) {
+					std::cout << "New best " << new_score << " at iteration " << current_iteration << "\n";
 					best_score = new_score;
 					// save current x to best_x location
 					for(int i=0; i<K; i++) {

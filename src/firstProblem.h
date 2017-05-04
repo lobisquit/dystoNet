@@ -60,7 +60,7 @@ class SimulatedAnnealing : public TheoreticBound {
 	public:
 		/** Random numbers generator */
 		std::mt19937 rng;
-		
+
 		/** Current system temperature */
 		double temperature;
 		/** Number of attempts with temperature value \f$ T \f$ is computed as
@@ -68,19 +68,13 @@ class SimulatedAnnealing : public TheoreticBound {
 		*/
 		double steps_coefficient;
 
-		/** After round with temperature \f$ T \f$, next one has temperature 
+		/** After round with temperature \f$ T \f$, next one has temperature
 		* \f$ cooling\_rate \cdot T \f$
 		*/
 		double cooling_rate;
 
 		/** Maximal numbers of steps taken from starting point */
 		int max_iterations;
-		
-		/** Threshold that #acceptance_probability has to surpass in order to be  
-		* accepted as a solution 
-		*/
-		double acceptance_threshold;
-
 
 		/**
 		* Custom overload of << operator, to print debug info
@@ -94,8 +88,7 @@ class SimulatedAnnealing : public TheoreticBound {
 				"temperature=" 				<< obj.temperature 				<< ", " <<
 				"cooling_rate=" 			<< obj.cooling_rate 			<< ", " <<
 				"max_iterations=" 			<< obj.max_iterations 			<< ", " <<
-				"acceptance_threshold="		<< obj.acceptance_threshold		<< ", " <<
-				"steps_coefficient="		<< obj.steps_coefficient		<< 
+				"steps_coefficient="		<< obj.steps_coefficient		<<
 				")>";
 			return strm;
 		}
@@ -107,7 +100,6 @@ class SimulatedAnnealing : public TheoreticBound {
 							double _starting_temperature,
 							double _cooling_rate,
 							int _max_iterations,
-							double _acceptance_threshold,
 							double _steps_coefficient);
 
 		// these functions are taken as they are from upper class

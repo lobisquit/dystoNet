@@ -62,13 +62,17 @@ void print_array(double* x, int K) {
 
 int main() {
 	int K = 1000;
-	int N = 3000;
-	RobustSoliton rs = RobustSoliton(0.01, 0.05, K);
-	TheoreticBound TB = TheoreticBound(
-								K,
-								N,
-								&rs,
-								0.05);
+	int N = 2000;
+	RobustSoliton rs = RobustSoliton(
+		/* c 		*/	0.01,
+		/* delta 	*/	0.05,
+						K);
+
+	// TheoreticBound TB = TheoreticBound(
+	// 							K,
+	// 							N,
+	// 							&rs,
+	// 							0.05);
 	// std::cout << TB << "\n";
 	double x[K];
 	// TB.run_search(x);
@@ -79,22 +83,29 @@ int main() {
 				/* N 						*/ N,
 				/* robust_soliton 			*/ &rs,
 				/* max_failure_probability 	*/ 0.05,
-				/* starting_temperature 	*/ 50.0,
-				/* cooling_rate 			*/ 0.99,
-				/* max_iterations 			*/ 100000,
-				/* acceptance_threshold		*/ 0.9999,
+				/* starting_temperature 	*/ 100.0,
+				/* cooling_rate 			*/ 0.8,
+				/* max_iterations 			*/ 500000,
 				/* steps_coefficient 		*/ 5e5);
 
 	// double new_x[K];
+	double x_farlocco[K];
+	for(int i=0; i<K; i++) {
+		x_farlocco[i] = 1;
+	}
 
 	std::cout << SA << "\n";
-	SA.run_search(x);
-	std::cout << "Arriving to   score " << SA.objective_function(x) << " with point ";
-	print_array(x, K);
 
 	SA.get_initial_solution(x);
-	std::cout << "Starting from score " << SA.objective_function(x) << " with point ";
-	print_array(x, K);
+	std::cout << "Starting from score "
+		<< (SA.objective_function(x)/SA.objective_function(x_farlocco)) << " with point ";
+	print_array(x, 10);
+
+	SA.run_search(x);
+	std::cout << "Arriving to   score "
+		<< (SA.objective_function(x)/SA.objective_function(x_farlocco)) << " with point ";
+	print_array(x, 10);
+
 }
 
 //
