@@ -100,7 +100,7 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 	steps_coefficient = _steps_coefficient;
 
 	// random seed is set to a default value, for reproducibility
-	rng.seed(1);
+	rng.seed(time(nullptr));
 }
 
 void SimulatedAnnealing::get_initial_solution(double x[]) {

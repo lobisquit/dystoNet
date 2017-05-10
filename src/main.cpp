@@ -83,9 +83,9 @@ int main() {
 				/* N 						*/ N,
 				/* robust_soliton 			*/ &rs,
 				/* max_failure_probability 	*/ 0.05,
-				/* starting_temperature 	*/ 100.0,
+				/* starting_temperature 	*/ 150.0,
 				/* cooling_rate 			*/ 0.9,
-				/* max_iterations 			*/ 100000,
+				/* max_iterations 			*/ 500000,
 				/* steps_coefficient 		*/ 5e4);
 
 	// double new_x[K];
