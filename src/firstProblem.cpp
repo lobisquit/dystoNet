@@ -75,7 +75,7 @@ void TheoreticBound::run_search(double x[]) {
 
 	// check obtained bound is valid (you never know...)
 	if(!respect_constraints(x)) {
-		// throw std::logic_error("Theoretic bound is not a valid solution");
+		throw std::logic_error("Theoretic bound is not a valid solution");
 	}
 }
 
@@ -145,11 +145,10 @@ double SimulatedAnnealing::acceptance_probability(double x[], double new_x[]) {
 		return 1.0;
 	}
 	/**
-	* - accept worse solutions with probability \f$ e^{- \frac{200\Delta}{T} } \f$, where \f$ 200\Delta \f$ is to make this probability
-	* uniformely distributed in (0,1)
+	* - accept worse solutions with probability \f$ e^{- \frac{200 \Delta}{T} } \f$, where 
+	* \f$ 200\Delta \f$ is to make this probability uniformely distributed in (0,1)
 	*/
-	//std::cout << exp(-200*delta / temperature) << '\n';
-	return exp(-200*delta / temperature);
+	return exp(-200 * delta / temperature);
 }
 
 double SimulatedAnnealing::new_temperature() {
@@ -164,28 +163,33 @@ double SimulatedAnnealing::temperature_steps() {
 void SimulatedAnnealing::run_search(double x[]) {
 	get_initial_solution(x);
 
+	// keep trace of how much jumps have been done since the beginning
 	int current_iteration = 0;
-	std::uniform_real_distribution<double> die(0,1);
 
-	// save best current result in this variable
+	// save current best result in this variable
 	double* best_x = (double*) malloc(K * sizeof(double));
 	double best_score = std::numeric_limits<double>::infinity();
 
-	// current candidates
-	double* tmp = (double*) malloc(K * sizeof(double));
+	// store here the best value of x when swapping old with new one (see below)
+	double* tmp; // = (double*) malloc(K * sizeof(double));
 
-	// double new_x[K];
+	// store here new point explored with its score
 	double* new_x = (double*) malloc(K * sizeof(double));
 	double new_score;
 
+	// random variable that set the threshold for accepting worse solutions
+	std::uniform_real_distribution<double> acceptance_threshold(0,1);
+
 	while(current_iteration <= max_iterations && temperature > 0.5) {
+		// round of search for current temperature
 		std::cout << "Temperature " << temperature << " at iteration " <<
-		current_iteration << "/" << max_iterations << "\n";
+			current_iteration << "/" << max_iterations << "\n";
 		std::cout << "Best score: " << best_score << "\n";
 
-		// round of search for current temperature
-		double mean = 0;
-		int acc = 0;
+		// keep trace of mean value of acceptance_probability when new point is worse
+		double acceptance_mean = 0;
+		int worsening_proposals = 0;
+
 		for(int i = 0; i < temperature_steps(); i++) {
 			// better organization of cycles needed
 			current_iteration++;
@@ -193,12 +197,14 @@ void SimulatedAnnealing::run_search(double x[]) {
 			// search new candidate, save it to new_x
 			get_neighbour(x, new_x);
 
-			// accept or reject according to acceptance probability
+			// increment mean probability and counter when new_x is worse than x
 			if(acceptance_probability(x, new_x) != 1){
-				mean += acceptance_probability(x, new_x);
-				acc++;
+				acceptance_mean += acceptance_probability(x, new_x);
+				worsening_proposals++;
 			}
-			if( acceptance_probability(x, new_x) >= die(rng) ) {
+
+			// accept or reject according to acceptance probability
+			if( acceptance_probability(x, new_x) >= acceptance_threshold(rng) ) {
 				// subistitute x with new value
 				tmp = x;
 				x = new_x;
@@ -207,7 +213,6 @@ void SimulatedAnnealing::run_search(double x[]) {
 				// update best result (up to now) if needed
 				new_score = objective_function(x);
 				if (new_score < best_score) {
-					//std::cout << "New best " << new_score << " at iteration " << current_iteration << "\n";
 					best_score = new_score;
 					// save current x to best_x location
 					for(int j=0; j<K; j++) {
@@ -216,11 +221,15 @@ void SimulatedAnnealing::run_search(double x[]) {
 				}
 			}
 		}
-		mean /= acc;
-		std::cout << "acceptanceProbability mean = " << mean << '\n';
-		// update temperature
+
+		// report mean of acceptance probability up to now
+		acceptance_mean = acceptance_mean / worsening_proposals;
+		std::cout << "mean of acceptance_probability = " << acceptance_mean << '\n';
+
+		// update temperature for new round
 		temperature = new_temperature();
 	}
-	// save to variable x the best result found up to now
+
+	// save to variable x the best result found up to now, then exit
 	x = best_x;
 }

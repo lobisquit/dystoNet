@@ -16,8 +16,10 @@ class TheoreticBound : public HeuristicSearch {
 	public:
 		/** Number of sensor nodes */
 		int K;
+
 		/** Total number of nodes */
 		int N;
+
 		/** Maximal probability that a node receive less packets than we wanted */
 		double max_failure_probability;
 
@@ -63,6 +65,7 @@ class SimulatedAnnealing : public TheoreticBound {
 
 		/** Current system temperature */
 		double temperature;
+
 		/** Number of attempts with temperature value \f$ T \f$ is computed as
 		* \f$ \frac{steps\_coefficient}{T} \f$
 		*/
