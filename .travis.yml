@@ -1,0 +1,13 @@
+# Enable C++ support
+language: cpp
+
+notifications:
+  email: false
+
+# Compiler selection
+compiler:
+  - gcc
+
+# Build steps
+script:
+  - make tests

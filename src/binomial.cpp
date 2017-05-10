@@ -1,6 +1,6 @@
 #include <stdexcept>
+#include <sstream>
 #include <math.h>
-#include <stdexcept>
 #include "binomial.h"
 
 double ln_gamma(double x) {
@@ -56,8 +56,11 @@ double betai(double a, double b, double x) {
 
 	// values of x outside [0, 1] lead to a function error
 	if (x < 0.0 || x > 1.0) {
-		throw std::runtime_error("x parameter = " + std::to_string(x) +
-			" (p parameter of binomial) is out of [0, 1].");
+		std::ostringstream error_message;
+		error_message 	<< "x parameter = "
+						<< x
+						<< " (p parameter of binomial) is out of [0, 1].";
+		throw std::runtime_error(error_message.str());
 	}
 	/**
 	* --------

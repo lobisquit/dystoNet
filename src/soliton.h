@@ -1,6 +1,8 @@
 #ifndef _SOLITON_H_
 #define _SOLITON_H_
 
+#include <sstream>
+
 class IdealSoliton {
 	public:
 		/**
@@ -37,7 +39,7 @@ class RobustSoliton {
 		/**
 		* Normalization factor for Robust Soliton distribution
 		*/
-		double beta = 0;
+		double beta;
 
 		/**
 		* Parameter precomputed and stored at creation given c, delta, K
@@ -60,6 +62,17 @@ class RobustSoliton {
 
 		/** Ideal Soliton parameter: distribution is defined then in [0, K] */
 		int K;
+
+		/**
+		* Make RobustSoliton objects printable, for debug
+		*/
+		friend std::ostream& operator<<(std::ostream &strm, RobustSoliton &obj) {
+			strm << "<RobustSoliton("
+				"c="		<< obj.c		<< ", " <<
+				"delta="	<< obj.delta	<< ", " <<
+				"K="		<< obj.K 		<< ")>";
+			return strm;
+		}
 
 		/**
 		* Build Robust Soliton generator object
