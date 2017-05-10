@@ -86,7 +86,8 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 										double _starting_temperature,
 										double _cooling_rate,
 										int _max_iterations,
-										double _steps_coefficient)
+										double _steps_coefficient,
+										double _acceptance_coefficient)
 										// constructor of upper class to trigger
 										: TheoreticBound::TheoreticBound(
 											_K,
@@ -98,9 +99,10 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 	cooling_rate = _cooling_rate;
 	max_iterations = _max_iterations;
 	steps_coefficient = _steps_coefficient;
+	acceptance_coefficient = _acceptance_coefficient;
 
 	// random seed is set to a default value, for reproducibility
-	rng.seed(time(nullptr));
+	rng.seed(1);
 }
 
 void SimulatedAnnealing::get_initial_solution(double x[]) {
@@ -145,10 +147,9 @@ double SimulatedAnnealing::acceptance_probability(double x[], double new_x[]) {
 		return 1.0;
 	}
 	/**
-	* - accept worse solutions with probability \f$ e^{- \frac{200 \Delta}{T} } \f$, where 
-	* \f$ 200\Delta \f$ is to make this probability uniformely distributed in (0,1)
+	* - accept worse solutions with probability \f$ e^{- \frac{acceptance_coefficient \Delta}{T} } \f$
 	*/
-	return exp(-200 * delta / temperature);
+	return exp(-acceptance_coefficient * delta / temperature);
 }
 
 double SimulatedAnnealing::new_temperature() {

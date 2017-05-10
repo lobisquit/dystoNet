@@ -67,13 +67,15 @@ class SimulatedAnnealing : public TheoreticBound {
 		double temperature;
 
 		/** Number of attempts with temperature value \f$ T \f$ is computed as
-		* \f$ \frac{steps\_coefficient}{T} \f$
-		*/
+		*	\f$ \frac{steps\_coefficient}{T} \f$ */
 		double steps_coefficient;
 
+		/** Parameter that adjusts probability of accepting a worse point
+		*	see #acceptance_probability */
+		double acceptance_coefficient;
+
 		/** After round with temperature \f$ T \f$, next one has temperature
-		* \f$ cooling\_rate \cdot T \f$
-		*/
+		*	\f$ cooling\_rate \cdot T \f$ */
 		double cooling_rate;
 
 		/** Maximal numbers of steps taken from starting point */
@@ -91,7 +93,8 @@ class SimulatedAnnealing : public TheoreticBound {
 				"temperature=" 				<< obj.temperature 				<< ", " <<
 				"cooling_rate=" 			<< obj.cooling_rate 			<< ", " <<
 				"max_iterations=" 			<< obj.max_iterations 			<< ", " <<
-				"steps_coefficient="		<< obj.steps_coefficient		<<
+				"steps_coefficient="		<< obj.steps_coefficient		<< ", " <<
+				"acceptance_coefficient="	<< obj.acceptance_coefficient	<<
 				")>";
 			return strm;
 		}
@@ -103,7 +106,8 @@ class SimulatedAnnealing : public TheoreticBound {
 							double _starting_temperature,
 							double _cooling_rate,
 							int _max_iterations,
-							double _steps_coefficient);
+							double _steps_coefficient,
+							double _acceptance_coefficient);
 
 		// these functions are taken as they are from upper class
 		using TheoreticBound::objective_function;

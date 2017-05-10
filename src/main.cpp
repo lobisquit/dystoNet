@@ -86,7 +86,8 @@ int main() {
 				/* starting_temperature 	*/ 150.0,
 				/* cooling_rate 			*/ 0.9,
 				/* max_iterations 			*/ 500000,
-				/* steps_coefficient 		*/ 5e4);
+				/* steps_coefficient 		*/ 5e4,
+				/* acceptance_coefficient	*/ 200);
 
 	// double new_x[K];
 	double x_farlocco[K];
