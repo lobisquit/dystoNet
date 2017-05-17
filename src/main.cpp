@@ -30,6 +30,7 @@
 #include "binomial.h"
 #include "heuristicSearch.h"
 #include "firstProblem.h"
+#include "jumping_ball.h"
 
 /**
 * Probability to accept the new solution calculated in the last step of the Simulated Annealing.
@@ -78,7 +79,7 @@ int main() {
 	// TB.run_search(x);
 	// print_array(x, K);
 
-	SimulatedAnnealing SA = SimulatedAnnealing(
+	JumpingBall SA = JumpingBall(
 				/* K 						*/ K,
 				/* N 						*/ N,
 				/* robust_soliton 			*/ &rs,
