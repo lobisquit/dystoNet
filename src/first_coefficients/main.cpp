@@ -27,8 +27,8 @@
 #include <string>
 #include <ctime>
 #include "soliton.h"
-#include "first_simulated_annealing.h"
-#include "first_genetic_algorithm.h"
+#include "simulated_annealing.h"
+#include "genetic_algorithm.h"
 
 /**
 * Probability to accept the new solution calculated in the last step of the Simulated Annealing.

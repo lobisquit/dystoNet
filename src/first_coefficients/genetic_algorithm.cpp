@@ -7,8 +7,8 @@
 #include <algorithm>
 
 #include "soliton.h"
-#include "first_genetic_algorithm.h"
-#include "first_theoretic_bound.h"
+#include "genetic_algorithm.h"
+#include "theoretic_bound.h"
 
 void array_copy(double* x, double* y, int dim){
 	for(int i = 0; i < dim; i++){
