@@ -1,9 +1,9 @@
 #!/usr/bin/python
 import argparse
-import subprocess
 import os
-from pathlib import Path
+import subprocess
 import webbrowser
+from pathlib import Path
 
 SRC_DIR = Path('src')
 BUILD_DIR = Path('build')
