@@ -33,7 +33,7 @@ GeneticAlgorithm::GeneticAlgorithm(	int _K,
 	dim_population = _dim_population;
 
 	// random seed is set to a default value, for reproducibility
-	rng.seed( time(NULL) );
+	rng.seed( 1 );
 	//rng.seed(1);
 }
 

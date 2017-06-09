@@ -34,7 +34,7 @@ def single_compile(cpp_file, dependencies):
 	# build the proper output file name
 	output_file = Path("".join(cpp_file.name.split('.')[:-1]) + '.o')
 
-	# obtain dependencies path as a string for next command
+	# obtain dependencies paths as a list of string for next command
 	dep_paths = [str(SRC_DIR / Path(dependency)) for dependency in dependencies]
 
 	# launch compilation
