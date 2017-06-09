@@ -1,13 +1,5 @@
-#define CATCH_CONFIG_MAIN
 #include "catch.hpp"
-
-#if defined(linux) || defined(__linux) || defined(__linux__)
-	#include "../src/soliton.cpp"
-#elif defined(WIN32) || defined(__WIN32__) || defined(_WIN32) || defined(_MSC_VER)
-	#include "..\src\soliton.cpp"
-#else
-	#error OS not supported
-#endif
+#include "soliton.cpp"
 
 TEST_CASE( "Our ideal soliton is a probability distribution", "[ideal_soliton]" ) {
 	int K = 1000;
