@@ -3,12 +3,16 @@ import argparse
 import subprocess
 import os
 from pathlib import Path
+import webbrowser
 
 SRC_DIR = Path('src')
 BUILD_DIR = Path('build')
-PROGRAM_FILE = BUILD_DIR / Path('program.out')
+DOC_DIR = Path('doc')
 
-def exec_command(command, output=True, **env_variables):
+PROGRAM_FILE = BUILD_DIR / Path('program.out')
+DOXYFILE = DOC_DIR / Path('Doxyfile')
+
+def exec_command(command, **env_variables):
 	''' Execute command via bash with given environment variables '''
 	# convert path to string representation to feed subprocess.call
 	if isinstance(command, Path):
@@ -20,17 +24,13 @@ def exec_command(command, output=True, **env_variables):
 		# load all environment variable and add new wanted ones
 		env={**env_variables, **dict(os.environ)})
 
-# def list_projects(src_path=SRC_DIR):
-# 	return exec_command("cd {} && ls -d */".format(src_path))
-#
-# def list_files(path):
-# 	return exec_command("ls {}*.cpp".format(path))
-
 def clean():
+	''' Remove all build artifacts from BUILD_DIR '''
 	for build_file in Path(BUILD_DIR).glob('*.o'):
 		build_file.unlink()
 
 def single_compile(cpp_file, dependencies):
+	''' Compile a cpp source file with its dependencies '''
 	# build the proper output file name
 	output_file = Path("".join(cpp_file.name.split('.')[:-1]) + '.o')
 
@@ -38,17 +38,17 @@ def single_compile(cpp_file, dependencies):
 	dep_paths = [str(SRC_DIR / Path(dependency)) for dependency in dependencies]
 
 	# launch compilation
-	exec_command('g++ -O3 -c -Wall -std=c++0x {input} -o {output} {includes}'.format(
+	return exec_command('g++ -O3 -c -Wall -std=c++0x {input} -o {output} {includes}'.format(
 		input = str(cpp_file),
 		output = BUILD_DIR / output_file,
 		includes = " ".join(["-I" + dep for dep in dep_paths])))
 
-def build(project='**', dependencies=['utils']):
+def build(project, dependencies):
+	''' Build a project with its dependencies (default all projects) '''
 	# compile dependencies before compiling actual project
 	for dependency in dependencies:
 		deps_cpp_files = Path(SRC_DIR).glob('{}/*.cpp'.format(dependency))
 		for cpp_file in deps_cpp_files:
-			print(cpp_file)
 			single_compile(cpp_file, dependencies)
 
 	# compile separately each cpp file, including dependencies
@@ -57,27 +57,54 @@ def build(project='**', dependencies=['utils']):
 		single_compile(cpp_file, dependencies)
 
 	# compile every in a single executable
-	exec_command('g++ build/*.o -o {}'.format(PROGRAM_FILE))
+	return exec_command('g++ build/*.o -o {}'.format(PROGRAM_FILE))
 
 def run(program=PROGRAM_FILE):
-	exec_command(str(PROGRAM_FILE), output=False)
+	''' Execute a program, default to output of build step '''
+	return exec_command(str(program))
 
+def docs(doxyfile=DOXYFILE):
+	''' Create doxygen output '''
+	return exec_command('doxygen {}'.format(str(doxyfile)))
 
+if __name__ == '__main__':
+	# setup command line arguments parser
+	parser = argparse.ArgumentParser(description='Manage dystoNet project execution')
 
+	parser.add_argument('--mode',
+		dest='mode',
+		choices=['build', 'run', 'docs'],
+		default='run',
+		help='Select operation mode (voices of this Makefile)')
 
-clean()
-build(project='first_coefficients')
-run()
+	parser.add_argument('--project',
+		dest='project',
+		default='first_coefficients',
+		help='Project to compile')
 
+	parser.add_argument('--deps',
+		dest='deps',
+		default=['utils'],
+		nargs='*',
+		help='Packets that are needed to compile wanted project')
 
-#
-# # assess sources tree
-# projects = list_projects()
-# projects.zip([list])
-#
-# def build(project):
-# 	if not project.endswith('/'):
-# 		project += '/'
-# 	for source_file in list_files(SRC_DIR + project):
-#
-# build('utils')
+	cmd_args = parser.parse_args()
+
+	# act accordingly to selected parameters
+	if cmd_args.mode == 'build' or cmd_args.mode == 'run':
+		clean()
+		build_result = build(
+			project=cmd_args.project,
+			dependencies=cmd_args.deps)
+
+		# run only if build was successfull
+		if build_result == 0 and cmd_args.mode == 'run':
+			run()
+
+	if cmd_args.mode == 'docs':
+		docs_result = docs()
+		# if docs are generated successfully,
+		# open index of generated html
+		if docs_result == 0:
+			index_html_path = Path('doc/html/index.html')
+			webbrowser.open_new_tab(str(index_html_path))
