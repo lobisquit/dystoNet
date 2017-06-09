@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from __future__ import print_function
+
 import argparse
 import os
 import subprocess
@@ -19,10 +21,17 @@ def exec_command(command, **env_variables):
 		command = str(command)
 
 	print('------> ', command)
+
+	# retrieve system environment variables
+	env = dict(os.environ)
+
+	# add those passed to exec via kwargs
+	env.update(env_variables)
+
 	return subprocess.call(command,
 		shell=True,
 		# load all environment variable and add new wanted ones
-		env={**env_variables, **dict(os.environ)})
+		env=env)
 
 def clean():
 	''' Remove all build artifacts from BUILD_DIR '''
