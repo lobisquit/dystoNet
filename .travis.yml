@@ -8,6 +8,9 @@ notifications:
 compiler:
   - gcc
 
-# Build steps
+install:
+  - pip install pathlib --user
+
 script:
-  - make tests
+  - python make.py --project utils --mode test
+  - python make.py --project first_coefficients --mode test

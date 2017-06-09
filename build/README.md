@@ -1,1 +1,1 @@
-All outputs from g++ compilation are put here
+Object files and executables are put here by `make.py` script.

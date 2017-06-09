@@ -12,8 +12,7 @@ BUILD_DIR = Path('build')
 DOC_DIR = Path('doc')
 TEST_DIR = Path('test')
 
-PROGRAM_RUN_FILE = BUILD_DIR / Path('program.out')
-PROGRAM_TEST_FILE = BUILD_DIR / Path('program_test.out')
+PROGRAM_FILE = Path('program.out')
 DOXYFILE = DOC_DIR / Path('Doxyfile')
 
 def exec_command(command, **env_variables):
@@ -22,14 +21,11 @@ def exec_command(command, **env_variables):
 	if isinstance(command, Path):
 		command = str(command)
 
-	print('------> ', command)
-
-	# retrieve system environment variables
+	# retrieve system environment variables and add those passed to exec via kwargs
 	env = dict(os.environ)
-
-	# add those passed to exec via kwargs
 	env.update(env_variables)
 
+	print('------> ', command)
 	return subprocess.call(command,
 		shell=True,
 		# load all environment variable and add new wanted ones
@@ -37,72 +33,67 @@ def exec_command(command, **env_variables):
 
 def clean():
 	''' Remove all build artifacts from BUILD_DIR '''
-	for build_file in Path(BUILD_DIR).glob('*.o'):
+	for build_file in Path(BUILD_DIR).glob('**/*.o'):
 		build_file.unlink()
+
 
 def single_compile(cpp_file, dependencies):
 	''' Compile a cpp source file with its dependencies '''
-	# build the proper output file name
-	output_file = Path("".join(cpp_file.name.split('.')[:-1]) + '.o')
+	# create the proper output file name
+	output_file = BUILD_DIR / cpp_file.parent / (cpp_file.stem + '.o')
 
-	# obtain dependencies paths as a list of string for next command
-	dep_paths = []
-	for dependency in dependencies:
-		# add SRC_DIR to path if dependency is only the name of the package,
-		# not the actual path to it
-		if isinstance(dependency, str):
-			dep_paths.append( SRC_DIR / Path(dependency) )
-		else:
-			dep_paths.append( dependency )
+	# create a directory for output file, if not present
+	output_file.parent.mkdir(parents=True, exist_ok=True)
 
 	# launch compilation
 	return exec_command('g++ -O3 -c -Wall -std=c++0x {input} -o {output} {includes}'.format(
-		input = str(cpp_file),
-		output = BUILD_DIR / output_file,
-		includes = " ".join(["-I" + str(dep) for dep in dep_paths])))
+		input = cpp_file,
+		output = output_file,
+		includes = " ".join(["-I" + str(dep) for dep in dependencies])))
 
 def build(project, dependencies):
-	''' Build a project with its dependencies (default all projects) '''
-	# compile dependencies before compiling actual project
+	'''
+		Build a project with its dependencies
+
+		Parameters
+		----------
+		project : Path
+			path to the directory containing cpp files to compile
+		dependencies : list of Path
+			paths of all directories to include in compilation
+	'''
 	for dependency in dependencies:
-		deps_cpp_files = Path(SRC_DIR).glob('{}/*.cpp'.format(dependency))
-		for cpp_file in deps_cpp_files:
+		dep_cpp_files = dependency.glob('**/*.cpp')
+		for cpp_file in dep_cpp_files:
 			single_compile(cpp_file, dependencies)
 
 	# compile separately each cpp file, including dependencies
-	project_cpp_files = Path(SRC_DIR).glob('{}/*.cpp'.format(project))
+	project_cpp_files = project.glob('**/*.cpp')
 	for cpp_file in project_cpp_files:
 		single_compile(cpp_file, dependencies)
 
-	# compile every in a single executable
-	return exec_command('g++ build/*.o -o {}'.format(PROGRAM_RUN_FILE))
+	# retrieve object files of current build
+	obj_files = (Path('build') / project.parent ).glob('**/*.o')
 
-def run(program=PROGRAM_RUN_FILE):
-	''' Execute a program, default to output of build step '''
-	return exec_command(str(program))
+	# compile every object file in a single executable
+	return exec_command('g++ {} -o {}'.format(
+		" ".join( [str(obj_file) for obj_file in obj_files] ),
+		Path('build') / project / PROGRAM_FILE))
 
-def test(program=PROGRAM_TEST_FILE):
-	''' Execute all tests, default by taking all project as dependencies '''
+def run(project):
+	'''
+		Execute a program compiled with build
 
-	# retrieve all projects paths, to include them in compilation deps
-	dependencies = [path for path in Path(SRC_DIR).iterdir() if path.is_dir()]
-
-	# retrieve cpp of test files
-	test_cpp_files = TEST_DIR.glob('*.cpp')
-
-	for cpp_file in test_cpp_files:
-		single_compile(cpp_file, dependencies)
-
-	# compile tests, all in one step
-	test_result = exec_command('g++ build/*.o -o {}'.format(program))
-
-	# run tests if everything went ok
-	if test_result == 0:
-		return exec_command(str(program))
+		Parameters
+		----------
+		project : Path
+			path to the directory containing cpp files whose build has to be run
+	'''
+	return exec_command(Path('build') / project / PROGRAM_FILE)
 
 def docs(doxyfile=DOXYFILE):
 	''' Create doxygen output '''
-	return exec_command('doxygen {}'.format(str(doxyfile)))
+	return exec_command('doxygen {}'.format(doxyfile))
 
 if __name__ == '__main__':
 	# setup command line arguments parser
@@ -128,19 +119,32 @@ if __name__ == '__main__':
 	cmd_args = parser.parse_args()
 
 	# act accordingly to selected parameters
-	if cmd_args.mode in ['build', 'run']:
+	if cmd_args.mode in ['build', 'run', 'test']:
+		# always clean the environment in these cases
 		clean()
+
+		# create paths for dependencies in SRC_DIR
+		dep_paths = [SRC_DIR / dep for dep in cmd_args.deps]
+
+		if cmd_args.mode in ['build', 'run']:
+			# in build mode, project is expected to be in SRC_DIR
+			project = SRC_DIR / cmd_args.project
+
+		elif cmd_args.mode in ['test']:
+			# in test mode, project is expected to be in TEST_DIR
+			project = TEST_DIR / cmd_args.project
+
+			# add test/ as dependency, since catch.hpp is there
+			# and project SRC directory as well
+			dep_paths += [Path('test/'), SRC_DIR / cmd_args.project]
+
 		build_result = build(
-			project=cmd_args.project,
-			dependencies=cmd_args.deps)
+			project=project,
+			dependencies=dep_paths)
 
 		# run only if build was successfull
-		if build_result == 0 and cmd_args.mode == 'run':
-			run()
-
-	if cmd_args.mode == 'test':
-		clean()
-		test()
+		if build_result == 0 and cmd_args.mode in ['run', 'test']:
+			run(project)
 
 	if cmd_args.mode == 'docs':
 		docs_result = docs()
