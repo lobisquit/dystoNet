@@ -12,7 +12,7 @@ Node::Node(){
 	forwardingTable = newForwardingTable;
 }
 
-Node::setNeighList(std::vector<Node*> newNeighList){
+void Node::setNeighList(std::vector<Node*> newNeighList){
 	neighList = newNeighList;
 }
 
@@ -20,11 +20,11 @@ std::vector<Node*> Node::getNeighList(){
 	return neighList;
 }
 
-Node::setX(double x){
+void Node::setX(double x){
 	coordx = x;
 }
 
-Node::setY(double y){
+void Node::setY(double y){
 	coordy = y;
 }
 
@@ -80,7 +80,7 @@ std::vector<Node> Network::getNodeList(){
 	return nodeList;
 }
 
-Network::findNeigh(double neighDiff){
+void Network::findNeigh(double neighDiff){
 	neighThresh = neighDiff;
 	for(int i=0; i<size; i++){
 		Node thisNode = nodeList[i];
@@ -103,7 +103,7 @@ Network::findNeigh(double neighDiff){
 	}
 }
 
-Network::describeNetwork(){
+void Network::describeNetwork(){
 	std::cout << "Numero di nodi: " << nodeList.size() << '\n';
 	std::cout << "Grandezza della rete: " << lenx << "*" << leny << '\n';
 	std::cout << "Soglia di vicinanza: " << neighThresh << '\n';
@@ -119,7 +119,7 @@ Network::describeNetwork(){
 		for (int h=0; h < myNeigh.size(); h++){
 			double neighx = myNeigh[h]->getCoordX();
 			double neighy = myNeigh[h]->getCoordY();
-			std::cout << "Nodo n. "<< myNeigh[h]<< " " << neighx << " " << neighy << '\n';
+			std::cout << "Nodo "<< myNeigh[h]<< " " << neighx << " " << neighy << '\n';
 		}
 	}
 }

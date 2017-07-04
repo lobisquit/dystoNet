@@ -16,9 +16,9 @@ class Node {
 		std::vector<double> forwardingTable;
 	public:
 		Node();
-		setX(double x);
-		setY(double y);
-		setNeighList(std::vector<Node*> newNeighList);
+		void setX(double x);
+		void setY(double y);
+		void setNeighList(std::vector<Node*> newNeighList);
 		double getCoordX();
 		double getCoordY();
 		std::vector<Node*> getNeighList();
@@ -37,7 +37,7 @@ class Network {
 		double getArea();
 		double getX();
 		double getY();
-		findNeigh(double neighDiff);
+		void findNeigh(double neighDiff);
 		std::vector<Node> getNodeList();
-		describeNetwork();
+		void describeNetwork();
 };
