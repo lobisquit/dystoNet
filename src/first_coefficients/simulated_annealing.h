@@ -7,10 +7,10 @@
 #include <sstream>
 
 #include "soliton.h"
-#include "first_theoretic_bound.h"
+#include "theoretic_bound.h"
 
-#ifndef _FIRST_SIMULATED_ANNEALING_H_
-#define _FIRST_SIMULATED_ANNEALING_H_
+#ifndef _SIMULATED_ANNEALING_H_
+#define _SIMULATED_ANNEALING_H_
 
 class SimulatedAnnealing : public TheoreticBound {
 	public:

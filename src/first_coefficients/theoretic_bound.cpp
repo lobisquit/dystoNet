@@ -6,7 +6,7 @@
 
 #include "soliton.h"
 #include "binomial.h"
-#include "first_theoretic_bound.h"
+#include "theoretic_bound.h"
 
 TheoreticBound::TheoreticBound(	int _K,
 								int _N,

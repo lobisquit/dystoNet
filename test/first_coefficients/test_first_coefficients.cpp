@@ -1,14 +1,9 @@
+#define CATCH_CONFIG_MAIN
 #include <iostream>
 #include "catch.hpp"
+#include "theoretic_bound.cpp"
+#include "simulated_annealing.cpp"
 #include <math.h>
-
-#if defined(linux) || defined(__linux) || defined(__linux__)
-	#include "../src/firstProblem.cpp"
-#elif defined(WIN32) || defined(__WIN32__) || defined(_WIN32) || defined(_MSC_VER)
-	#include "..\src\firstProblem.cpp"
-#else
-	#error OS not supported
-#endif
 
 TEST_CASE( "Test theoretic bound", "[TheoreticBound]" ) {
 	int K = 10;

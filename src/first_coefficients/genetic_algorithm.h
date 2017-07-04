@@ -7,10 +7,10 @@
 #include <sstream>
 
 #include "soliton.h"
-#include "first_theoretic_bound.h"
+#include "theoretic_bound.h"
 
-#ifndef _FIRST_GENETIC_ALGORITHM_H_
-#define _FIRST_GENETIC_ALGORITHM_H_
+#ifndef _GENETIC_ALGORITHM_H_
+#define _GENETIC_ALGORITHM_H_
 
 class GeneticAlgorithm : public TheoreticBound {
 	public:
