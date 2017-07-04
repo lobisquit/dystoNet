@@ -1,56 +1,21 @@
 #include "Network.h"
 
-Node::Node(){
-	d = 0;
-	b = 0;
-	pid = 0;
-	coordx = 0;
-	coordy = 0;
-	std::vector<Node*> newNeighList(0);
-	neighList = newNeighList;
-	std::vector<double> newForwardingTable(0);
-	forwardingTable = newForwardingTable;
-}
-
-void Node::setNeighList(std::vector<Node*> newNeighList){
-	neighList = newNeighList;
-}
-
-std::vector<Node*> Node::getNeighList(){
-	return neighList;
-}
-
-void Node::setX(double x){
-	coordx = x;
-}
-
-void Node::setY(double y){
-	coordy = y;
-}
-
-double Node::getCoordX(){
-	return coordx;
-}
-
-double Node::getCoordY(){
-	return coordy;
-}
-
 Network::Network(int num, double x, double y) {
 	neighThresh = sqrt(pow(x,2)+pow(y,2));
    	size=num;
    	lenx = x;
    	leny = y;
 	std::vector<Node> newNodeList(size);
-	std::default_random_engine rdx;
-	std::default_random_engine rdy;
-	std::uniform_real_distribution<> disx(0, lenx);
-	std::uniform_real_distribution<> disy(0, leny);
-	auto weightx = std::bind(disx, rdx);
-	auto weighty = std::bind(disy, rdy);
+
+	// random seed is set to a default value, for reproducibility
+	rng.seed(1);
+
+	std::uniform_real_distribution<double> disx(0, lenx);
+	std::uniform_real_distribution<double> disy(0, leny);
+
 	for(int i=0; i<size; i++){
-		double newNodeX = weightx();
-		double newNodeY = weightx();
+		double newNodeX = disx(rng);
+		double newNodeY = disy(rng);
 		Node newNode = Node();
 		newNode.setX(newNodeX);
 		newNode.setY(newNodeY);
