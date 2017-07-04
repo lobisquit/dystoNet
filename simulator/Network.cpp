@@ -6,17 +6,17 @@ Node::Node(){
 	pid = 0;
 	coordx = 0;
 	coordy = 0;
-	std::vector<int> newNeighList(0);
+	std::vector<Node*> newNeighList(0);
 	neighList = newNeighList;
 	std::vector<double> newForwardingTable(0);
 	forwardingTable = newForwardingTable;
 }
 
-Node::setNeighList(std::vector<int> newNeighList){
+Node::setNeighList(std::vector<Node*> newNeighList){
 	neighList = newNeighList;
 }
 
-std::vector<int> Node::getNeighList(){
+std::vector<Node*> Node::getNeighList(){
 	return neighList;
 }
 
@@ -86,7 +86,7 @@ Network::findNeigh(double neighDiff){
 		Node thisNode = nodeList[i];
 		double thisx = thisNode.getCoordX();
 		double thisy = thisNode.getCoordY();
-		std::vector<int> newNeighList(0);
+		std::vector<Node*> newNeighList(0);
 		for (int j = 0; j < size; j++) {
 			if (j!=i){
 				double thatx = nodeList[j].getCoordX();
@@ -95,7 +95,7 @@ Network::findNeigh(double neighDiff){
 				double diffy = thisy-thaty;
 				double diff = sqrt(pow(diffx,2)+pow(diffy,2));
 				if (diff<neighDiff){
-					newNeighList.push_back(j);
+					newNeighList.push_back(&nodeList[j]);
 				}
 			}
 		}
@@ -113,12 +113,12 @@ Network::describeNetwork(){
 		double thisx = thisNode.getCoordX();
 		double thisy = thisNode.getCoordY();
 		std::cout << "Coordinate del nodo num. "<< i <<": "<< '\n' << thisx << " "<< thisy << '\n';
-		std::vector<int> myNeigh = thisNode.getNeighList();
+		std::vector<Node*> myNeigh = thisNode.getNeighList();
 		std::cout << "Numero dei vicini del nodo num. "<< i << ": " << myNeigh.size() <<'\n';
 		std::cout << "Coordinate dei vicini: " << '\n';
 		for (int h=0; h < myNeigh.size(); h++){
-			double neighx = nodeList[myNeigh[h]].getCoordX();
-			double neighy = nodeList[myNeigh[h]].getCoordY();
+			double neighx = myNeigh[h]->getCoordX();
+			double neighy = myNeigh[h]->getCoordY();
 			std::cout << "Nodo n. "<< myNeigh[h]<< " " << neighx << " " << neighy << '\n';
 		}
 	}

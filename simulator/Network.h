@@ -12,16 +12,16 @@ class Node {
 		double pid;
 		double coordx;
 		double coordy;
-		std::vector<int> neighList;
+		std::vector<Node*> neighList;
 		std::vector<double> forwardingTable;
 	public:
 		Node();
 		setX(double x);
 		setY(double y);
-		setNeighList(std::vector<int> newNeighList);
+		setNeighList(std::vector<Node*> newNeighList);
 		double getCoordX();
 		double getCoordY();
-		std::vector<int> getNeighList();
+		std::vector<Node*> getNeighList();
 };
 
 class Network {
