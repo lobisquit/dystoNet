@@ -8,15 +8,22 @@
 class Network {
 	private:
 
+		/** List of nodes in the network */
 		std::vector<Node> nodeList;
+
+		/** Maximum distance of the neighbours of each node */
+		double neighThresh;
 
 		/** Random numbers generator */
 		std::mt19937 rng;
 
-		Distribution* distribution;
+		/** TO DO */
+		// Distribution* distribution;
+
+		void find_neigh();
 
 	public:
-		Network(int num, double x, double y);
+		Network(int num, double x, double y, double neighThresh);
 
 		std::vector<Node> getNodeList();
 		void describeNetwork();

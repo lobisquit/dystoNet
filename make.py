@@ -100,6 +100,10 @@ def run(project):
 		project : Path
 			path to the directory containing cpp files whose build has to be run
 	'''
+	# return exec_command('{path} > {output}'.format(
+	# 	path = Path('build') / project / PROGRAM_FILE,
+	# 	output = 'output.txt'
+	# ))
 	return exec_command(Path('build') / project / PROGRAM_FILE)
 
 def docs():

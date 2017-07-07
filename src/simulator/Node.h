@@ -20,7 +20,7 @@ class Node {
 		double pi_d;
 
 		/** Packets received by the node */
-		std::vector<Packet*> packets;
+		// std::vector<Packet*> packets;
 
 		/** forwardingTable towards each neighbours */
 		std::map<Node*, double> forwardingTable;
@@ -29,14 +29,16 @@ class Node {
 		Node(
 			double coordx,
 			double coordy,
-			std::map<Node*, double> forwardingTable,
 			int degree,
 			double pi_d);
 
+		void set_neighbours(std::vector<Node*> neighbours);
+
+		/** --- GETTERS --- */
 		double get_coordx();
 		double get_coordy();
-		std::vector<Node*> getNeighbours();
-		std::vector<Packet*> getPackets();
+		std::vector<Node*> get_neighbours();
+		// std::vector<Packet*> getPackets();
 
 };
 
@@ -49,15 +51,8 @@ class SensingNode : public Node{
 		SensingNode(
 			double coordx,
 			double coordy,
-			std::vector<Node*> neighbours,
 			int degree,
-			double pi):
-		Node::Node(
-			coordx,
-			coordy,
-			neighbours,
-			degree,
-			pi);
+			double pi);
 
 		int get_b();
 };
@@ -74,8 +69,8 @@ class Packet {
 
 		Packet(Node* origin, int id);
 		/** Getters */
-		Node* getOrigin();
-		int getId();
+		Node* get_origin();
+		int get_id();
 };
 
 #endif

@@ -60,8 +60,8 @@ void print_array(double* x, int K) {
 }
 
 int main() {
-	int K = 100;
-	int N = 2000;
+	int K = 50;
+	int N = 100;
 	int dim_population = 20;
 	int num_generations = 80;
 	RobustSoliton rs = RobustSoliton(
@@ -85,13 +85,36 @@ int main() {
 				/* number of generations*/ num_generations,
 				/* dim_population				*/ dim_population);
 
+	SimulatedAnnealing SA = SimulatedAnnealing(
+				/* K */ K,
+				/* N */ N,
+				/* robust_soliton */ &rs,
+				/* max_failure_probability */ 0.05,
+				/* starting_temperature */ 150.0,
+				/* cooling_rate */ 0.9,
+				/* max_iterations */ 500000,
+				/* steps_coefficient */ 5e4,
+				/* acceptance_coefficient */ 200
+	);
+
 	double x_farlocco[K];
 	for(int i=0; i<K; i++) {
 		x_farlocco[i] = 1;
 	}
 
-	std::cout << GA << "\n";
-	GA.run_search(x);
+	std::cout << SA << "\n";
+	SA.get_initial_solution(x);
+	// std::cout << "Starting from score "
+	// 		<< (SA.objective_function(x)/SA.objective_function(x_farlocco)) << " with point ";
+	// 	print_array(x, 10);
+
+	SA.run_search(x);
+		std::cout << "Arriving to   score "
+			<< (SA.objective_function(x)/SA.objective_function(x_farlocco)) << " with point ";
+		print_array(x, K);
+
+	// std::cout << GA << "\n";
+	// GA.run_search(x);
 
 	// std::cout << "Starting from score "
 	// 	<< (GA.objective_function(x)/GA.objective_function(x_farlocco)) << " with point ";

@@ -53,7 +53,7 @@ class SimulatedAnnealing : public TheoreticBound {
 			return strm;
 		}
 
-		SimulatedAnnealing(	int _K,
+		SimulatedAnnealing(int _K,
 							int _N,
 							RobustSoliton* _robust_soliton,
 							double _max_failure_probability,

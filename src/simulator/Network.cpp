@@ -1,11 +1,8 @@
 #include "Network.h"
 
-Network::Network(int num, double x, double y) {
-	neighThresh = sqrt(pow(x,2)+pow(y,2));
-   	size=num;
-   	lenx = x;
-   	leny = y;
-	std::vector<Node> newNodeList(size);
+Network::Network(int num, double lenx, double leny, double neighThresh) {
+
+	this->neighThresh = neighThresh;
 
 	// random seed is set to a default value, for reproducibility
 	rng.seed(1);
@@ -13,77 +10,60 @@ Network::Network(int num, double x, double y) {
 	std::uniform_real_distribution<double> disx(0, lenx);
 	std::uniform_real_distribution<double> disy(0, leny);
 
-	for(int i=0; i<size; i++){
-		double newNodeX = disx(rng);
-		double newNodeY = disy(rng);
-		Node newNode = Node();
-		newNode.setX(newNodeX);
-		newNode.setY(newNodeY);
-		newNodeList[i]=newNode;
+	for(int i=0; i<num; i++){
+		double newNodeX = disx(this->rng);
+		double newNodeY = disy(this->rng);
+		/**----------------- TO DO: compute degree and pi ----------------- */
+		Node newNode = Node(newNodeX, newNodeY, 2, 1);
+		this->nodeList.push_back(newNode);
 	}
-	nodeList = newNodeList;
-}
 
-double Network::getSize(){
-	return size;
-}
-
-double Network::getX(){
-	return lenx;
-}
-
-double Network::getY(){
-	return leny;
-}
-
-double Network::getArea(){
-	double area = lenx*leny;
-	return area;
+	/** Once all nodes are created, create the neighbors map */
+	this->find_neigh();
 }
 
 std::vector<Node> Network::getNodeList(){
 	return nodeList;
 }
 
-void Network::findNeigh(double neighDiff){
-	neighThresh = neighDiff;
-	for(int i=0; i<size; i++){
-		Node thisNode = nodeList[i];
-		double thisx = thisNode.getCoordX();
-		double thisy = thisNode.getCoordY();
+void Network::find_neigh(){
+	for(int i=0; i<nodeList.size(); i++){
+		Node thisNode = this->nodeList[i];
+		double thisx = thisNode.get_coordx();
+		double thisy = thisNode.get_coordy();
 		std::vector<Node*> newNeighList(0);
-		for (int j = 0; j < size; j++) {
+		for (int j = 0; j < nodeList.size(); j++) {
 			if (j!=i){
-				double thatx = nodeList[j].getCoordX();
-				double thaty = nodeList[j].getCoordY();
+				double thatx = this->nodeList[j].get_coordx();
+				double thaty = this->nodeList[j].get_coordy();
 				double diffx = thisx-thatx;
 				double diffy = thisy-thaty;
 				double diff = sqrt(pow(diffx,2)+pow(diffy,2));
-				if (diff<neighDiff){
-					newNeighList.push_back(&nodeList[j]);
+				if (diff<this->neighThresh){
+					newNeighList.push_back(&this->nodeList[j]);
 				}
 			}
 		}
-		nodeList[i].setNeighList(newNeighList);
+		this->nodeList[i].set_neighbours(newNeighList);
 	}
 }
 
 void Network::describeNetwork(){
 	std::cout << "Numero di nodi: " << nodeList.size() << '\n';
-	std::cout << "Grandezza della rete: " << lenx << "*" << leny << '\n';
-	std::cout << "Soglia di vicinanza: " << neighThresh << '\n';
+	// std::cout << "Grandezza della rete: " << lenx << "*" << leny << '\n';
+	std::cout << "Soglia di vicinanza: " << this->neighThresh << '\n';
 
-	for(int i=0; i<size; i++){
+	for(int i=0; i<nodeList.size(); i++){
 		Node thisNode = nodeList[i];
-		double thisx = thisNode.getCoordX();
-		double thisy = thisNode.getCoordY();
+		double thisx = thisNode.get_coordx();
+		double thisy = thisNode.get_coordy();
 		std::cout << "Coordinate del nodo num. "<< i <<": "<< '\n' << thisx << " "<< thisy << '\n';
-		std::vector<Node*> myNeigh = thisNode.getNeighList();
+		std::vector<Node*> myNeigh = thisNode.get_neighbours();
 		std::cout << "Numero dei vicini del nodo num. "<< i << ": " << myNeigh.size() <<'\n';
 		std::cout << "Coordinate dei vicini: " << '\n';
 		for (int h=0; h < myNeigh.size(); h++){
-			double neighx = myNeigh[h]->getCoordX();
-			double neighy = myNeigh[h]->getCoordY();
+			double neighx = myNeigh[h]->get_coordx();
+			double neighy = myNeigh[h]->get_coordy();
 			std::cout << "Nodo "<< myNeigh[h]<< " " << neighx << " " << neighy << '\n';
 		}
 	}

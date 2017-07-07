@@ -7,75 +7,85 @@ using namespace std;
 Node::Node(
 	double coordx,
 	double coordy,
-	map<Node*, double> forwardingTable,
 	int degree,
 	double pi) {
-		this.degree = degree;
-		this.pi_d = pi_d;
-		this.coordx = coordx;
-		this.coordy = coordy;
-		this.forwardingTable = forwardingTable;
-
+		this->degree = degree;
+		this->pi_d = pi_d;
+		this->coordx = coordx;
+		this->coordy = coordy;
 }
 
-vector<<Node*> getNeighbours() {
-	vector<Node*> nodes;
-
-	// iterate over map entries
-	map<Node*, double>::iterator iter = this.forwardingTable.begin();
-	while(it != this.forwardingTable.end()) {
-		// push key into vector
-		nodes.push_back(iter->first);
-
-		// jump to next one
-		iter++;
+void Node::set_neighbours(std::vector<Node*> neighbours){
+	/**------------------- TO DO ------------------
+	* Compute forwarding probability
+	*/
+	double forwarding_prob = 1/neighbours.size();
+	for (int i = 0; i < neighbours.size(); i++){
+		this->forwardingTable.insert(std::pair<Node*,double>(neighbours[i],forwarding_prob));
 	}
-	return nodes;
 }
+
+// vector<Node*> Node::get_neighbours() {
+// 	vector<Node*> nodes;
+//
+// 	// iterate over map entries
+// 	map<Node*, double>::iterator iter = this->forwardingTable.begin();
+// 	while(it != this->forwardingTable.end()) {
+// 		// push key into vector
+// 		nodes.push_back(iter->first);
+//
+// 		// jump to next one
+// 		iter++;
+// 	}
+// 	return nodes;
+// }
 
 double Node::get_coordx(){
-	return this.coordx;
+	return this->coordx;
 }
 
 double Node::get_coordy(){
-	return this.coordy;
+	return this->coordy;
 }
 
-std::vector<Node*> Node::getNeighbours(){
+std::vector<Node*> Node::get_neighbours(){
 	std::vector<Node*> neighbours;
-	for (auto const& element : this.forwardingTable) {
+	for (auto const& element : this->forwardingTable) {
 		neighbours.push_back(element.first);
 	}
 	return neighbours;
 }
 
+// vector<Packet*> Node::getPackets(){
+// 	return this->packets;
+// }
+
 SensingNode::SensingNode(
 	double coordx,
 	double coordy,
-	map<Node*, double> forwardingTable,
 	int degree,
 	double pi):
 Node::Node(
 		coordx,
 		coordy,
-		neighbours,
 		degree,
 		pi) {
-}
+	/** --------------- COMPUTE B ---------------- */
+	}
 
-vector<Packet*> Node::getPackets(){
-	return this.packets;
+int SensingNode::get_b(){
+	return this->b;
 }
 
 Packet::Packet(Node* origin, int id){
-	this.origin = origin;
-	this.id = id;
+	this->origin = origin;
+	this->id = id;
 }
 
-Node* get_origin(){
-	return this.origin;
+Node* Packet::get_origin(){
+	return this->origin;
 }
 
-int get_id(){
-	return this.id;
+int Packet::get_id(){
+	return this->id;
 }

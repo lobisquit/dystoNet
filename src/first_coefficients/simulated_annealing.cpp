@@ -33,7 +33,7 @@ SimulatedAnnealing::SimulatedAnnealing(	int _K,
 	acceptance_coefficient = _acceptance_coefficient;
 
 	// random seed is set to a default value, for reproducibility
-	rng.seed(1);
+	rng.seed(time(NULL));
 }
 
 void SimulatedAnnealing::get_initial_solution(double x[]) {
@@ -114,9 +114,9 @@ void SimulatedAnnealing::run_search(double x[]) {
 
 	while(current_iteration <= max_iterations && temperature > 0.5) {
 		// round of search for current temperature
-		std::cout << "Temperature " << temperature << " at iteration " <<
-			current_iteration << "/" << max_iterations << "\n";
-		std::cout << "Best score: " << best_score << "\n";
+		// std::cout << "Temperature " << temperature << " at iteration " <<
+		// 	current_iteration << "/" << max_iterations << "\n";
+		// std::cout << "Best score: " << best_score << "\n";
 
 		// keep trace of mean value of acceptance_probability when new point is worse
 		double acceptance_mean = 0;
@@ -156,7 +156,7 @@ void SimulatedAnnealing::run_search(double x[]) {
 
 		// report mean of acceptance probability up to now
 		acceptance_mean = acceptance_mean / worsening_proposals;
-		std::cout << "mean of acceptance_probability = " << acceptance_mean << '\n';
+		//std::cout << "mean of acceptance_probability = " << acceptance_mean << '\n';
 
 		// update temperature for new round
 		temperature = new_temperature();
