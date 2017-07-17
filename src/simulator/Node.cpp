@@ -9,44 +9,36 @@ Node::Node(double x, double y, int degree, double pi) {
 		this->pi_d = pi_d;
 		this->x = x;
 		this->y = y;
-		vector<Packet*> packets;
+		vector<Packet> packets;
 		this->packets = packets;
 }
 
-double Node::get_x(){
+double Node::get_x() {
 	return this->x;
 }
 
-double Node::get_y(){
+double Node::get_y() {
 	return this->y;
 }
 
-vector<Packet*> Node::getPackets(){
+double Node::distance(Node other) {
+	double delta_x = this->x - other.x;
+	double delta_y = this->y - other.y;
+
+	return sqrt(pow(delta_x, 2) + pow(delta_y, 2));
+}
+
+vector<Packet> Node::getPackets() {
 	return this->packets;
 }
 
-void Node::addPacket(Packet* pkt) {
+void Node::addPacket(Packet pkt) {
 	this->packets.push_back(pkt);
 }
 
-void Node::set_neighbours(vector<Node*> neighbours){
-	/** Compute forwarding probability, according to Metropolis algorithm */
-	double forwarding_prob = 1 / (double) neighbours.size();
-
-	for (Node *node : neighbours) {
-		this->forwardingTable.insert(
-			pair<Node*, double>(node, forwarding_prob));
-	}
+vector<Node> Node::get_neighbours() {
+	return this->neighbours;
 }
-
-vector<Node*> Node::get_neighbours(){
-	vector<Node*> neighbours;
-	for (auto const& entry : this->forwardingTable) {
-		neighbours.push_back(entry.first);
-	}
-	return neighbours;
-}
-
 
 SensingNode::SensingNode(
 	double x,
@@ -57,7 +49,7 @@ SensingNode::SensingNode(
 		this->b = b;
 	}
 
-double SensingNode::get_b(){
+double SensingNode::get_b() {
 	return this->b;
 }
 

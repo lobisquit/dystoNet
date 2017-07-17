@@ -2,7 +2,6 @@
 #include <vector>
 #include <random>
 #include <string>
-#include <map>
 
 using namespace std;
 
@@ -24,10 +23,10 @@ class Node {
 		double pi_d;
 
 		/** Packets received by the node */
-		vector<Packet*> packets;
+		vector<Packet> packets;
 
 		/** forwardingTable towards each neighbours */
-		map<Node*, double> forwardingTable;
+		vector<Node> neighbours;
 
 	public:
 		Node(double x, double y, int degree, double pi_d);
@@ -36,11 +35,17 @@ class Node {
 		double get_x();
 		double get_y();
 
-		vector<Packet*> getPackets();
-		void addPacket(Packet* pkt);
+		vector<Packet> getPackets();
+		void addPacket(Packet pkt);
 
-		void set_neighbours(vector<Node*> neighbours);
-		vector<Node*> get_neighbours();
+		vector<Node> get_neighbours();
+
+		/**
+		* Compute distance from another node
+		* @param other node to check
+		* @return distance from nodes
+		*/
+		double distance(Node other);
 
 		friend std::ostream& operator<<(std::ostream &strm, Node &obj) {
 			strm << "<Node("
