@@ -4,8 +4,12 @@
 #include <string>
 #include <map>
 
+using namespace std;
+
 #ifndef _NODE_H_
 #define _NODE_H_
+
+class Packet;
 
 class Node {
 	private:
@@ -20,41 +24,33 @@ class Node {
 		double pi_d;
 
 		/** Packets received by the node */
-		// std::vector<Packet*> packets;
+		vector<Packet*> packets;
 
 		/** forwardingTable towards each neighbours */
-		std::map<Node*, double> forwardingTable;
+		map<Node*, double> forwardingTable;
 
 	public:
-		Node(
-			double coordx,
-			double coordy,
-			int degree,
-			double pi_d);
+		Node(double coordx, double coordy, int degree, double pi_d);
 
-		void set_neighbours(std::vector<Node*> neighbours);
-
-		/** --- GETTERS --- */
+		/** Set neighbours in the network of current node */
 		double get_coordx();
 		double get_coordy();
-		std::vector<Node*> get_neighbours();
-		// std::vector<Packet*> getPackets();
 
+		vector<Packet*> getPackets();
+		void addPacket(Packet* pkt);
+
+		void set_neighbours(vector<Node*> neighbours);
+		vector<Node*> get_neighbours();
 };
 
-class SensingNode : public Node{
+class SensingNode : public Node {
 	private:
 		/** Number of random walks starting from the node */
-		int b;
+		double b;
 
 	public:
-		SensingNode(
-			double coordx,
-			double coordy,
-			int degree,
-			double pi);
-
-		int get_b();
+		SensingNode(double coordx, double coordy, int degree, double pi, double b);
+		double get_b();
 };
 
 class Packet {
@@ -66,9 +62,8 @@ class Packet {
 		int id;
 
 	public:
-
 		Packet(Node* origin, int id);
-		/** Getters */
+
 		Node* get_origin();
 		int get_id();
 };
