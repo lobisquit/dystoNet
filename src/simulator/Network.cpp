@@ -1,70 +1,53 @@
 #include "Network.h"
+#include "soliton.h"
 
-Network::Network(int num, double lenx, double leny, double neighThresh) {
+using namespace std;
 
-	this->neighThresh = neighThresh;
+Network::Network(
+	int N,
+	int K,
+	double len_x,
+	double len_y,
+	double max_distance,
+	Distribution* distribution) {
 
-	// random seed is set to a default value, for reproducibility
-	rng.seed(1);
+	// setup random number generation
+	mt19937 rng = distribution->get_rng();
 
-	std::uniform_real_distribution<double> disx(0, lenx);
-	std::uniform_real_distribution<double> disy(0, leny);
+	uniform_real_distribution<double> x(0, len_x);
+	uniform_real_distribution<double> y(0, len_y);
 
-	for(int i=0; i<num; i++){
-		double newNodeX = disx(this->rng);
-		double newNodeY = disy(this->rng);
-		/**----------------- TO DO: compute degree and pi ----------------- */
-		Node newNode = Node(newNodeX, newNodeY, 2, 1);
-		this->nodeList.push_back(newNode);
+
+	// create K sensing nodes
+	for(int i=0; i<K; i++) {
+		std::cout << "sensing: " << i << "\n";
+		int degree = distribution->realization();
+		double pi = degree / ( N * distribution->exp() ); // see (15) in Lin, Liao
+		double b = N * distribution->exp() / K; // see (14) in Lin, Liao
+
+		SensingNode node = SensingNode(x(rng), y(rng), degree, pi, b);
+		this->nodes.push_back( (Node) node );
 	}
 
-	/** Once all nodes are created, create the neighbors map */
-	this->find_neigh();
-}
+	// create N-K normal nodes
+	for(int i=K; i<N; i++) {
+		std::cout << "normal: " << i << "\n";
+		int degree = distribution->realization();
+		double pi = degree / ( N * distribution->exp() ); // see (15) in Lin, Liao
 
-std::vector<Node> Network::getNodeList(){
-	return nodeList;
-}
+		Node node = Node(x(rng), y(rng), degree, pi);
+		this->nodes.push_back(node);
+	}
 
-void Network::find_neigh(){
-	for(int i=0; i<nodeList.size(); i++){
-		Node thisNode = this->nodeList[i];
-		double thisx = thisNode.get_coordx();
-		double thisy = thisNode.get_coordy();
-		std::vector<Node*> newNeighList(0);
-		for (int j = 0; j < nodeList.size(); j++) {
-			if (j!=i){
-				double thatx = this->nodeList[j].get_coordx();
-				double thaty = this->nodeList[j].get_coordy();
-				double diffx = thisx-thatx;
-				double diffy = thisy-thaty;
-				double diff = sqrt(pow(diffx,2)+pow(diffy,2));
-				if (diff<this->neighThresh){
-					newNeighList.push_back(&this->nodeList[j]);
-				}
+	/** Once all nodes are created, create the neighbors network */
+	for (Node node : this->nodes) {
+		for (Node other : node.get_neighbours()) {
+			double distance = node.distance(other);
+
+			// distance == 0 is when other == node: case to avoid
+			if (distance > 0 && distance <= max_distance) {
+				node.get_neighbours().push_back(other);
 			}
-		}
-		this->nodeList[i].set_neighbours(newNeighList);
-	}
-}
-
-void Network::describeNetwork(){
-	std::cout << "Numero di nodi: " << nodeList.size() << '\n';
-	// std::cout << "Grandezza della rete: " << lenx << "*" << leny << '\n';
-	std::cout << "Soglia di vicinanza: " << this->neighThresh << '\n';
-
-	for(int i=0; i<nodeList.size(); i++){
-		Node thisNode = nodeList[i];
-		double thisx = thisNode.get_coordx();
-		double thisy = thisNode.get_coordy();
-		std::cout << "Coordinate del nodo num. "<< i <<": "<< '\n' << thisx << " "<< thisy << '\n';
-		std::vector<Node*> myNeigh = thisNode.get_neighbours();
-		std::cout << "Numero dei vicini del nodo num. "<< i << ": " << myNeigh.size() <<'\n';
-		std::cout << "Coordinate dei vicini: " << '\n';
-		for (int h=0; h < myNeigh.size(); h++){
-			double neighx = myNeigh[h]->get_coordx();
-			double neighy = myNeigh[h]->get_coordy();
-			std::cout << "Nodo "<< myNeigh[h]<< " " << neighx << " " << neighy << '\n';
 		}
 	}
 }
