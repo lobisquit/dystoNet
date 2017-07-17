@@ -1,9 +1,21 @@
-#ifndef _SOLITON_H_
-#define _SOLITON_H_
+#ifndef SOLITONH
+#define SOLITONH
 
 #include <sstream>
 
-class IdealSoliton {
+class Distribution {
+	public:
+		Distribution() {};
+
+		/**
+		* Compute probability distribution given parameters
+		* @param degree node degree
+		* @return probability of having given degree
+		*/
+		virtual double get(int degree) = 0;
+};
+
+class IdealSoliton : public Distribution {
 	public:
 		/**
 		* Ideal Soliton parameter: distribution is defined then in [0, K]
@@ -12,24 +24,19 @@ class IdealSoliton {
 
 		/**
 		* Build Ideal Soliton generator object
-		* @param _K highest integer for which the distribution is defined
+		* @param K highest integer for which the distribution is defined
 		*/
-		IdealSoliton(int _K);
+		IdealSoliton(int K);
 
 		/**
 		* Default constructor, with K set to 1000
 		*/
 		IdealSoliton();
 
-		/**
-		* Compute probability distribution given parameters
-		* @param degree node degree
-		* @return probability of having given degree
-		*/
 		double get(int degree);
 };
 
-class RobustSoliton {
+class RobustSoliton : public Distribution {
 	private:
 		/**
 		* Related Ideal Soliton distribution, employed in Robust Soliton computation
@@ -68,25 +75,20 @@ class RobustSoliton {
 		*/
 		friend std::ostream& operator<<(std::ostream &strm, RobustSoliton &obj) {
 			strm << "<RobustSoliton("
-				"c="		<< obj.c		<< ", " <<
-				"delta="	<< obj.delta	<< ", " <<
-				"K="		<< obj.K 		<< ")>";
+				"c="      << obj.c      << ", " <<
+				"delta="  << obj.delta  << ", " <<
+				"K="      << obj.K      << ")>";
 			return strm;
 		}
 
 		/**
 		* Build Robust Soliton generator object
-		* @param _c constant
-		* @param _delta maximal failure probability
-		* @param _K highest integer for which the distribution is defined
+		* @param c constant
+		* @param delta maximal failure probability
+		* @param K highest integer for which the distribution is defined
 		*/
-		RobustSoliton(double _c, double _delta, int _K);
+		RobustSoliton(double c, double delta, int K);
 
-		/**
-		* Compute probability distribution given parameters
-		* @param degree node degree
-		* @return probability of having given degree
-		*/
 		double get(int degree);
 };
 

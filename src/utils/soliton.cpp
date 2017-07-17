@@ -1,12 +1,12 @@
 #include <math.h>
 #include "soliton.h"
 
-IdealSoliton::IdealSoliton() {
+IdealSoliton::IdealSoliton() : Distribution() {
 	K = 1000;
 }
 
-IdealSoliton::IdealSoliton(int _K) {
-	K = _K;
+IdealSoliton::IdealSoliton(int K) {
+	this->K = K;
 }
 
 double IdealSoliton::get(int degree) {
@@ -19,14 +19,14 @@ double IdealSoliton::get(int degree) {
 	return 0;
 }
 
-RobustSoliton::RobustSoliton(double _c, double _delta, int _K) {
+RobustSoliton::RobustSoliton(double c, double delta, int K) : Distribution() {
 	// save parameters
-	c = _c;
-	delta = _delta;
-	K = _K;
+	this->c = c;
+	this->delta = delta;
+	this->K = K;
 
 	// generate related Ideal Soliton distribution
-	rho = IdealSoliton(_K);
+	rho = IdealSoliton(K);
 
 	// compute relevant quantities, beta and R) and store them
 	R = c * log(K / delta) * sqrt(K);
