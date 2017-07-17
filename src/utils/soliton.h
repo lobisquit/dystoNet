@@ -41,6 +41,13 @@ class Distribution {
 		* @return probability of having given degree
 		*/
 		double get(int degree);
+
+		/**
+		* @return retrieve rng for use outside of distribution
+		*/
+		mt19937 get_rng() {
+			return this->rng;
+		}
 };
 
 class IdealSoliton : public Distribution {
