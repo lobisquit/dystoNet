@@ -11,7 +11,7 @@ using namespace std;
 class Packet;
 
 class Node {
-	private:
+	protected:
 		/** Coordinates of the node */
 		double x;
 		double y;
@@ -64,6 +64,15 @@ class SensingNode : public Node {
 	public:
 		SensingNode(double x, double y, int degree, double pi, double b);
 		double get_b();
+
+		friend std::ostream& operator<<(std::ostream &strm, SensingNode &obj) {
+			strm << "<SensingNode("
+				"x="      << obj.x      << ", " <<
+				"y="      << obj.y      << ", " <<
+				"b="      << obj.b      << ", " <<
+				"degree=" << obj.degree << ")>";
+			return strm;
+		}
 };
 
 class Packet {
