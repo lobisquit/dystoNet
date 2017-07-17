@@ -2,63 +2,68 @@
 #define SOLITONH
 
 #include <sstream>
+#include <random>
+
+using namespace std;
 
 class Distribution {
-	public:
-		Distribution() {};
+	protected:
+		/** Random number generator, needed for realizations */
+		mt19937 rng;
 
 		/**
-		* Compute probability distribution given parameters
+		* Vector of length K, where element \f$ p(i) = probabilities[i-1] \f$:
+		* probability is non-zero only for \f$ i \in [1, K] \f$
+		*/
+		vector<double> probabilities;
+
+	public:
+		Distribution(int seed);
+
+		Distribution(vector<double> probabilities, int seed);
+
+		/**
+		* Get a realization of the random variable described by
+		* current Distribution
+		* @return realization
+		*/
+		int realization();
+
+		/**
+		* Get expected value of random variable described by Distribution
+		* @return expected value
+		*/
+		double exp();
+
+		/**
+		* Compute probability Distribution (given parameters)
 		* @param degree node degree
 		* @return probability of having given degree
 		*/
-		virtual double get(int degree) = 0;
+		double get(int degree);
 };
 
 class IdealSoliton : public Distribution {
 	public:
 		/**
-		* Ideal Soliton parameter: distribution is defined then in [0, K]
-		*/
-		int K;
-
-		/**
 		* Build Ideal Soliton generator object
-		* @param K highest integer for which the distribution is defined
+		* @param K highest integer for which the Distribution is defined
 		*/
-		IdealSoliton(int K);
+		IdealSoliton(int K, int seed);
 
-		/**
-		* Default constructor, with K set to 1000
-		*/
-		IdealSoliton();
-
-		double get(int degree);
+		using Distribution::get;
+		using Distribution::realization;
+		using Distribution::exp;
 };
 
 class RobustSoliton : public Distribution {
 	private:
 		/**
-		* Related Ideal Soliton distribution, employed in Robust Soliton computation
-		*/
-		IdealSoliton rho;
-
-		/**
-		* Normalization factor for Robust Soliton distribution
-		*/
-		double beta;
-
-		/**
-		* Parameter precomputed and stored at creation given c, delta, K
-		*/
-		double R;
-
-		/**
 		* Compute function tau
 		* @param degree node degree
 		* @return tau function computed in given input integer
 		*/
-		double get_tau(int degree);
+		double get_tau(int degree, double R);
 
 	public:
 		/** Robust Soliton constant */
@@ -67,7 +72,7 @@ class RobustSoliton : public Distribution {
 		/** Robust Soliton maximal failure probability */
 		double delta;
 
-		/** Ideal Soliton parameter: distribution is defined then in [0, K] */
+		/** Ideal Soliton parameter: Distribution is defined then in [0, K] */
 		int K;
 
 		/**
@@ -85,11 +90,13 @@ class RobustSoliton : public Distribution {
 		* Build Robust Soliton generator object
 		* @param c constant
 		* @param delta maximal failure probability
-		* @param K highest integer for which the distribution is defined
+		* @param K highest integer for which the Distribution is defined
 		*/
-		RobustSoliton(double c, double delta, int K);
+		RobustSoliton(double c, double delta, int K, int seed);
 
-		double get(int degree);
+		using Distribution::get;
+		using Distribution::realization;
+		using Distribution::exp;
 };
 
 #endif
