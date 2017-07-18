@@ -7,7 +7,7 @@
 
 TEST_CASE( "Test theoretic bound", "[TheoreticBound]" ) {
 	int K = 10;
-	RobustSoliton rs = RobustSoliton(0.01, 0.05, K);
+	RobustSoliton rs = RobustSoliton(0.01, 0.05, K, 1);
 	TheoreticBound TB = TheoreticBound(
 				/* K 						*/ K,
 				/* N 						*/ 100,
@@ -23,7 +23,7 @@ TEST_CASE( "Test theoretic bound", "[TheoreticBound]" ) {
 
 TEST_CASE( "Test simulated annealing", "[SimulatedAnnealing]" ) {
 	int K = 10;
-	RobustSoliton rs = RobustSoliton(0.01, 0.05, K);
+	RobustSoliton rs = RobustSoliton(0.01, 0.05, K, 1);
 	SimulatedAnnealing SA = SimulatedAnnealing(
 				/* K 						*/ K,
 				/* N 						*/ 100,
