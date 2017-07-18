@@ -1,3 +1,6 @@
+#ifndef _NODE_H_
+#define _NODE_H_
+
 #include <iostream>
 #include <vector>
 #include <random>
@@ -5,13 +8,10 @@
 
 using namespace std;
 
-#ifndef _NODE_H_
-#define _NODE_H_
-
 class Packet;
 
 class Node {
-	protected:
+	private:
 		/** Coordinates of the node */
 		double x;
 		double y;
@@ -23,22 +23,27 @@ class Node {
 		double pi_d;
 
 		/** Packets received by the node */
-		vector<Packet> packets;
+		vector<Packet*> packets;
 
-		/** forwardingTable towards each neighbours */
-		vector<Node> neighbours;
+		/** Neighbours of current node */
+		vector<Node*> neighbours;
+
+		/** Number of random walks starting from the node (= if node is not sensing)*/
+		double b;
 
 	public:
-		Node(double x, double y, int degree, double pi_d);
+		Node(double x, double y, int degree, double pi_d, double b);
 
-		/** Set neighbours in the network of current node */
 		double get_x();
 		double get_y();
+		double get_b();
 
-		vector<Packet> getPackets();
-		void addPacket(Packet pkt);
+		vector<Packet*> get_packets();
+		void add_packet(Packet* pkt);
 
-		vector<Node> get_neighbours();
+		vector<Node*> get_neighbours();
+
+		void add_neighbour(Node* other);
 
 		/**
 		* Compute distance from another node
@@ -49,24 +54,6 @@ class Node {
 
 		friend std::ostream& operator<<(std::ostream &strm, Node &obj) {
 			strm << "<Node("
-				"x="      << obj.x      << ", " <<
-				"y="      << obj.y      << ", " <<
-				"degree=" << obj.degree << ")>";
-			return strm;
-		}
-};
-
-class SensingNode : public Node {
-	private:
-		/** Number of random walks starting from the node */
-		double b;
-
-	public:
-		SensingNode(double x, double y, int degree, double pi, double b);
-		double get_b();
-
-		friend std::ostream& operator<<(std::ostream &strm, SensingNode &obj) {
-			strm << "<SensingNode("
 				"x="      << obj.x      << ", " <<
 				"y="      << obj.y      << ", " <<
 				"b="      << obj.b      << ", " <<
@@ -92,10 +79,10 @@ class Packet {
 		Node* get_origin();
 		int get_id();
 
-		friend std::ostream& operator<<(std::ostream &strm, Packet &obj) {
+		friend std::ostream& operator<<(std::ostream &strm, Packet obj) {
 			strm << "<Packet("
-				"origin=" << obj.origin << ", " <<
-				"id="     << obj.id     << ")>";
+				"origin=" << *obj.origin << ", " <<
+				"id="     <<  obj.id     << ")>";
 			return strm;
 		}
 };

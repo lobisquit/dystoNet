@@ -4,12 +4,13 @@
 
 using namespace std;
 
-Node::Node(double x, double y, int degree, double pi) {
+Node::Node(double x, double y, int degree, double pi, double b) {
 		this->degree = degree;
 		this->pi_d = pi_d;
 		this->x = x;
 		this->y = y;
-		vector<Packet> packets;
+		this->b = b;
+		vector<Packet*> packets;
 		this->packets = packets;
 }
 
@@ -28,29 +29,20 @@ double Node::distance(Node other) {
 	return sqrt(pow(delta_x, 2) + pow(delta_y, 2));
 }
 
-vector<Packet> Node::getPackets() {
+vector<Packet*> Node::get_packets() {
 	return this->packets;
 }
 
-void Node::addPacket(Packet pkt) {
+void Node::add_packet(Packet* pkt) {
 	this->packets.push_back(pkt);
 }
 
-vector<Node> Node::get_neighbours() {
+vector<Node*> Node::get_neighbours() {
 	return this->neighbours;
 }
 
-SensingNode::SensingNode(
-	double x,
-	double y,
-	int degree,
-	double pi,
-	double b): Node::Node(x, y, degree, pi) {
-		this->b = b;
-	}
-
-double SensingNode::get_b() {
-	return this->b;
+void Node::add_neighbour(Node* other) {
+	this->neighbours.push_back(other);
 }
 
 Packet::Packet(Node* origin, int id) {
