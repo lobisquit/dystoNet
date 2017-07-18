@@ -22,6 +22,10 @@ double Node::get_y() {
 	return this->y;
 }
 
+double Node::get_b() {
+	return this->b;
+}
+
 double Node::distance(Node other) {
 	double delta_x = this->x - other.x;
 	double delta_y = this->y - other.y;

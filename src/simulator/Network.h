@@ -14,6 +14,7 @@ class Network {
 		vector<Node> nodes;
 
 	public:
+		vector<Packet> packets;
 		/**
 		* Create a network of nodes
 		* @param N number of nodes (of any type)
@@ -33,13 +34,20 @@ class Network {
 			Distribution* distribution);
 
 		friend std::ostream& operator<<(std::ostream &strm, Network &obj) {
-			strm << "<Network(nodes=[";
+			strm << "<Network(\nnodes=[";
 
 			for (Node node : obj.nodes) {
-				strm << node << ", ";
+				strm << "\n" << node << ", ";
 			}
 			// \b\b moves cursor backwards 2 times, deleting last ", "
-			strm << "\b\b)>";
-			return strm;
+			strm << "], ";
+			strm << "\npackages=[";
+
+			for (Packet packet : obj.packets) {
+				strm << "\n" << packet << ", ";
+			}
+			return strm << "])>";
 		}
+
+		vector<Node> get_nodes();
 };
