@@ -2,14 +2,6 @@
 #include "binomial.cpp"
 #include "catch.hpp"
 #include <math.h>
-//
-// #if defined(linux) || defined(__linux) || defined(__linux__)
-// 	#include "../src/binomial.cpp"
-// #elif defined(WIN32) || defined(__WIN32__) || defined(_WIN32) || defined(_MSC_VER)
-// 	#include "..\src\binomial.cpp"
-// #else
-// 	#error OS not supported
-// #endif
 
 TEST_CASE( "Test log_gamma values", "[ln_gamma]" ) {
 	SECTION( "This gamma coincide with python scipy implementation" ) {
