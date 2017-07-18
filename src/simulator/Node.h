@@ -8,8 +8,6 @@
 
 using namespace std;
 
-class Packet;
-
 class Node {
 	private:
 		/** Coordinates of the node */
@@ -22,14 +20,11 @@ class Node {
 		/** \f$ \pi_d \f$ */
 		double pi_d;
 
-		/** Packets received by the node */
-		vector<Packet*> packets;
-
-		/** Neighbours of current node */
-		vector<Node*> neighbours;
-
 		/** Number of random walks starting from the node (= if node is not sensing)*/
 		double b;
+
+		/** neighbour_ids id of current node */
+		vector<int> neighbour_ids;
 
 	public:
 		Node(double x, double y, int degree, double pi_d, double b);
@@ -38,12 +33,9 @@ class Node {
 		double get_y();
 		double get_b();
 
-		vector<Packet*> get_packets();
-		void add_packet(Packet* pkt);
+		vector<int> get_neighbour_ids();
 
-		vector<Node*> get_neighbours();
-
-		void add_neighbour(Node* other);
+		void add_neighbour(int other);
 
 		/**
 		* Compute distance from another node
@@ -57,32 +49,46 @@ class Node {
 				"x="      << obj.x      << ", " <<
 				"y="      << obj.y      << ", " <<
 				"b="      << obj.b      << ", " <<
-				"degree=" << obj.degree << ")>";
-			return strm;
+				"degree=" << obj.degree << ", ";
+
+			strm << "neighbours=[";
+
+			// print no more than MAX_LENGTH entries, otherwise ...
+			unsigned int MAX_LENGTH = 15;
+			for (unsigned int i=0; i<obj.neighbour_ids.size(); i++) {
+				if (i<MAX_LENGTH) {
+					strm << obj.neighbour_ids[i] << ", ";
+				}
+				else {
+					strm << "...";
+					break;
+				}
+			}
+			return strm << "])>";
 		}
 };
 
 class Packet {
 	private:
 		/** Source of the packet */
-		Node* origin;
+		int origin_id;
 
 		/**
 		* Unique id of the packet, since each source
 		* generate more than 1 packet
 		*/
-		int id;
+		int packet_id;
 
 	public:
-		Packet(Node* origin, int id);
+		Packet(int origin_id, int id);
 
-		Node* get_origin();
+		int get_origin_id();
 		int get_id();
 
 		friend std::ostream& operator<<(std::ostream &strm, Packet obj) {
 			strm << "<Packet("
-				"origin=" << *obj.origin << ", " <<
-				"id="     <<  obj.id     << ")>";
+				"origin_id=" << obj.origin_id << ", " <<
+				"packet_id=" <<  obj.packet_id << ")>";
 			return strm;
 		}
 };

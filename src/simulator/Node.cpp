@@ -10,8 +10,6 @@ Node::Node(double x, double y, int degree, double pi, double b) {
 		this->x = x;
 		this->y = y;
 		this->b = b;
-		vector<Packet*> packets;
-		this->packets = packets;
 }
 
 double Node::get_x() {
@@ -33,31 +31,23 @@ double Node::distance(Node other) {
 	return sqrt(pow(delta_x, 2) + pow(delta_y, 2));
 }
 
-vector<Packet*> Node::get_packets() {
-	return this->packets;
+vector<int> Node::get_neighbour_ids() {
+	return this->neighbour_ids;
 }
 
-void Node::add_packet(Packet* pkt) {
-	this->packets.push_back(pkt);
+void Node::add_neighbour(int other) {
+	this->neighbour_ids.push_back(other);
 }
 
-vector<Node*> Node::get_neighbours() {
-	return this->neighbours;
+Packet::Packet(int origin_id, int packet_id) {
+	this->origin_id = origin_id;
+	this->packet_id = packet_id;
 }
 
-void Node::add_neighbour(Node* other) {
-	this->neighbours.push_back(other);
-}
-
-Packet::Packet(Node* origin, int id) {
-	this->origin = origin;
-	this->id = id;
-}
-
-Node* Packet::get_origin() {
-	return this->origin;
+int Packet::get_origin_id() {
+	return this->origin_id;
 }
 
 int Packet::get_id() {
-	return this->id;
+	return this->packet_id;
 }

@@ -3,26 +3,21 @@
 #include <iostream>
 
 int main() {
-	int N = 10;
+	int N = 1000;
 	int K = 5;
 	double len_x = 10;
 	double len_y = 10;
-	double neighThresh = 100;
+	double neighThresh = 2;
 	Distribution d = IdealSoliton(K, 10);
 
 	Network net = Network(N, K, len_x, len_y, neighThresh, &d);
 
-	for (Node node : net.get_nodes()) {
-		std::cout <<
-			node << ", neigh_size = " <<
-			node.get_neighbours().size() << "\n";
-		for (Node* neigh : node.get_neighbours()) {
-			std::cout << *neigh << "\n";
-		}
-	}
-
-	// std::cout << net.packets.size() << '\n';
-	// std::cout << net << "\n";
+	// for (Node node : net.get_nodes()) {
+	// 	std::cout << node << "\n";
+	// }
+	//
+	// std::cout << net.get_packets().size() << '\n';
+	std::cout << net << "\n";
 }
 
 // int main() {
