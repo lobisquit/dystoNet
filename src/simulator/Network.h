@@ -14,6 +14,9 @@ class Network {
 		vector<Node> nodes;
 		vector<Packet> packets;
 
+		/** Random numbers generator */
+		mt19937 rng;
+
 	public:
 		/**
 		* Create a network of nodes
@@ -64,4 +67,6 @@ class Network {
 
 		vector<Node> get_nodes();
 		vector<Packet> get_packets();
+
+		void spread_packets();
 };

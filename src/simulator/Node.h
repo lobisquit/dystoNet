@@ -17,25 +17,27 @@ class Node {
 		/** Degree */
 		int degree;
 
-		/** \f$ \pi_d \f$ */
-		double pi_d;
-
-		/** Number of random walks starting from the node (= if node is not sensing)*/
-		double b;
+		/** \f$ \pi_d \f$ = probability that a random walk stops at current node */
+		double pi;
 
 		/** neighbour_ids id of current node */
 		vector<int> neighbour_ids;
 
+		/** packets ids received by current node */
+		vector<int> packets_ids;
+
 	public:
-		Node(double x, double y, int degree, double pi_d, double b);
+		Node(double x, double y, int degree, double pi);
 
 		double get_x();
 		double get_y();
-		double get_b();
+		double get_pi();
 
-		vector<int> get_neighbour_ids();
+		vector<int>* get_neighbour_ids();
+		vector<int>* get_packets_ids();
 
 		void add_neighbour(int other);
+		void add_packet(int packet_id);
 
 		/**
 		* Compute distance from another node
@@ -48,7 +50,6 @@ class Node {
 			strm << "<Node("
 				"x="      << obj.x      << ", " <<
 				"y="      << obj.y      << ", " <<
-				"b="      << obj.b      << ", " <<
 				"degree=" << obj.degree << ", ";
 
 			strm << "neighbours=[";
@@ -58,6 +59,20 @@ class Node {
 			for (unsigned int i=0; i<obj.neighbour_ids.size(); i++) {
 				if (i<MAX_LENGTH) {
 					strm << obj.neighbour_ids[i] << ", ";
+				}
+				else {
+					strm << "...";
+					break;
+				}
+			}
+			strm << "], ";
+
+			strm << "packets=[";
+
+			// print no more than MAX_LENGTH entries, otherwise ...
+			for (unsigned int i=0; i<obj.packets_ids.size(); i++) {
+				if (i<MAX_LENGTH) {
+					strm << obj.packets_ids[i] << ", ";
 				}
 				else {
 					strm << "...";

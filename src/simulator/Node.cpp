@@ -4,12 +4,11 @@
 
 using namespace std;
 
-Node::Node(double x, double y, int degree, double pi, double b) {
+Node::Node(double x, double y, int degree, double pi) {
 		this->degree = degree;
-		this->pi_d = pi_d;
+		this->pi = pi;
 		this->x = x;
 		this->y = y;
-		this->b = b;
 }
 
 double Node::get_x() {
@@ -20,8 +19,8 @@ double Node::get_y() {
 	return this->y;
 }
 
-double Node::get_b() {
-	return this->b;
+double Node::get_pi() {
+	return this->pi;
 }
 
 double Node::distance(Node other) {
@@ -31,12 +30,20 @@ double Node::distance(Node other) {
 	return sqrt(pow(delta_x, 2) + pow(delta_y, 2));
 }
 
-vector<int> Node::get_neighbour_ids() {
-	return this->neighbour_ids;
+vector<int>* Node::get_neighbour_ids() {
+	return &this->neighbour_ids;
+}
+
+vector<int>* Node::get_packets_ids() {
+	return &this->packets_ids;
 }
 
 void Node::add_neighbour(int other) {
 	this->neighbour_ids.push_back(other);
+}
+
+void Node::add_packet(int packet_id) {
+	this->packets_ids.push_back(packet_id);
 }
 
 Packet::Packet(int origin_id, int packet_id) {
