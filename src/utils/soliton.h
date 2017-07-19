@@ -33,7 +33,7 @@ class Distribution {
 		* Get expected value of random variable described by Distribution
 		* @return expected value
 		*/
-		double exp();
+		virtual double exp();
 
 		/**
 		* Compute probability Distribution (given parameters)
@@ -105,5 +105,43 @@ class RobustSoliton : public Distribution {
 		using Distribution::realization;
 		using Distribution::exp;
 };
+
+class OverheadRobustSoliton : public RobustSoliton {
+	private:
+		/**
+		* Overhead coefficients
+		*/
+		vector<double> x;
+
+	public:
+		/**
+		* Make RobustSoliton objects printable, for debug
+		*/
+		friend std::ostream& operator<<(std::ostream &strm, OverheadRobustSoliton &obj) {
+			strm << "<OverheadRobustSoliton("
+				"c="      << obj.c      << ", " <<
+				"delta="  << obj.delta  << ", " <<
+				"K="      << obj.K      << ")>";
+			return strm;
+		}
+
+		/**
+		* Build Robust Soliton generator object
+		* @param c constant
+		* @param delta maximal failure probability
+		* @param K highest integer for which the Distribution is defined
+		*/
+		OverheadRobustSoliton(
+			vector<double> x,
+			double c,
+			double delta,
+			int K,
+			int seed);
+
+		int realization();
+		double get(int degree);
+		double exp();
+};
+
 
 #endif

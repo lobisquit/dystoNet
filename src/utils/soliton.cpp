@@ -1,6 +1,7 @@
 #include <math.h>
 #include <random>
 #include "soliton.h"
+#include <iostream>
 
 using namespace std;
 
@@ -125,4 +126,37 @@ double RobustSoliton::get_tau(int degree, double R) {
 		return R * log(R / delta) / K;
 	}
 	return 0;
+}
+
+OverheadRobustSoliton::OverheadRobustSoliton(
+	vector<double> x,
+	double c,
+	double delta,
+	int K,
+	int seed) : RobustSoliton(c, delta, K, seed) {
+
+	if (x.size() != (unsigned int) K) {
+		throw invalid_argument( "x (overheads vector) must be of lenght K" );
+	}
+	this->x = x;
+}
+
+int OverheadRobustSoliton::realization() {
+	int realization = RobustSoliton::realization();
+	// add overhead, round to nearest integer
+	return (int) ( realization * this->x[realization - 1] );
+}
+
+double OverheadRobustSoliton::exp() {
+	double E = 0;
+	for(unsigned int degree = 1; degree <= this->probabilities.size(); degree++) {
+		E += degree * RobustSoliton::get(degree) * this->x[degree - 1];
+	}
+	return E;
+}
+
+double OverheadRobustSoliton::get(int degree) {
+	std::cerr
+		<< "WARNING: get of OverheadRobustSoliton has un-overheaded degree as its input\n";
+	return RobustSoliton::get(degree);
 }
