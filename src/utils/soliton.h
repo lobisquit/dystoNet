@@ -33,14 +33,14 @@ class Distribution {
 		* Get expected value of random variable described by Distribution
 		* @return expected value
 		*/
-		virtual double exp();
+		virtual double expectation();
 
 		/**
 		* Compute probability Distribution (given parameters)
 		* @param degree node degree
 		* @return probability of having given degree
 		*/
-		double get(int degree);
+		double probability(int degree);
 
 		/**
 		* @return retrieve rng for use outside of distribution
@@ -58,9 +58,9 @@ class IdealSoliton : public Distribution {
 		*/
 		IdealSoliton(int K, int seed);
 
-		using Distribution::get;
+		using Distribution::probability;
 		using Distribution::realization;
-		using Distribution::exp;
+		using Distribution::expectation;
 };
 
 class RobustSoliton : public Distribution {
@@ -101,9 +101,9 @@ class RobustSoliton : public Distribution {
 		*/
 		RobustSoliton(double c, double delta, int K, int seed);
 
-		using Distribution::get;
+		using Distribution::probability;
 		using Distribution::realization;
-		using Distribution::exp;
+		using Distribution::expectation;
 };
 
 class OverheadRobustSoliton : public RobustSoliton {
@@ -139,8 +139,8 @@ class OverheadRobustSoliton : public RobustSoliton {
 			int seed);
 
 		int realization();
-		double get(int degree);
-		double exp();
+		double probability(int degree);
+		double expectation();
 };
 
 

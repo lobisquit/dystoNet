@@ -43,7 +43,17 @@ void Node::add_neighbour(int other) {
 }
 
 void Node::add_packet(int packet_id) {
-	this->packets_ids.push_back(packet_id);
+	// store only if packet was not in node
+	bool contains_packet = false;
+	for (int i : this->packets_ids) {
+		if (packet_id == i) {
+			contains_packet = true;
+			break;
+		}
+	}
+	if (!contains_packet) {
+		this->packets_ids.push_back(packet_id);
+	}
 }
 
 Packet::Packet(int origin_id, int packet_id) {

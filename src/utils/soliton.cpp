@@ -11,23 +11,24 @@ Distribution::Distribution(int seed) {
 }
 
 Distribution::Distribution(vector<double> probabilities, int seed) {
+	// TODO check probabilities
 	this->probabilities = probabilities;
 
 	// set random number generator
 	this->rng.seed(seed);
 }
 
-double Distribution::get(int degree) {
+double Distribution::probability(int degree) {
 	if (degree >= 1 && degree <= (int) this->probabilities.size()) {
 		return this->probabilities[degree - 1];
 	}
 	return 0;
 }
 
-double Distribution::exp() {
+double Distribution::expectation() {
 	double E = 0;
 	for(unsigned int degree = 1; degree <= this->probabilities.size(); degree++) {
-		E += degree * this->get(degree);
+		E += degree * this->probability(degree);
 	}
 	return E;
 }
@@ -42,7 +43,7 @@ int Distribution::realization() {
 
 	for(unsigned int degree = 1; degree <= this->probabilities.size(); degree++) {
 		// get to the next step
-		sum += this->get(degree);
+		sum += this->probability(degree);
 
 		// if in current degree interval, return
 		if (choice < sum) {
@@ -94,7 +95,7 @@ RobustSoliton::RobustSoliton(
 	double R = c * log(K / delta) * sqrt(K);
 	double beta = 0;
 	for(int d = 1; d <= K; d++) {
-		beta += rho.get(d) + get_tau(d, R);
+		beta += rho.probability(d) + get_tau(d, R);
 	}
 
 	// set capacity of probabilities to K
@@ -105,7 +106,7 @@ RobustSoliton::RobustSoliton(
 		// compute probability of current degree
 		double prob;
 		if (degree >= 1 && degree <= K ) {
-			prob = (rho.get(degree) + this->get_tau(degree, R)) / beta;
+			prob = (rho.probability(degree) + this->get_tau(degree, R)) / beta;
 		}
 		else {
 			prob = 0;
@@ -147,16 +148,16 @@ int OverheadRobustSoliton::realization() {
 	return (int) ( realization * this->x[realization - 1] );
 }
 
-double OverheadRobustSoliton::exp() {
+double OverheadRobustSoliton::expectation() {
 	double E = 0;
 	for(unsigned int degree = 1; degree <= this->probabilities.size(); degree++) {
-		E += degree * RobustSoliton::get(degree) * this->x[degree - 1];
+		E += degree * RobustSoliton::probability(degree) * this->x[degree - 1];
 	}
 	return E;
 }
 
-double OverheadRobustSoliton::get(int degree) {
+double OverheadRobustSoliton::probability(int degree) {
 	std::cerr
-		<< "WARNING: get of OverheadRobustSoliton has un-overheaded degree as its input\n";
-	return RobustSoliton::get(degree);
+		<< "WARNING: probability of OverheadRobustSoliton has un-overheaded degree as its input\n";
+	return RobustSoliton::probability(degree);
 }
