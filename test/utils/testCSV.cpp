@@ -1,21 +1,23 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include <string>
-using namespace std;
+#include "catch.hpp"
 #include "functionCSV.cpp"
+#include <stdio.h>
 
-int main () {
-	vector<double> v1(10,10);
-	string name("results/results.csv");
+TEST_CASE("Functions writeCSV and readCSV are able to build and read a csv file containing a vector of double", "[CSV]"){
+	SECTION("My input and output values are the same"){
+		vector<double> v1(1000);
+		for(unsigned int i=0; i<v1.size(); i++){
+			v1[i]=i;
+		}
+		string name("results.csv");
 
-	writeCSV(v1, name);
+		writeCSV(v1, name, "Results");
 
-	vector<double> v2 = readCSV("results/results.csv");
+		vector<double> v2 = readCSV(name);
 
-	for (int i =0; i<v2.size(); i++){
-		cout << v2[i] << '\n';
+		for (unsigned int i =0; i<v2.size(); i++){
+			REQUIRE(abs(v1[i]-v2[i]) <= 1e-9);
+		}
 	}
 
-	return 0;
+	remove("results.csv");
 }
