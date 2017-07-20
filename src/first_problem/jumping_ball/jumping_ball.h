@@ -11,7 +11,8 @@ using namespace std;
 
 class JumpingBall : public SimulatedAnnealing {
 	public:
-
+		int max_worsening_steps;
+		
 		double best_score;
 
 		/**
@@ -40,7 +41,9 @@ class JumpingBall : public SimulatedAnnealing {
 			double cooling_rate,
 			int max_iterations,
 			double steps_coefficient,
-			double acceptance_coefficient);
+			double acceptance_coefficient,
+			int max_worsening_steps
+		);
 
 		// these functions are taken as they are from upper class
 		// these functions are taken as they are from upper class

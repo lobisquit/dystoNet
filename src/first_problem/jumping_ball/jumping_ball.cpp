@@ -21,7 +21,8 @@ JumpingBall::JumpingBall(
 	double cooling_rate,
 	int max_iterations,
 	double steps_coefficient,
-	double acceptance_coefficient)
+	double acceptance_coefficient,
+	int max_worsening_steps)
 		: SimulatedAnnealing::SimulatedAnnealing(
 			K,
 			N,
@@ -31,7 +32,9 @@ JumpingBall::JumpingBall(
 			cooling_rate,
 			max_iterations,
 			steps_coefficient,
-			acceptance_coefficient) {}
+			acceptance_coefficient) {
+	this->max_worsening_steps = max_worsening_steps;
+}
 
 vector<double> JumpingBall::get_neighbour(vector<double> x) {
 	// copy x to new array before perturbation
@@ -47,6 +50,7 @@ vector<double> JumpingBall::get_neighbour(vector<double> x) {
 
 		if (this->best_score - objective_function(x) < 0) {
 			worsening_steps++;
+			std::cout << "      worsening_steps = " << worsening_steps << "\r";
 		}
 		else {
 			worsening_steps = 0;
@@ -58,18 +62,22 @@ vector<double> JumpingBall::get_neighbour(vector<double> x) {
 		uniform_int_distribution<int> index_choice(0, this->K-1);
 
 		// if we were are not improving for too long, jump!
-		if (worsening_steps>1000) {
-			// perturb an uniformly distributed number of components
-			for(int i=0; i<number_of_variations(this->rng); i++) {
-				int chosen_d = index_choice(this->rng);
-				candidate[chosen_d] = x[chosen_d] + perturbation(this->rng);
+		if (worsening_steps > this->max_worsening_steps) {
+			while (!respect_constraints(candidate)) {
+				// perturb an uniformly distributed number of components
+				for(int i=0; i<number_of_variations(this->rng); i++) {
+					int chosen_d = index_choice(this->rng);
+					candidate[chosen_d] = x[chosen_d] + perturbation(this->rng);
+				}
 			}
 			// reset step counter after the jump
 			worsening_steps = 0;
+			cout << "Jump! \n";
 		}
 		else {
 			// classic step if counter is too low
-			uniform_real_distribution<double> perturbation(-50, 50);
+			uniform_real_distribution<double>
+				perturbation(-2*this->temperature, this->temperature);
 			uniform_int_distribution<int> index_choice(0, K-1);
 			int chosen_d = index_choice(rng);
 			candidate[chosen_d] = x[chosen_d] + perturbation(rng);
