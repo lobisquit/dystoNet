@@ -17,7 +17,8 @@ GeneticAlgorithm::GeneticAlgorithm(int K,
 									RobustSoliton* robust_soliton,
 									double max_failure_probability,
 									int num_generations,
-									int dim_population)
+									int dim_population,
+									double survival_rate)
 										// constructor of upper class to trigger
 										: FirstProblem::FirstProblem(
 											K,
@@ -27,48 +28,35 @@ GeneticAlgorithm::GeneticAlgorithm(int K,
 	//Genetic specific parameters
 	this->num_generations = num_generations;
 	this->dim_population = dim_population;
-}
-
-vector<double> GeneticAlgorithm::get_individual(){
-	uniform_real_distribution<double> generator(1, 40);
-	vector<double> individual(this->K,0);
-
-	while(!respect_constraints(individual)){
-		for(int j=0; j<this->K; j++){
-			individual[j] = generator(rng);
-		}
-	}
-
-	return individual;
+	this->survival_rate = survival_rate;
 }
 
 vector<vector<double>> GeneticAlgorithm::get_initial_population() {
-	vector<vector<double>> population(this->dim_population, vector<double>(this->K));
-	for(int i = 0; i<this->dim_population; i++){
-		population[i] = get_individual();
+	vector<vector<double>>
+		population(this->dim_population, vector<double>(this->K));
+	for(int i = 0; i < this->dim_population; i++){
+		population[i] = FirstProblem::get_initial_solution();
+		cerr
+			<< "Created "
+			<< i+1 << "/" << this->dim_population
+			<< " elements \r";
 	}
 
 	return population;
 }
 
-bool GeneticAlgorithm::sortByObjFunction(
-	vector<double> individual_i, vector<double> individual_j){
-	return objective_function(individual_i) > objective_function(individual_j);
-}
-
 vector<double> GeneticAlgorithm::run_search() {
 	int generation = 0;
-	vector<vector<double>> population = get_initial_population();
 
+	vector<vector<double>> population = get_initial_population();
 	/** Selection */
 	/** fraction of individuals picked for the next generation */
-	double fraction_rate = 0.25;
-	int first_part = ceil(this->dim_population*fraction_rate);
-	int chosen_d;
-	uniform_real_distribution<double> mutation(-20, 20);
-	uniform_int_distribution<int> index_choice(0, K-1);
+	int part_size = ceil(this->dim_population * this->survival_rate);
 
-	vector<double> no_redundancy(this->K,1);
+	uniform_real_distribution<double> mutation(-20, 20);
+	uniform_int_distribution<int> index_choice(0, K - 1);
+
+	vector<double> no_redundancy(this->K, 1);
 
 	double b0 = objective_function(no_redundancy);
 
@@ -79,29 +67,33 @@ vector<double> GeneticAlgorithm::run_search() {
 				return this->objective_function(s1) < this->objective_function(s2);
 			});
 
-		/** Best score for this generation, since vectors are sorted */
-		cout << objective_function(population[1])/b0 << "\n";
+		cerr << "=====> "
+			<< generation << "/" << this->num_generations
+			<< " ==> g1 = "
+			/** Best score for this generation, since vectors are sorted */
+			<< this->objective_function(population[0]) / b0 << "\n";
 
-		/** Copy of the best individuals in the whole population, and then perturbe it, checking you are respecting
-		* constraints.
+		/** Copy the best individuals in the population, and then
+		* perturbe them checking constraints are still met.
 		*/
-		for(int j = 1; j < round(1/fraction_rate); j++){
-			for(int i = 0; i<first_part; i++){
-				chosen_d = index_choice(rng);
-				population[j*first_part+i] = population[i];
+		for(int j = 1; j < round(1/this->survival_rate); j++){
+			for(int i = 0; i < part_size; i++){
+				int chosen_d = index_choice(rng);
+				population[j * part_size + i] = population[i];
 
-				vector<double> iterable = population[j*first_part+i];
-				/** Mutation */
+				/** Mutation of  */
+				vector<double> candidate = population[j * part_size + i];
 				do {
-					iterable[chosen_d] = population[j*first_part+i][chosen_d] + mutation(rng);
-				} while(!respect_constraints(iterable));
+					candidate[chosen_d] =
+						population[j * part_size + i][chosen_d] + mutation(rng);
+				} while(!respect_constraints(candidate));
 
-				population[j*first_part+i] = iterable;
+				population[j * part_size + i] = candidate;
 			}
 		}
 		generation++;
 	}
-	return population[1];
+	return population[0];
 }
 
 vector<double> get_neighbour(vector<double> x) {

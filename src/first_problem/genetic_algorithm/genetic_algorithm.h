@@ -16,8 +16,8 @@ using namespace std;
 
 class GeneticAlgorithm : public FirstProblem {
 	public:
-		/** Random numbers generator */
-		mt19937 rng;
+		/** Percentage of population that survives the next turn */
+		double survival_rate;
 
 		/** Number of generations created from starting population */
 		int num_generations;
@@ -44,7 +44,8 @@ class GeneticAlgorithm : public FirstProblem {
 							RobustSoliton* robust_soliton,
 							double max_failure_probability,
 							int num_generations,
-							int dim_population);
+							int dim_population,
+							double survival_rate);
 
 		// these functions are taken as they are from upper class
 		using FirstProblem::objective_function;
@@ -61,11 +62,6 @@ class GeneticAlgorithm : public FirstProblem {
 		* the possible solution.
 		*/
 		vector<vector<double>> get_initial_population();
-
-		vector<double> get_individual();
-
-		bool sortByObjFunction(vector<double> individual_i, vector<double> individual_j);
-
 };
 
 #endif
