@@ -53,9 +53,9 @@ class FirstProblem : public HeuristicSearch {
 		bool respect_constraints(vector<double> candidate_x);
 
 		// functions to implement in lower classes
-		virtual vector<double> get_neighbour(vector<double> x) = 0;
-		virtual double acceptance_probability(vector<double> old_x, vector<double> new_x) = 0;
-		virtual vector<double> run_search() = 0;
+		vector<double> get_neighbour(vector<double> x);
+		double acceptance_probability(vector<double> old_x, vector<double> new_x);
+		vector<double> run_search();
 };
 
 #endif

@@ -27,9 +27,6 @@ GeneticAlgorithm::GeneticAlgorithm(int K,
 	//Genetic specific parameters
 	this->num_generations = num_generations;
 	this->dim_population = dim_population;
-
-	// random seed is set to a default value, for reproducibility
-	rng.seed(1);
 }
 
 vector<double> GeneticAlgorithm::get_individual(){
@@ -46,7 +43,6 @@ vector<double> GeneticAlgorithm::get_individual(){
 }
 
 vector<vector<double>> GeneticAlgorithm::get_initial_population() {
-
 	vector<vector<double>> population(this->dim_population, vector<double>(this->K));
 	for(int i = 0; i<this->dim_population; i++){
 		population[i] = get_individual();
@@ -55,12 +51,12 @@ vector<vector<double>> GeneticAlgorithm::get_initial_population() {
 	return population;
 }
 
-bool GeneticAlgorithm::sortByObjFunction(vector<double> individual_i, vector<double> individual_j){
+bool GeneticAlgorithm::sortByObjFunction(
+	vector<double> individual_i, vector<double> individual_j){
 	return objective_function(individual_i) > objective_function(individual_j);
 }
 
 vector<double> GeneticAlgorithm::run_search() {
-
 	int generation = 0;
 	vector<vector<double>> population = get_initial_population();
 
@@ -76,9 +72,7 @@ vector<double> GeneticAlgorithm::run_search() {
 
 	double b0 = objective_function(no_redundancy);
 
-
 	while(generation < this->num_generations){
-
 		/** Sorting of the population */
 		std::sort(population.begin(), population.end(),
 			[this](vector<double> s1, vector<double> s2) -> bool {
@@ -98,9 +92,9 @@ vector<double> GeneticAlgorithm::run_search() {
 
 				vector<double> iterable = population[j*first_part+i];
 				/** Mutation */
-				do{
+				do {
 					iterable[chosen_d] = population[j*first_part+i][chosen_d] + mutation(rng);
-				}while(!respect_constraints(iterable));
+				} while(!respect_constraints(iterable));
 
 				population[j*first_part+i] = iterable;
 			}
@@ -110,10 +104,10 @@ vector<double> GeneticAlgorithm::run_search() {
 	return population[1];
 }
 
-vector<double> get_neighbour(vector<double> x){
+vector<double> get_neighbour(vector<double> x) {
 	throw invalid_argument("Not implemented for this class");
 }
 
-double acceptance_probability(vector<double> old_x, vector<double> new_x){
+double acceptance_probability(vector<double> old_x, vector<double> new_x) {
 	throw invalid_argument("Not implemented for this class");
 }
