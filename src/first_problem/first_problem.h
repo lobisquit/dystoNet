@@ -45,16 +45,13 @@ class FirstProblem : public HeuristicSearch {
 		}
 
 		double objective_function(vector<double> x);
-
 		vector<double> get_initial_solution();
-
 		bool respect_constraints(vector<double> candidate_x);
 
-		vector<double> get_neighbour(vector<double> x);
-
-		double acceptance_probability(vector<double> old_x, vector<double> new_x);
-
-		vector<double> run_search();
+		// functions to implement in lower classes
+		virtual vector<double> get_neighbour(vector<double> x) = 0;
+		virtual double acceptance_probability(vector<double> old_x, vector<double> new_x) = 0;
+		virtual vector<double> run_search() = 0;
 };
 
 #endif

@@ -54,15 +54,3 @@ bool FirstProblem::respect_constraints(vector<double> candidate_x) {
 	}
 	return true;
 }
-
-vector<double> FirstProblem::get_neighbour(vector<double> x) {
-	throw std::logic_error("Not implemented for this class");
-}
-
-double FirstProblem::acceptance_probability(vector<double> old_x, vector<double> new_x) {
-	throw std::logic_error("Not implemented for this class");
-}
-
-vector<double> FirstProblem::run_search() {
-	throw std::logic_error("Not implemented for this class");
-}

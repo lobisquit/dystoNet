@@ -76,14 +76,15 @@ def build(package, dependencies):
 	'''
 	# compile package deps
 	for dep in dependencies:
-		for cpp_file in dep.glob('**/*.cpp'):
-			single_compile(cpp_file, dependencies=[])
+		for cpp_file in dep.glob('*.cpp'):
+			# compile including all dependencies, to be sure
+			single_compile(cpp_file, dependencies=dependencies)
 
 	# compile package files
 	if package.parent == TEST_DIR:
 		dependencies += [Path('test/'), SRC_DIR / package.stem]
 
-	for cpp_file in package.glob('**/*.cpp'):
+	for cpp_file in package.glob('*.cpp'):
 		single_compile(
 			cpp_file=cpp_file,
 			# include each dependency

@@ -12,10 +12,12 @@
 #ifndef _SIMULATED_ANNEALING_H_
 #define _SIMULATED_ANNEALING_H_
 
-class SimulatedAnnealing : public TheoreticBound {
+using namespace std;
+
+class SimulatedAnnealing : public FirstProblem {
 	public:
 		/** Random numbers generator */
-		std::mt19937 rng;
+		mt19937 rng;
 
 		/** Current system temperature */
 		double temperature;
@@ -38,7 +40,7 @@ class SimulatedAnnealing : public TheoreticBound {
 		/**
 		* Custom overload of << operator, to print debug info
 		*/
-		friend std::ostream& operator<<(std::ostream &strm, SimulatedAnnealing &obj) {
+		friend ostream& operator<<(ostream &strm, SimulatedAnnealing &obj) {
 			strm << "<SimulatedAnnealing("
 				"K="						<< obj.K 						<< ", " <<
 				"N="						<< obj.N 						<< ", " <<
@@ -53,29 +55,29 @@ class SimulatedAnnealing : public TheoreticBound {
 			return strm;
 		}
 
-		SimulatedAnnealing(int _K,
-							int _N,
-							RobustSoliton* _robust_soliton,
-							double _max_failure_probability,
-							double _starting_temperature,
-							double _cooling_rate,
-							int _max_iterations,
-							double _steps_coefficient,
-							double _acceptance_coefficient);
+		SimulatedAnnealing(
+			int K,
+			int N,
+			RobustSoliton* robust_soliton,
+			double max_failure_probability,
+			double starting_temperature,
+			double cooling_rate,
+			int max_iterations,
+			double steps_coefficient,
+			double acceptance_coefficient);
 
 		// these functions are taken as they are from upper class
-		using TheoreticBound::objective_function;
-
-		using TheoreticBound::respect_constraints;
+		using FirstProblem::objective_function;
+		using FirstProblem::respect_constraints;
 
 		// these are implemented in cpp
-		void get_initial_solution(double x[]);
+		vector<double> get_initial_solution();
+		bool respect_constraints(vector<double> candidate_x);
+		vector<double> get_neighbour(vector<double> x);
 
-		void get_neighbour(double x[], double new_x[]);
+		double acceptance_probability(vector<double> old_x, vector<double> new_x);
 
-		double acceptance_probability(double old_x[], double new_x[]);
-
-		void run_search(double x[]);
+		vector<double> run_search();
 
 		/**
 		* Compute temperature for next round of search
