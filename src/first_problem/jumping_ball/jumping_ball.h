@@ -2,36 +2,22 @@
 
 #include "soliton.h"
 #include "first_problem.h"
+#include "simulated_annealing.h"
 
 #ifndef _FIRST_JUMPING_BALL_H_
 #define _FIRST_JUMPING_BALL_H_
 
-class JumpingBall : public TheoreticBound {
+using namespace std;
+
+class JumpingBall : public SimulatedAnnealing {
 	public:
-		/** Random numbers generator */
-		std::mt19937 rng;
 
-		/** Current system temperature */
-		double temperature;
-		/** Number of attempts with temperature value \f$ T \f$ is computed as
-		* \f$ \frac{steps\_coefficient}{T} \f$
-		*/
-		double steps_coefficient;
-
-		/** After round with temperature \f$ T \f$, next one has temperature
-		* \f$ cooling\_rate \cdot T \f$
-		*/
-		double cooling_rate;
-
-		/** Maximal numbers of steps taken from starting point */
-		int max_iterations;
-
-		int minkiata;
+		double best_score;
 
 		/**
 		* Custom overload of << operator, to print debug info
 		*/
-		/*friend std::ostream& operator<<(std::ostream &strm, SimulatedAnnealing &obj) {
+		/*friend ostream& operator<<(ostream &strm, SimulatedAnnealing &obj) {
 			strm << "<SimulatedAnnealing("
 				"K="						<< obj.K 						<< ", " <<
 				"N="						<< obj.N 						<< ", " <<
@@ -45,40 +31,44 @@ class JumpingBall : public TheoreticBound {
 			return strm;
 		}*/
 
-		JumpingBall(	int _K,
-							int _N,
-							RobustSoliton* _robust_soliton,
-							double _max_failure_probability,
-							double _starting_temperature,
-							double _cooling_rate,
-							int _max_iterations,
-							double _steps_coefficient);
+		JumpingBall(
+			int K,
+			int N,
+			RobustSoliton* robust_soliton,
+			double max_failure_probability,
+			double starting_temperature,
+			double cooling_rate,
+			int max_iterations,
+			double steps_coefficient,
+			double acceptance_coefficient);
 
 		// these functions are taken as they are from upper class
-		using TheoreticBound::objective_function;
+		// these functions are taken as they are from upper class
+		using FirstProblem::objective_function;
+		using FirstProblem::respect_constraints;
+		using FirstProblem::get_initial_solution;
+		using SimulatedAnnealing::acceptance_probability;
 
-		using TheoreticBound::respect_constraints;
-
-		// these are implemented in cpp
-		void get_initial_solution(double x[]);
-
-		void get_neighbour(double x[], double new_x[], double best_score);
-
-		double acceptance_probability(double old_x[], double new_x[]);
-
-		void run_search(double x[]);
+		vector<double> run_search();
+		vector<double> get_neighbour(vector<double> x);
 
 		/**
-		* Compute temperature for next round of search
-		* @return temperature value
+		* Custom overload of << operator, to print debug info
 		*/
-		double new_temperature();
-
-		/**
-		* Search steps to perform for current temperature value
-		* @return real number whose floor is the number of steps
-		*/
-		double temperature_steps();
+		friend ostream& operator<<(ostream &strm, JumpingBall &obj) {
+			strm << "<JumpingBall("
+				"K="                       << obj.K                       << ", " <<
+				"N="                       << obj.N                       << ", " <<
+				"max_failure_probability=" << obj.max_failure_probability << ", " <<
+				"robust_soliton="          << *obj.robust_soliton         << ", " <<
+				"temperature="             << obj.temperature             << ", " <<
+				"cooling_rate="            << obj.cooling_rate            << ", " <<
+				"max_iterations="          << obj.max_iterations          << ", " <<
+				"steps_coefficient="       << obj.steps_coefficient       << ", " <<
+				"acceptance_coefficient="  << obj.acceptance_coefficient  <<
+				")>";
+			return strm;
+		}
 };
 
 #endif
