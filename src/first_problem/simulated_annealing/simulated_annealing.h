@@ -42,15 +42,15 @@ class SimulatedAnnealing : public FirstProblem {
 		*/
 		friend ostream& operator<<(ostream &strm, SimulatedAnnealing &obj) {
 			strm << "<SimulatedAnnealing("
-				"K="						<< obj.K 						<< ", " <<
-				"N="						<< obj.N 						<< ", " <<
-				"max_failure_probability=" 	<< obj.max_failure_probability 	<< ", " <<
-				"robust_soliton=" 			<< *obj.robust_soliton 			<< ", " <<
-				"temperature=" 				<< obj.temperature 				<< ", " <<
-				"cooling_rate=" 			<< obj.cooling_rate 			<< ", " <<
-				"max_iterations=" 			<< obj.max_iterations 			<< ", " <<
-				"steps_coefficient="		<< obj.steps_coefficient		<< ", " <<
-				"acceptance_coefficient="	<< obj.acceptance_coefficient	<<
+				"K="                       << obj.K                       << ", " <<
+				"N="                       << obj.N                       << ", " <<
+				"max_failure_probability=" << obj.max_failure_probability << ", " <<
+				"robust_soliton="          << *obj.robust_soliton         << ", " <<
+				"temperature="             << obj.temperature             << ", " <<
+				"cooling_rate="            << obj.cooling_rate            << ", " <<
+				"max_iterations="          << obj.max_iterations          << ", " <<
+				"steps_coefficient="       << obj.steps_coefficient       << ", " <<
+				"acceptance_coefficient="  << obj.acceptance_coefficient  <<
 				")>";
 			return strm;
 		}

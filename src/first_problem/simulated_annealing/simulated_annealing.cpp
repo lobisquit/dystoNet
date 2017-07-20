@@ -36,19 +36,6 @@ SimulatedAnnealing::SimulatedAnnealing(
 	this->acceptance_coefficient = acceptance_coefficient;
 }
 
-vector<double> SimulatedAnnealing::get_initial_solution() {
-	vector<double> x(this->K, 1);
-	uniform_real_distribution<double> generator(1, 100);
-
-	while (!FirstProblem::respect_constraints(x)) {
-		// create a new point ex-novo, until constrants are met
-		for(int j=0; j<this->K; j++){
-			x[j] = generator(rng);
-		}
-	}
-	return x;
-}
-
 vector<double> SimulatedAnnealing::get_neighbour(vector<double> x) {
 
 	// initializa distributions
@@ -103,7 +90,7 @@ double SimulatedAnnealing::temperature_steps() {
 }
 
 vector<double> SimulatedAnnealing::run_search() {
-	vector<double> x = get_initial_solution();
+	vector<double> x = FirstProblem::get_initial_solution();
 
 	// keep trace of how much jumps have been done since the beginning
 	int current_iteration = 0;
