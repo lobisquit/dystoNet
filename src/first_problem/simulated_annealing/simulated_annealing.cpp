@@ -111,7 +111,7 @@ vector<double> SimulatedAnnealing::run_search() {
 
 	while(current_iteration <= this->max_iterations) {
 		// round of search for current temperature
-		std::cerr << "=====> "
+		cerr << "=====> "
 			<< current_iteration << "/" << this->max_iterations
 			<< " ==> temperature: " << this->temperature
 			<< " ==> Best score: " << best_score << "\n";
