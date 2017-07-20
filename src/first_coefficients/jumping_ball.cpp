@@ -7,7 +7,7 @@
 
 #include "soliton.h"
 #include "binomial.h"
-#include "firstProblem.h"
+#include "first_problem.h"
 #include "jumping_ball.h"
 
 JumpingBall::JumpingBall(   int _K,

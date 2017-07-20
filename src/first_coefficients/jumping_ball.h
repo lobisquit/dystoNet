@@ -1,7 +1,7 @@
 #include <sstream>
 
 #include "soliton.h"
-#include "firstProblem.h"
+#include "first_problem.h"
 
 #ifndef _FIRST_JUMPING_BALL_H_
 #define _FIRST_JUMPING_BALL_H_
