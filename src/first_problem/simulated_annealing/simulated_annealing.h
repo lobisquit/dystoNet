@@ -69,6 +69,7 @@ class SimulatedAnnealing : public FirstProblem {
 		// these functions are taken as they are from upper class
 		using FirstProblem::objective_function;
 		using FirstProblem::respect_constraints;
+		using FirstProblem::get_initial_solution;
 
 		// these are implemented in cpp
 		vector<double> get_initial_solution();

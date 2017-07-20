@@ -8,14 +8,16 @@
 #include "binomial.h"
 #include "first_problem.h"
 
-FirstProblem::FirstProblem(int K,
-								int N,
-								RobustSoliton* robust_soliton,
-								double max_failure_probability) {
+FirstProblem::FirstProblem(
+	int K,
+	int N,
+	RobustSoliton* robust_soliton,
+	double max_failure_probability) {
 	this->K = K;
 	this->N = N;
 	this->robust_soliton = robust_soliton;
 	this->max_failure_probability = max_failure_probability;
+	this->rng = robust_soliton->get_rng();
 }
 
 double FirstProblem::objective_function(vector<double> x) {
@@ -27,7 +29,16 @@ double FirstProblem::objective_function(vector<double> x) {
 }
 
 vector<double> FirstProblem::get_initial_solution() {
-	throw std::logic_error("Not implemented for this class");
+	vector<double> x(this->K, 1);
+	uniform_real_distribution<double> generator(1, 100);
+
+	while (!this->respect_constraints(x)) {
+		// create a new point ex-novo, until constrants are met
+		for(int j=0; j<this->K; j++){
+			x[j] = generator(this->rng);
+		}
+	}
+	return x;
 }
 
 bool FirstProblem::respect_constraints(vector<double> candidate_x) {

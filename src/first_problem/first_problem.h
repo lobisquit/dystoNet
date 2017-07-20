@@ -14,6 +14,9 @@
 
 class FirstProblem : public HeuristicSearch {
 	public:
+		/** Random numbers generator */
+		mt19937 rng;
+
 		/** Number of sensor nodes */
 		int K;
 
@@ -26,10 +29,11 @@ class FirstProblem : public HeuristicSearch {
 		/** Robust Soliton reference distribution */
 		RobustSoliton* robust_soliton;
 
-		FirstProblem(int _K,
-						int _N,
-						RobustSoliton* _robust_soliton,
-						double _max_failure_probability);
+		FirstProblem(
+			int K,
+			int N,
+			RobustSoliton* robust_soliton,
+			double max_failure_probability);
 
 		/**
 		* Custom overload of << operator, to print debug info

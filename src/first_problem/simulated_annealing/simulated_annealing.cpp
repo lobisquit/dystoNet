@@ -23,16 +23,17 @@ SimulatedAnnealing::SimulatedAnnealing(
 	double steps_coefficient,
 	double acceptance_coefficient)
 	// constructor of upper class to trigger
-	: FirstProblem::FirstProblem(K, N, robust_soliton, max_failure_probability) {
+		: FirstProblem::FirstProblem(
+			K,
+			N,
+			robust_soliton,
+			max_failure_probability) {
 	// annealing specific parameters
 	this->temperature = starting_temperature;
 	this->cooling_rate = cooling_rate;
 	this->max_iterations = max_iterations;
 	this->steps_coefficient = steps_coefficient;
 	this->acceptance_coefficient = acceptance_coefficient;
-
-	// randon number generator is taken from distribution
-	this->rng = robust_soliton->get_rng();
 }
 
 vector<double> SimulatedAnnealing::get_initial_solution() {
