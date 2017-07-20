@@ -8,7 +8,7 @@
 #include "soliton.h"
 #include "binomial.h"
 #include "simulated_annealing.h"
-#include "theoretic_bound.h"
+#include "first_problem.h"
 
 SimulatedAnnealing::SimulatedAnnealing(	int _K,
 										int _N,

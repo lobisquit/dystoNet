@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "soliton.h"
-#include "theoretic_bound.h"
+#include "first_problem.h"
 
 #ifndef _SIMULATED_ANNEALING_H_
 #define _SIMULATED_ANNEALING_H_

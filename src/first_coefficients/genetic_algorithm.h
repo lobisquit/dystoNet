@@ -7,7 +7,7 @@
 #include <sstream>
 
 #include "soliton.h"
-#include "theoretic_bound.h"
+#include "first_problem.h"
 
 #ifndef _GENETIC_ALGORITHM_H_
 #define _GENETIC_ALGORITHM_H_

@@ -9,10 +9,10 @@
 #include "soliton.h"
 #include "heuristicSearch.h"
 
-#ifndef _FIRST_THEORETIC_BOUND_H_
-#define _FIRST_THEORETIC_BOUND_H_
+#ifndef _FIRST_PROBLEM_H_
+#define _FIRST_PROBLEM_H_
 
-class TheoreticBound : public HeuristicSearch {
+class FirstProblem : public HeuristicSearch {
 	public:
 		/** Number of sensor nodes */
 		int K;
@@ -26,7 +26,7 @@ class TheoreticBound : public HeuristicSearch {
 		/** Robust Soliton reference distribution */
 		RobustSoliton* robust_soliton;
 
-		TheoreticBound(	int _K,
+		FirstProblem(int _K,
 						int _N,
 						RobustSoliton* _robust_soliton,
 						double _max_failure_probability);
@@ -34,8 +34,8 @@ class TheoreticBound : public HeuristicSearch {
 		/**
 		* Custom overload of << operator, to print debug info
 		*/
-		friend std::ostream& operator<<(std::ostream &strm, TheoreticBound &obj) {
-			strm << "<TheoreticBound("
+		friend std::ostream& operator<<(std::ostream &strm, FirstProblem &obj) {
+			strm << "<FirstProblem("
 				"K="						<< obj.K 						<< ", " <<
 				"N="						<< obj.N 						<< ", " <<
 				"max_failure_probability=" 	<< obj.max_failure_probability 	<< ", " <<
@@ -44,17 +44,17 @@ class TheoreticBound : public HeuristicSearch {
 			return strm;
 		}
 
-		double objective_function(double x[]);
+		double objective_function(vector<double> x);
 
-		void get_initial_solution(double x[]);
+		vector<double> get_initial_solution();
 
-		bool respect_constraints(double candidate_x[]);
+		bool respect_constraints(vector<double> candidate_x);
 
-		void get_neighbour(double x[], double new_x[]);
+		vector<double> get_neighbour(vector<double> x);
 
-		double acceptance_probability(double old_x[], double new_x[]);
+		double acceptance_probability(vector<double> old_x, vector<double> new_x);
 
-		void run_search(double best_x[]);
+		vector<double> run_search();
 };
 
 #endif
