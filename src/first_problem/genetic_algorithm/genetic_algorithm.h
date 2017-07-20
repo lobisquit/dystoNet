@@ -12,7 +12,9 @@
 #ifndef _GENETIC_ALGORITHM_H_
 #define _GENETIC_ALGORITHM_H_
 
-class GeneticAlgorithm : public TheoreticBound {
+using namespace std;
+
+class GeneticAlgorithm : public FirstProblem {
 	public:
 		/** Random numbers generator */
 		std::mt19937 rng;
@@ -37,32 +39,32 @@ class GeneticAlgorithm : public TheoreticBound {
 			return strm;
 		}
 
-		GeneticAlgorithm(	int _K,
-							int _N,
-							RobustSoliton* _robust_soliton,
-							double _max_failure_probability,
-							int _num_generations,
-							int _dim_population);
+		GeneticAlgorithm(int K,
+							int N,
+							RobustSoliton* robust_soliton,
+							double max_failure_probability,
+							int num_generations,
+							int dim_population);
 
 		// these functions are taken as they are from upper class
-		using TheoreticBound::objective_function;
+		using FirstProblem::objective_function;
+		using FirstProblem::respect_constraints;
+		using FirstProblem::get_initial_solution;
 
-		using TheoreticBound::respect_constraints;
+		vector<double> get_neighbour(vector<double> x);
+		double acceptance_probability(vector<double> old_x, vector<double> new_x);
 
-		// these are implemented in cpp
 		/**
 		* Create the first generation, with random values within the range of
 		* the possible solution.
 		*/
-		//void GeneticAlgorithm::get_initial_population(std::vector < std::vector<double> >* population);
-		void get_initial_population(double** population);
+		vector<vector<double>> get_initial_population();
 
-		void get_individual(double individual[]);
+		vector<double> get_individual();
 
-		bool sortByObjFunction(double individual_i[], double individual_j[]);
+		bool sortByObjFunction(vector<double> individual_i, vector<double> individual_j);
 
-		void run_search(double x[]);
-
+		vector<double> run_search();
 };
 
 #endif

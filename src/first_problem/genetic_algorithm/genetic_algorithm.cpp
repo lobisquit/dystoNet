@@ -10,116 +10,110 @@
 #include "genetic_algorithm.h"
 #include "first_problem.h"
 
-void array_copy(double* x, double* y, int dim){
-	for(int i = 0; i < dim; i++){
-		x[i] = y[i];
-	}
-}
+using namespace std;
 
-GeneticAlgorithm::GeneticAlgorithm(	int _K,
-									int _N,
-									RobustSoliton* _robust_soliton,
-									double _max_failure_probability,
-									int _num_generations,
-									int _dim_population)
+GeneticAlgorithm::GeneticAlgorithm(int K,
+									int N,
+									RobustSoliton* robust_soliton,
+									double max_failure_probability,
+									int num_generations,
+									int dim_population)
 										// constructor of upper class to trigger
-										: TheoreticBound::TheoreticBound(
-											_K,
-											_N,
-											_robust_soliton,
-											_max_failure_probability) {
+										: FirstProblem::FirstProblem(
+											K,
+											N,
+											robust_soliton,
+											max_failure_probability) {
 	//Genetic specific parameters
-	num_generations = _num_generations;
-	dim_population = _dim_population;
+	this->num_generations = num_generations;
+	this->dim_population = dim_population;
 
 	// random seed is set to a default value, for reproducibility
-	rng.seed( 1 );
-	//rng.seed(1);
+	rng.seed(1);
 }
 
-void GeneticAlgorithm::get_individual(double individual[]){
-	std::uniform_real_distribution<double> generator(1, 40);
+vector<double> GeneticAlgorithm::get_individual(){
+	uniform_real_distribution<double> generator(1, 40);
+	vector<double> individual(this->K,0);
 
 	while(!respect_constraints(individual)){
-		for(int j=0; j<K; j++){
+		for(int j=0; j<this->K; j++){
 			individual[j] = generator(rng);
 		}
 	}
+
+	return individual;
 }
 
-void GeneticAlgorithm::get_initial_population(double** population) {
+vector<vector<double>> GeneticAlgorithm::get_initial_population() {
 
-	for(int i = 0; i<dim_population; i++){
-		get_individual(population[i]);
+	vector<vector<double>> population(this->dim_population, vector<double>(this->K));
+	for(int i = 0; i<this->dim_population; i++){
+		population[i] = get_individual();
 	}
+
+	return population;
 }
 
-bool GeneticAlgorithm::sortByObjFunction(double individual_i[], double individual_j[]){
+bool GeneticAlgorithm::sortByObjFunction(vector<double> individual_i, vector<double> individual_j){
 	return objective_function(individual_i) > objective_function(individual_j);
 }
 
-void GeneticAlgorithm::run_search(double x[]) {
+vector<double> GeneticAlgorithm::run_search() {
 
 	int generation = 0;
-	/** Initialization */
-	double** population;
-	population = new double*[dim_population];
-	for (int i = 0; i < dim_population; i++){
-		population[i] = new double[K];
-	}
-
-	get_initial_population(population);
+	vector<vector<double>> population = get_initial_population();
 
 	/** Selection */
 	/** fraction of individuals picked for the next generation */
 	double fraction_rate = 0.25;
-	int first_part = ceil(dim_population*fraction_rate);
-	double score[dim_population];
+	int first_part = ceil(this->dim_population*fraction_rate);
 	int chosen_d;
-	std::uniform_real_distribution<double> mutation(-20, 20);
-	std::uniform_int_distribution<int> index_choice(0, K-1);
+	uniform_real_distribution<double> mutation(-20, 20);
+	uniform_int_distribution<int> index_choice(0, K-1);
 
-	double x_farlocco[K];
-	for(int i=0; i<K; i++) {
-		x_farlocco[i] = 1;
-	}
+	vector<double> no_redundancy(this->K,1);
 
-	double b0 = objective_function(x_farlocco);
+	double b0 = objective_function(no_redundancy);
 
 
-	while(generation < num_generations){
+	while(generation < this->num_generations){
 
 		/** Sorting of the population */
-		std::sort(population, population + dim_population,
-			[this](double s1[], double s2[]) -> bool {
+		std::sort(population.begin(), population.end(),
+			[this](vector<double> s1, vector<double> s2) -> bool {
 				return this->objective_function(s1) < this->objective_function(s2);
 			});
 
-		for(int i = 0; i<dim_population; i++){
-			/** Compute the score with the actual population */
-			score[i] = objective_function(population[i]);
-		}
-		std::cout << score[1]/b0 << "\n";
+		/** Best score for this generation, since vectors are sorted */
+		cout << objective_function(population[1])/b0 << "\n";
 
-		/** Create the new generation */
-		//double** new_generation;
-		dim_population = first_part*round(1/fraction_rate);
-
-
+		/** Copy of the best individuals in the whole population, and then perturbe it, checking you are respecting
+		* constraints.
+		*/
 		for(int j = 1; j < round(1/fraction_rate); j++){
-
 			for(int i = 0; i<first_part; i++){
 				chosen_d = index_choice(rng);
-				array_copy(population[j*first_part+i], population[i], K);
+				population[j*first_part+i] = population[i];
 
+				vector<double> iterable = population[j*first_part+i];
 				/** Mutation */
 				do{
-					population[j*first_part+i][chosen_d] = population[j*first_part+i][chosen_d] + mutation(rng);
-				}while(!respect_constraints(population[j*first_part+i]));
+					iterable[chosen_d] = population[j*first_part+i][chosen_d] + mutation(rng);
+				}while(!respect_constraints(iterable));
 
+				population[j*first_part+i] = iterable;
 			}
 		}
 		generation++;
 	}
+	return population[1];
+}
 
+vector<double> get_neighbour(vector<double> x){
+	throw invalid_argument("Not implemented for this class");
+}
+
+double acceptance_probability(vector<double> old_x, vector<double> new_x){
+	throw invalid_argument("Not implemented for this class");
 }
