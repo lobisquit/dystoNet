@@ -84,9 +84,10 @@ int main() {
 	std::cout << JB << "\n";
 
 	vector<double> best_redundancy = JB.run_search();
-		std::cout << "Arriving to score "
+		std::cout << "g1 = "
 			<< (
-				JB.objective_function(best_redundancy) / JB.objective_function(no_redundancy)
+				JB.objective_function(best_redundancy) /
+				JB.objective_function(no_redundancy)
 			) << "\n";
 
 	// std::cout << GA << "\n";
