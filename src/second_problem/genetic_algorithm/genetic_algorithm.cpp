@@ -17,7 +17,8 @@ GeneticAlgorithm::GeneticAlgorithm(int K,
 									RobustSoliton* robust_soliton,
 									double max_failure_probability,
 									int num_generations,
-									int dim_population)
+									int dim_population,
+									double survival_rate)
 										// constructor of upper class to trigger
 										: SecondProblem::SecondProblem(
 											K,
@@ -76,8 +77,8 @@ vector<double> GeneticAlgorithm::run_search() {
 		/** Copy of the best individuals in the whole population, and then perturbe it, checking you are respecting
 		* constraints.
 		*/
-		for(int j = 1; j < round(1/fraction_rate); j++){
-			for(int i = 0; i<first_part; i++){
+		for(int j = 1; j < round(1/this->survival_rate); j++){
+			for(int i = 0; i<part_size; i++){
 				int chosen_d = index_choice(rng);
 				population[j*part_size+i] = population[i];
 

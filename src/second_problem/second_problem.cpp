@@ -8,6 +8,8 @@
 #include "binomial.h"
 #include "second_problem.h"
 
+using namespace std;
+
 SecondProblem::SecondProblem(
 	int K,
 	int N,
@@ -43,12 +45,21 @@ vector<double> SecondProblem::get_initial_solution() {
 	vector<double> v(this->K, 1);
 	uniform_real_distribution<double> generator(1, 100);
 
-	while (!this->respect_constraints(v)) {
+	do{
+		double sum = 0;
 		// create a new point ex-novo, until constrants are met
 		for(int j=0; j<this->K; j++){
 			v[j] = generator(this->rng);
+			sum += v[j];
 		}
-	}
+
+		for(int j=0; j<this->K; j++){
+			v[j] /= sum;
+		}
+	}while (!this->respect_constraints(v));
+
+	for(int i=0; i<10; i++)
+		cout << v[i] << ' ';
 	return v;
 }
 
@@ -71,7 +82,7 @@ bool SecondProblem::respect_constraints(vector<double> candidate_v) {
 		for(int i = 1; i<=this->K; i++){
 			sum += candidate_v[i-1];
 		}
-		if(sum < 1) {
+		if(sum != 1) {
 			return false;
 		}
 	}
