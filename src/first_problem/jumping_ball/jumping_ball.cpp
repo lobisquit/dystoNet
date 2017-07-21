@@ -41,6 +41,8 @@ vector<double> JumpingBall::get_neighbour(vector<double> x) {
 	// copy x to new array before perturbation
 	vector<double> candidate(K, 1);
 
+	// count number of steps taken that lead to a
+	// solution worse than the current top
 	do {
 		// copy x to candidate
 		candidate = x;
@@ -51,7 +53,7 @@ vector<double> JumpingBall::get_neighbour(vector<double> x) {
 		uniform_int_distribution<int> index_choice(0, this->K-1);
 
 		// if we were are not improving for too long, jump!
-		if (this->worsening_steps > this->max_worsening_steps) {
+		if (worsening_steps > this->max_worsening_steps) {
 			while (!respect_constraints(candidate)) {
 				// perturb an uniformly distributed number of components
 				for(int i=0; i<number_of_variations(this->rng); i++) {
@@ -59,12 +61,10 @@ vector<double> JumpingBall::get_neighbour(vector<double> x) {
 					candidate[chosen_d] = x[chosen_d] + perturbation(this->rng);
 				}
 			}
-
-			cout
-				<< "Jump! steps = "
-				<< this->worsening_steps << "/"
-				<< this->max_worsening_steps << "\r";
+			// reset step counter after the jump
 			this->worsening_steps = 0;
+			this->num_jump = this->num_jump+1;
+			cout << "Jump num." << this->num_jump <<" \n";
 		}
 		else {
 			// classic step if counter is too low
@@ -87,6 +87,7 @@ vector<double> JumpingBall::run_search() {
 
 	// save current best result in these variables
 	vector<double> best_x(this->K, 1);
+	this->num_jump = 0;
 	this->best_score = numeric_limits<double>::infinity();
 
 	// store here the best value of x when swapping old with new one (see below)
@@ -130,19 +131,15 @@ vector<double> JumpingBall::run_search() {
 				tmp = x;
 				x = new_x;
 				new_x = tmp;
-				// cout << "Step" << "\n";
 
 				new_score = objective_function(x);
-				// cout << new_score << "<=>" << best_score << "\n";
-				if (new_score < this->best_score ) {
-					// update best result (up to now) if needed
+				// update best result (up to now) if needed
+				if (new_score < this->best_score) {
 					this->best_score = new_score;
 					best_x = x;
-					// reset jump counter
-					// cout << "New best score" << "\n";
 					this->worsening_steps = 0;
 				}
-				else {
+				else{
 					this->worsening_steps++;
 				}
 			}
@@ -154,6 +151,8 @@ vector<double> JumpingBall::run_search() {
 
 		// update temperature for new round
 		this->temperature = new_temperature();
+
+		std::cout << temperature << '\n';
 	}
 
 	return best_x;
