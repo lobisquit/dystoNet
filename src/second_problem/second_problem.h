@@ -52,6 +52,11 @@ class SecondProblem : public HeuristicSearch {
 		vector<double> get_initial_solution();
 		bool respect_constraints(vector<double> candidate_v);
 
+		/**
+		* Return the normalized vector
+		*/
+		vector<double> normalize(vector<double> v);
+
 		// functions to implement in lower classes
 		vector<double> get_neighbour(vector<double> v);
 		double acceptance_probability(vector<double> old_v, vector<double> new_v);

@@ -78,13 +78,30 @@ bool SecondProblem::respect_constraints(vector<double> candidate_v) {
 		* - check that chosen degree distribution sum to 1
 		* (see equation 18 in Lin's paper)
 		*/
-		double sum = 0;
-		for(int i = 1; i<=this->K; i++){
-			sum += candidate_v[i-1];
-		}
-		if(sum != 1) {
-			return false;
-		}
+		// double sum = 0;
+		// for(int i = 1; i<=this->K; i++){
+		// 	sum += candidate_v[i-1];
+		// }
+		// std::cout << sum << '\n';
+		// if(sum != 1.0) {
+		// 	std::cout << sum << '\n';
+		// 	return false;
+		// }
 	}
+
 	return true;
+}
+
+vector<double> SecondProblem::normalize(vector<double> v){
+	double sum = 0;
+	/** Then normalize it */
+	for(int j=0; j<this->K; j++){
+		sum += v[j];
+	}
+
+	for(int j=0; j<this->K; j++){
+		v[j] /= sum;
+	}
+
+	return v;
 }

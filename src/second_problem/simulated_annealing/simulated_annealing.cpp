@@ -56,7 +56,9 @@ vector<double> SimulatedAnnealing::get_neighbour(vector<double> v) {
 		* summing it a quantity \f$ \xi \sim \mathcal{U}[-2T, T] \f$
 		*/
 		int chosen_d = index_choice(rng);
-		candidate[chosen_d] = v[chosen_d] + perturbation(rng);
+		candidate[chosen_d] = v[chosen_d] + perturbation(rng)/(this->temperature*this->K);
+
+		candidate = SecondProblem::normalize(candidate);
 	} while (!SecondProblem::respect_constraints(candidate));
 
 	return candidate;
@@ -64,7 +66,6 @@ vector<double> SimulatedAnnealing::get_neighbour(vector<double> v) {
 
 double SimulatedAnnealing::acceptance_probability(
 	vector<double> old_v, vector<double> new_v) {
-
 	double delta = objective_function(new_v) - objective_function(old_v);
 	/**
 	* ---------------
@@ -123,12 +124,11 @@ vector<double> SimulatedAnnealing::run_search() {
 
 		for(int i = 0; i < temperature_steps(); i++) {
 			current_iteration++;
-
 			// search new candidate, save it to new_x
 			new_v = get_neighbour(v);
-
 			// increment mean probability and counter when new_x is worse than x
 			if(acceptance_probability(v, new_v) != 1){
+
 				acceptance_mean += acceptance_probability(v, new_v);
 				worsening_proposals++;
 			}
@@ -140,7 +140,6 @@ vector<double> SimulatedAnnealing::run_search() {
 				tmp = v;
 				v = new_v;
 				new_v = tmp;
-
 				new_score = objective_function(v);
 				// update best result (up to now) if needed
 				if (new_score < best_score) {
@@ -152,7 +151,6 @@ vector<double> SimulatedAnnealing::run_search() {
 
 		// report mean of acceptance probability up to now
 		acceptance_mean = acceptance_mean / worsening_proposals;
-		//cout << "mean of acceptance_probability = " << acceptance_mean << '\n';
 
 		// update temperature for new round
 		this->temperature = new_temperature();
