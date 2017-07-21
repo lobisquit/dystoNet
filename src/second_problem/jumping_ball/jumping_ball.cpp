@@ -48,7 +48,7 @@ vector<double> JumpingBall::get_neighbour(vector<double> v) {
 		candidate = v;
 
 		// setup random variables
-		uniform_real_distribution<double> perturbation(-50, 50);
+		uniform_real_distribution<double> perturbation(-2*this->temperature, this->temperature);
 		uniform_int_distribution<int> number_of_variations(0, this->K-1);
 		uniform_int_distribution<int> index_choice(0, this->K-1);
 
@@ -151,8 +151,6 @@ vector<double> JumpingBall::run_search() {
 
 		// update temperature for new round
 		this->temperature = new_temperature();
-
-		std::cout << temperature << '\n';
 	}
 
 	return best_v;

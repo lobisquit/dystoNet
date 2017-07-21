@@ -48,7 +48,7 @@ vector<double> JumpingBall::get_neighbour(vector<double> x) {
 		candidate = x;
 
 		// setup random variables
-		uniform_real_distribution<double> perturbation(-50, 50);
+		uniform_real_distribution<double> perturbation(-2*this->temperature, this->temperature);
 		uniform_int_distribution<int> number_of_variations(0, this->K-1);
 		uniform_int_distribution<int> index_choice(0, this->K-1);
 
@@ -64,7 +64,6 @@ vector<double> JumpingBall::get_neighbour(vector<double> x) {
 			// reset step counter after the jump
 			this->worsening_steps = 0;
 			this->num_jump = this->num_jump+1;
-			cout << "Jump num." << this->num_jump <<" \n";
 		}
 		else {
 			// classic step if counter is too low
@@ -105,7 +104,9 @@ vector<double> JumpingBall::run_search() {
 		std::cerr << "=====> "
 			<< current_iteration << "/" << this->max_iterations
 			<< " ==> temperature: " << this->temperature
+			<< "==> jump num." << this->num_jump
 			<< " ==> Best score: " << best_score << "\n";
+
 
 		// keep trace of mean value of acceptance_probability
 		// when new point is worse (for better points it is 1)
@@ -151,8 +152,6 @@ vector<double> JumpingBall::run_search() {
 
 		// update temperature for new round
 		this->temperature = new_temperature();
-
-		std::cout << temperature << '\n';
 	}
 
 	return best_x;
