@@ -15,15 +15,18 @@ Network::Network(
 	// setup random number generation
 	this->rng = distribution->get_rng();
 
+	this->N = N;
+	this->K = K;
+
 	uniform_real_distribution<double> x(0, len_x);
 	uniform_real_distribution<double> y(0, len_y);
 
-	double b = N * distribution->expectation() / K;             // see (14) in Lin, Liao
+	double b = this->N * distribution->expectation() / this->K;             // see (14) in Lin, Liao
 
 	// create K sensing nodes
-	for(int node_id=0; node_id<K; node_id++) {
+	for(int node_id=0; node_id<this->K; node_id++) {
 		int degree = distribution->realization();
-		double pi = degree / ( N * distribution->expectation() ); // see (15) in Lin, Liao
+		double pi = degree / ( this->N * distribution->expectation() ); // see (15) in Lin, Liao
 
 		this->nodes.push_back(Node(x(this->rng), y(this->rng), degree, pi));
 
@@ -34,9 +37,9 @@ Network::Network(
 	}
 
 	// create N-K normal nodes
-	for(int i=K; i<N; i++) {
+	for(int i=this->K; i<this->N; i++) {
 		int degree = distribution->realization();
-		double pi = degree / ( N * distribution->expectation() ); // see (15) in Lin, Liao
+		double pi = degree / ( this->N * distribution->expectation() ); // see (15) in Lin, Liao
 
 		this->nodes.push_back(Node(x(this->rng), y(this->rng), degree, pi));
 	}
@@ -86,5 +89,22 @@ void Network::spread_packets() {
 			node = &this->nodes[chosen_neigh_id];
 			node->add_packet(i);
 		}
+	}
+}
+
+void Network::collector(){
+	vector<Node> nodes = this->get_nodes();
+
+	vector<int> choices(this->N);
+	for(int i=0;i<this->N;i++){
+		choices[i] = i;
+	}
+
+	for(int h = 1; h <= round(2.5*this->N); h++){
+		/** pick uniformly at random h nodes from the network to try to retrieve packets */
+		uniform_int_distribution<int> pick(0,this->N-1);
+
+		random_shuffle(choices.begin(), choices.end());
+		
 	}
 }

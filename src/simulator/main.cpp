@@ -10,6 +10,8 @@ int main() {
 	double neighThresh = 5;
 	double c = 0.01;
 	double delta = 0.05;
+
+	/** Overhead coefficients */
 	vector<double> x(K, 1.1);
 
 	Distribution* d = new RobustSoliton(c, delta, K, 10);
@@ -25,4 +27,6 @@ int main() {
 
 	std::cout << "g1 = " << (b / (double) b0) << "\n";
 	std::cout << net << "\n";
+
+	net.spread_packets();
 }
