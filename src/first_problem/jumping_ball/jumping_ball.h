@@ -11,8 +11,8 @@ using namespace std;
 
 class JumpingBall : public SimulatedAnnealing {
 	public:
+		int worsening_steps;
 		int max_worsening_steps;
-		
 		double best_score;
 
 		/**

@@ -11,7 +11,8 @@ using namespace std;
 
 class JumpingBall : public SimulatedAnnealing {
 	public:
-
+		int worsening_steps;
+		int max_worsening_steps;
 		double best_score;
 
 		/**
@@ -40,7 +41,8 @@ class JumpingBall : public SimulatedAnnealing {
 			double cooling_rate,
 			int max_iterations,
 			double steps_coefficient,
-			double acceptance_coefficient);
+			double acceptance_coefficient,
+			int max_worsening_steps);
 
 		// these functions are taken as they are from upper class
 		// these functions are taken as they are from upper class
@@ -50,7 +52,7 @@ class JumpingBall : public SimulatedAnnealing {
 		using SimulatedAnnealing::acceptance_probability;
 
 		vector<double> run_search();
-		vector<double> get_neighbour(vector<double> v, int worsening_steps);
+		vector<double> get_neighbour(vector<double> v);
 
 		/**
 		* Custom overload of << operator, to print debug info

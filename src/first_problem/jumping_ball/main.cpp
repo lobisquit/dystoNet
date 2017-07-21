@@ -26,7 +26,7 @@ int main() {
 		/* max_iterations */ 500000,
 		/* steps_coefficient */ 5e4,
 		/* acceptance_coefficient */ 200,
-		/* max_worsening_steps */ 15
+		/* max_worsening_steps */ 100
 	);
 
 	vector<double> no_redundancy(K, 1);
