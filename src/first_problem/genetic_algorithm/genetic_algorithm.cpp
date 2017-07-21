@@ -78,14 +78,41 @@ vector<double> GeneticAlgorithm::run_search() {
 		*/
 		for(int j = 1; j < round(1/this->survival_rate); j++){
 			for(int i = 0; i < part_size; i++){
-				int chosen_d = index_choice(rng);
+
+
 				population[j * part_size + i] = population[i];
 
+				vector<double> candidate;
+
 				/** Mutation of  */
-				vector<double> candidate = population[j * part_size + i];
 				do {
-					candidate[chosen_d] =
-						population[j * part_size + i][chosen_d] + mutation(rng);
+
+					candidate = population[j * part_size + i];
+
+					int chosen_d_1 = index_choice(rng);
+					int chosen_d_2 = index_choice(rng);
+					int chosen_d_3 = index_choice(rng);
+
+					candidate[chosen_d_1] = population[j * part_size + i][chosen_d_1] + mutation(rng);
+					vector<double> candidate_1 = candidate;
+					candidate[chosen_d_2] = population[j * part_size + i][chosen_d_2] + mutation(rng);
+					vector<double> candidate_2 = candidate;
+					candidate[chosen_d_3] = population[j * part_size + i][chosen_d_3] + mutation(rng);
+					vector<double> candidate_3 = candidate;
+
+					vector<vector<double>> first_selection;
+
+					first_selection.push_back(candidate_1);
+					first_selection.push_back(candidate_2);
+					first_selection.push_back(candidate_3);
+
+					std::sort(first_selection.begin(), first_selection.end(),
+						[this](vector<double> f1, vector<double> f2) -> bool {
+							return this->objective_function(f1) < this->objective_function(f2);
+						});
+
+					candidate=first_selection[0];
+
 				} while(!respect_constraints(candidate));
 
 				population[j * part_size + i] = candidate;
