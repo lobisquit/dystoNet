@@ -92,10 +92,10 @@ RobustSoliton::RobustSoliton(
 	IdealSoliton rho = IdealSoliton(K, seed);
 
 	// compute relevant quantities (beta and R), needed later
-	double R = c * log(K / delta) * sqrt(K);
+	this->R = c * log(K / delta) * sqrt(K);
 	double beta = 0;
 	for(int d = 1; d <= K; d++) {
-		beta += rho.probability(d) + get_tau(d, R);
+		beta += rho.probability(d) + get_tau(d, this->R);
 	}
 
 	// set capacity of probabilities to K

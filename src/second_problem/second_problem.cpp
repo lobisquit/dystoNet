@@ -23,20 +23,23 @@ SecondProblem::SecondProblem(
 }
 
 double SecondProblem::objective_function(vector<double> v) {
-
 	double E = 0;
 	for(int j=1; j<=this->K; j++){
 		E += j*v[j-1];
 	}
 
 	double obj = 0;
-	for(int i = 1; i <= this->K; i++){
-		double v_first = 0;
-		for(int d = 1; d<= this->K; d++){
+	for(int i = 1; i <= this->K; i++) {
+		double v_prime = 0;
+
+		for(int d = 1; d <= this->K; d++) {
 			double p = 1 - pow((1 - d / (this->N * E)), (this->N * E / this->K));
-			v_first += v[d-1]*(binomial_CDF(this->K, i, p) - binomial_CDF(this->K, i-1, p));
+			v_prime += v[d - 1] *
+				// compute pdf using different of subsequent CDF
+				(binomial_CDF(this->K, i, p) - binomial_CDF(this->K, i - 1, p));
 		}
-		obj += pow(v_first - this->robust_soliton->probability(i),2);
+		// sum to objective function for each component of v
+		obj += pow(v_prime - this->robust_soliton->probability(i), 2);
 	}
 	return obj;
 }

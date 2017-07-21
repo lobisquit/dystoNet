@@ -79,6 +79,8 @@ class RobustSoliton : public Distribution {
 		/** Robust Soliton maximal failure probability */
 		double delta;
 
+		double R;
+
 		/** Ideal Soliton parameter: Distribution is defined then in [0, K] */
 		int K;
 
