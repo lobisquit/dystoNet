@@ -48,6 +48,8 @@ class Distribution {
 		mt19937 get_rng() {
 			return this->rng;
 		}
+
+		vector<double> get_probabilities();
 };
 
 class IdealSoliton : public Distribution {

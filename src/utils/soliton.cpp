@@ -54,6 +54,10 @@ int Distribution::realization() {
 	return -1;
 }
 
+vector<double> Distribution::get_probabilities() {
+	return this->probabilities;
+}
+
 IdealSoliton::IdealSoliton(int K, int seed) : Distribution(seed) {
 	// initialize probabilities vector
 
