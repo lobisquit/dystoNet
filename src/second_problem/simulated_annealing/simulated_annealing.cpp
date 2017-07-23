@@ -66,7 +66,8 @@ vector<double> SimulatedAnnealing::get_neighbour(vector<double> v) {
 
 double SimulatedAnnealing::acceptance_probability(
 	vector<double> old_v, vector<double> new_v) {
-	double delta = objective_function(new_v) - objective_function(old_v);
+	double delta =
+		approximate_objective_function(new_v) - approximate_objective_function(old_v);
 	/**
 	* ---------------
 	* ### Algorithm
@@ -112,10 +113,6 @@ vector<double> SimulatedAnnealing::run_search() {
 
 	while(current_iteration <= this->max_iterations) {
 		// round of search for current temperature
-		std::cerr << "=====> "
-			<< current_iteration << "/" << this->max_iterations
-			<< " ==> temperature: " << this->temperature
-			<< " ==> Best score: " << best_score << "\n";
 
 		// keep trace of mean value of acceptance_probability
 		// when new point is worse (for better points it is 1)
@@ -126,23 +123,39 @@ vector<double> SimulatedAnnealing::run_search() {
 			current_iteration++;
 			// search new candidate, save it to new_x
 			new_v = get_neighbour(v);
-			// increment mean probability and counter when new_x is worse than x
-			if(acceptance_probability(v, new_v) != 1){
-
-				acceptance_mean += acceptance_probability(v, new_v);
-				worsening_proposals++;
-			}
 
 			// accept or reject according to acceptance probability
 			if( acceptance_probability(v, new_v) >= acceptance_threshold(rng) ) {
 				// subistitute x with new value (note that assignment with vector is
 				// equivalent to a copy)
+
+				Distribution* v_distribution = new Distribution(v, 1);
+				double g2 =
+				v_distribution->expectation() / robust_soliton->expectation();
+
 				tmp = v;
 				v = new_v;
 				new_v = tmp;
-				new_score = objective_function(v);
+				new_score = approximate_objective_function(v);
+
+				cerr << "=====> "
+				<< current_iteration << "/" << this->max_iterations
+				<< " ==> temperature = " << new_score
+				<< " ==> score = " << this->temperature
+				<< " ==> g2 = " << g2 << "\r";
+
 				// update best result (up to now) if needed
 				if (new_score < best_score) {
+
+					Distribution* v_distribution = new Distribution(v, 1);
+					double g2 =
+						v_distribution->expectation() / robust_soliton->expectation();
+					cerr << "=====> "
+						<< current_iteration << "/" << this->max_iterations
+						<< " ==> temperature = " << this->temperature
+						<< " ==> score = " << this->temperature
+						<< " ==> g2 = " << g2 << "\n";
+
 					best_score = new_score;
 					best_v = v;
 				}
