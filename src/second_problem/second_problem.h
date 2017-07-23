@@ -40,15 +40,16 @@ class SecondProblem : public HeuristicSearch {
 		*/
 		friend std::ostream& operator<<(std::ostream &strm, SecondProblem &obj) {
 			strm << "<SecondProblem("
-				"K="						<< obj.K 						<< ", " <<
-				"N="						<< obj.N 						<< ", " <<
-				"max_failure_probability=" 	<< obj.max_failure_probability 	<< ", " <<
-				"robust_soliton=" 			<< *obj.robust_soliton 			<<
+				"K="                        << obj.K                       << ", " <<
+				"N="                        << obj.N                       << ", " <<
+				"max_failure_probability="  << obj.max_failure_probability << ", " <<
+				"robust_soliton="           << *obj.robust_soliton         <<
 				")>";
 			return strm;
 		}
 
 		double objective_function(vector<double> v);
+		double approximate_objective_function(vector<double> v);
 		vector<double> get_initial_solution();
 		bool respect_constraints(vector<double> candidate_v);
 
