@@ -65,7 +65,7 @@ int main() {
 	RobustSoliton rs = RobustSoliton(
 		/* c     */ 0.01,
 		/* delta */ 0.05,
-		            K, 1);
+		            K, 100);
 
 	SimulatedAnnealing SA = SimulatedAnnealing(
 		/* K */ K,
@@ -74,9 +74,9 @@ int main() {
 		/* max_failure_probability */ 0.05,
 		/* starting_temperature */ 1000.0,
 		/* cooling_rate */ 0.9,
-		/* max_iterations */ 500,
+		/* max_iterations */ 5000,
 		/* steps_coefficient */ 1e2,
-		/* acceptance_coefficient */ 200
+		/* acceptance_coefficient */ 2e12
 	);
 
 	std::cout << SA << "\n";

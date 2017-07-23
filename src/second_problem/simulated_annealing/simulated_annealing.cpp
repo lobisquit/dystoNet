@@ -73,7 +73,7 @@ double SimulatedAnnealing::acceptance_probability(double delta) {
 	* ### Algorithm
 	* - accept better solutions with probability 1
 	*/
-	if(delta <= 0){
+	if(delta <= 0) {
 		return 1.0;
 	}
 	/**
@@ -121,7 +121,6 @@ vector<double> SimulatedAnnealing::run_search() {
 			new_score = approximate_objective_function(v);
 
 			double delta = new_score - old_score;
-
 			// accept or reject according to acceptance probability
 			if( acceptance_probability(delta) >= acceptance_threshold(rng) ) {
 				// subistitute x with new value (note that assignment with vector is
@@ -139,12 +138,18 @@ vector<double> SimulatedAnnealing::run_search() {
 					<< current_iteration << "/" << this->max_iterations
 					<< " ==> temperature = " << this->temperature
 					<< " ==> score = " << new_score
-					<< " ==> g2 = " << g2 << "\n";
+					<< " ==> g2 = " << g2 << "\r";
 
 				// update best result (up to now) if needed
 				if (new_score < best_score) {
 					best_score = new_score;
 					best_v = v;
+
+					cerr << "=====> "
+						<< current_iteration << "/" << this->max_iterations
+						<< " ==> temperature = " << this->temperature
+						<< " ==> score = " << new_score
+						<< " ==> g2 = " << g2 << "\n";
 				}
 			}
 			// keep current score for the next cycle
