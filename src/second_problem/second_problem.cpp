@@ -116,7 +116,7 @@ bool SecondProblem::respect_constraints(vector<double> candidate_v) {
 	for(int i = 1; i<=this->K; i++){
 		sum += candidate_v[i-1];
 	}
-	if(sum != 1.0) {
+	if(sum - 1.0 > 1e-15) {
 		return false;
 	}
 	return true;
