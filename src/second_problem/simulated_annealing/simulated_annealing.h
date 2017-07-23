@@ -76,7 +76,7 @@ class SimulatedAnnealing : public SecondProblem {
 		bool respect_constraints(vector<double> candidate_v);
 		vector<double> get_neighbour(vector<double> v);
 
-		double acceptance_probability(vector<double> old_v, vector<double> new_v);
+		double acceptance_probability(double delta);
 
 		vector<double> run_search();
 

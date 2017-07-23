@@ -37,37 +37,37 @@ SimulatedAnnealing::SimulatedAnnealing(
 }
 
 vector<double> SimulatedAnnealing::get_neighbour(vector<double> v) {
-
 	// initialization distributions
-	uniform_real_distribution<double>
-	perturbation(- this->temperature*2, this->temperature);
 	uniform_int_distribution<int> index_choice(0, this->K-1);
 
 	vector<double> candidate;
+	int start_d;
+	int end_d;
 	do {
 		// copy x to new array before perturbation
 		candidate = v;
 
-		/**
-		* ------------------------
-		* ### Algorithm
-		* Find new point candidate modifying previous solution.
-		* component \f$ d \sim \mathcal{U}[1, K] \f$ of \f$ \vec{x} \f$ is perturbed
-		* summing it a quantity \f$ \xi \sim \mathcal{U}[-2T, T] \f$
-		*/
-		int chosen_d = index_choice(rng);
-		candidate[chosen_d] = v[chosen_d] + perturbation(rng)/(this->temperature*this->K);
+		do {
+			start_d = index_choice(rng);
+			// start_d must have a non-zero probability
+		} while(candidate[start_d] == 0);
 
-		candidate = SecondProblem::normalize(candidate);
+		do {
+			end_d = index_choice(rng);
+			// end_d can't go beyond 1 after move
+		} while(end_d == start_d || candidate[end_d] + candidate[start_d] > 1);
+
+		// "move" some probability from start to end point
+		uniform_real_distribution<double> perturbation(0, candidate[start_d]);
+		double delta = perturbation(rng);
+		candidate[start_d] -= delta;
+		candidate[end_d]   += delta;
 	} while (!SecondProblem::respect_constraints(candidate));
 
 	return candidate;
 }
 
-double SimulatedAnnealing::acceptance_probability(
-	vector<double> old_v, vector<double> new_v) {
-	double delta =
-		approximate_objective_function(new_v) - approximate_objective_function(old_v);
+double SimulatedAnnealing::acceptance_probability(double delta) {
 	/**
 	* ---------------
 	* ### Algorithm
@@ -107,63 +107,49 @@ vector<double> SimulatedAnnealing::run_search() {
 	// store here new point explored with its score
 	vector<double> new_v(this->K, 1);
 	double new_score;
+	double old_score = 0;
 
 	// random variable that set the threshold for accepting worse solutions
 	uniform_real_distribution<double> acceptance_threshold(0,1);
 
 	while(current_iteration <= this->max_iterations) {
 		// round of search for current temperature
-
-		// keep trace of mean value of acceptance_probability
-		// when new point is worse (for better points it is 1)
-		double acceptance_mean = 0;
-		int worsening_proposals = 0;
-
 		for(int i = 0; i < temperature_steps(); i++) {
 			current_iteration++;
 			// search new candidate, save it to new_x
 			new_v = get_neighbour(v);
+			new_score = approximate_objective_function(v);
+
+			double delta = new_score - old_score;
 
 			// accept or reject according to acceptance probability
-			if( acceptance_probability(v, new_v) >= acceptance_threshold(rng) ) {
+			if( acceptance_probability(delta) >= acceptance_threshold(rng) ) {
 				// subistitute x with new value (note that assignment with vector is
 				// equivalent to a copy)
-
-				Distribution* v_distribution = new Distribution(v, 1);
-				double g2 =
-				v_distribution->expectation() / robust_soliton->expectation();
-
 				tmp = v;
 				v = new_v;
 				new_v = tmp;
-				new_score = approximate_objective_function(v);
+
+				Distribution* v_distribution = new Distribution(v, 1);
+				double g2 =
+					v_distribution->expectation() /
+					robust_soliton->expectation();
 
 				cerr << "=====> "
-				<< current_iteration << "/" << this->max_iterations
-				<< " ==> temperature = " << new_score
-				<< " ==> score = " << this->temperature
-				<< " ==> g2 = " << g2 << "\r";
+					<< current_iteration << "/" << this->max_iterations
+					<< " ==> temperature = " << this->temperature
+					<< " ==> score = " << new_score
+					<< " ==> g2 = " << g2 << "\n";
 
 				// update best result (up to now) if needed
 				if (new_score < best_score) {
-
-					Distribution* v_distribution = new Distribution(v, 1);
-					double g2 =
-						v_distribution->expectation() / robust_soliton->expectation();
-					cerr << "=====> "
-						<< current_iteration << "/" << this->max_iterations
-						<< " ==> temperature = " << this->temperature
-						<< " ==> score = " << this->temperature
-						<< " ==> g2 = " << g2 << "\n";
-
 					best_score = new_score;
 					best_v = v;
 				}
 			}
+			// keep current score for the next cycle
+			old_score = new_score;
 		}
-
-		// report mean of acceptance probability up to now
-		acceptance_mean = acceptance_mean / worsening_proposals;
 
 		// update temperature for new round
 		this->temperature = new_temperature();
