@@ -89,7 +89,20 @@ void Network::spread_packets() {
 			// set it as next node in the trip and mark passage through it of pkt
 			node = &this->nodes[chosen_neigh_id];
 		}
-		node->add_packet(i);
+
+		/** Check that packet has not been yet received from this node */
+		// vector<int>* packets_ids = node->get_packets_ids();
+		bool contains = false;
+		// for(unsigned int j=0;j<packets_ids->size();j++){
+		// 	if(this->packets[packets_ids->at(j)].get_origin_id() ==
+		// 	this->packets[i].get_origin_id()){
+		// 		contains = true;
+		// 		break;
+		// 	}
+		// }
+		if(!contains){
+			node->add_packet(i);
+		}
 	}
 }
 
@@ -100,7 +113,7 @@ void Network::collector(){
 	for(int i=0;i<this->N;i++){
 		choices[i] = i;
 	}
-	int h = 5;
+	int h = 10;
 	// for(int h = 1; h <= round(2*this->K); h++){
 		random_shuffle(choices.begin(), choices.end());
 		/** Definition and building of the encoding matrix */
@@ -118,11 +131,11 @@ void Network::collector(){
 			}
 			cout << "]";
 		}
-		for(int i=0;i<h;i++){
-			cout << "\n";
-			for(unsigned int j=0;j<en_matrix[i].size();j++){
-				cout << en_matrix[i][j] << " ";
-			}
-		}
+		// for(int i=0;i<h;i++){
+		// 	cout << "\n";
+		// 	for(unsigned int j=0;j<en_matrix[i].size();j++){
+		// 		cout << en_matrix[i][j] << " ";
+		// 	}
+		// }
 	// }
 }
