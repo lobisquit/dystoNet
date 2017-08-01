@@ -74,8 +74,8 @@ int main() {
 		/* max_failure_probability */ 0.05,
 		/* starting_temperature */ 1000.0,
 		/* cooling_rate */ 0.9,
-		/* max_iterations */ 5000,
-		/* steps_coefficient */ 1e2,
+		/* max_iterations */ 50000,
+		/* steps_coefficient */ 5e3,
 		/* acceptance_coefficient */ 2e12
 	);
 

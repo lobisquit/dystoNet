@@ -46,22 +46,23 @@ vector<double> SimulatedAnnealing::get_neighbour(vector<double> v) {
 	do {
 		// copy x to new array before perturbation
 		candidate = v;
+		for (int i = 0; i < 100; i++) {
+			do {
+				start_d = index_choice(rng);
+				// start_d must have a non-zero probability
+			} while(candidate[start_d] == 0);
 
-		do {
-			start_d = index_choice(rng);
-			// start_d must have a non-zero probability
-		} while(candidate[start_d] == 0);
+			do {
+				end_d = index_choice(rng);
+				// end_d can't go beyond 1 after move
+			} while(end_d == start_d || candidate[end_d] + candidate[start_d] > 1);
 
-		do {
-			end_d = index_choice(rng);
-			// end_d can't go beyond 1 after move
-		} while(end_d == start_d || candidate[end_d] + candidate[start_d] > 1);
-
-		// "move" some probability from start to end point
-		uniform_real_distribution<double> perturbation(0, candidate[start_d]);
-		double delta = perturbation(rng);
-		candidate[start_d] -= delta;
-		candidate[end_d]   += delta;
+			// "move" some probability from start to end point
+			uniform_real_distribution<double> perturbation(0, candidate[start_d]);
+			double delta = perturbation(rng);
+			candidate[start_d] -= delta;
+			candidate[end_d]   += delta;
+		}
 	} while (!SecondProblem::respect_constraints(candidate));
 
 	return candidate;
