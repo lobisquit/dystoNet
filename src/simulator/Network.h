@@ -11,12 +11,14 @@ using namespace std;
 class Network {
 	private:
 		/** List of nodes in the network */
-		vector<Node> nodes;
-		vector<Packet> packets;
+		Node* nodes;
+		Packet* packets;
 
 		int N;
 
 		int K;
+
+		int b;
 
 		/** Random numbers generator */
 		mt19937 rng;
@@ -43,8 +45,8 @@ class Network {
 		friend std::ostream& operator<<(std::ostream &strm, Network &obj) {
 			strm << "<Network(\nnodes=[";
 
-			unsigned int MAX_LENGTH = 50;
-			for (unsigned int i=0; i<obj.nodes.size(); i++) {
+			int MAX_LENGTH = 50;
+			for (int i=0; i<obj.N; i++) {
 				if (i<MAX_LENGTH) {
 					strm << "\n\t" << obj.nodes[i] << ", ";
 				}
@@ -55,11 +57,11 @@ class Network {
 			}
 			strm << "], ";
 
-			MAX_LENGTH = 10;
-			strm << "\npackages=[";
-			for (unsigned int i=0; i<obj.packets.size(); i++) {
+			MAX_LENGTH = 20;
+			strm << "\npackets=[";
+			for (int i=0; i<obj.b * obj.K; i++) {
 				if (i<MAX_LENGTH) {
-					strm << obj.packets[i] << ", ";
+					strm << "\n\t" << obj.packets[i] << ", ";
 				}
 				else {
 					strm << "...";
@@ -71,11 +73,14 @@ class Network {
 			return strm;
 		}
 
-		vector<Node> get_nodes();
-		vector<Packet> get_packets();
+		int get_packets_size();
+		int get_nodes_size();
+
+		Node* get_nodes();
+		Packet* get_packets();
 
 		void spread_packets();
 
 		/** Visit to the network */
-		void collector();
+		// void collector();
 };
