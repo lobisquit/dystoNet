@@ -1,3 +1,4 @@
+#include<algorithm>
 #include "Network.h"
 #include "soliton.h"
 
@@ -87,8 +88,8 @@ void Network::spread_packets() {
 
 			// set it as next node in the trip and mark passage through it of pkt
 			node = &this->nodes[chosen_neigh_id];
-			node->add_packet(i);
 		}
+		node->add_packet(i);
 	}
 }
 
@@ -99,12 +100,29 @@ void Network::collector(){
 	for(int i=0;i<this->N;i++){
 		choices[i] = i;
 	}
-
-	for(int h = 1; h <= round(2.5*this->N); h++){
-		/** pick uniformly at random h nodes from the network to try to retrieve packets */
-		uniform_int_distribution<int> pick(0,this->N-1);
-
+	int h = 5;
+	// for(int h = 1; h <= round(2*this->K); h++){
 		random_shuffle(choices.begin(), choices.end());
-		
-	}
+		/** Definition and building of the encoding matrix */
+		vector<vector<int>> en_matrix(h,vector<int>(this->K,0));
+		/** Pick randomly h nodes from the network */
+		for(int i=0;i<h;i++){
+			/** Get packets of each visited node */
+			vector<int>* packets_ids = this->nodes[choices[i]].get_packets_ids();
+			/** Fill the encoding matrix */
+			cout << "\n" << "Packets of node " << i << " : [";
+			for(unsigned int j=0;j<packets_ids->size();j++){
+				int original_packet = this->packets[packets_ids->at(j)].get_origin_id();
+				cout << original_packet << " ";
+				en_matrix[i][original_packet] = 1;
+			}
+			cout << "]";
+		}
+		for(int i=0;i<h;i++){
+			cout << "\n";
+			for(unsigned int j=0;j<en_matrix[i].size();j++){
+				cout << en_matrix[i][j] << " ";
+			}
+		}
+	// }
 }

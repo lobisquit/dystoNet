@@ -29,4 +29,6 @@ int main() {
 	std::cout << net << "\n";
 
 	net.spread_packets();
+
+	net.collector();
 }
