@@ -82,5 +82,5 @@ class Network {
 		void spread_packets();
 
 		/** Visit to the network */
-		// void collector();
+		vector<vector<int>> collector(int h);
 };

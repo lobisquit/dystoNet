@@ -22,8 +22,8 @@ Network::Network(
 	uniform_real_distribution<double> x(0, len_x);
 	uniform_real_distribution<double> y(0, len_y);
 
-	// b is common to all sensing nodes
-	this->b = this->N * distribution->expectation() / this->K;             // see (14) in Lin, Liao
+	// b is common to all sensing nodes, see (14) in Lin, Liao
+	this->b = this->N * distribution->expectation() / this->K;
 
 	// initialize node and packet arrays
 	this->nodes = new Node[N];
@@ -32,7 +32,8 @@ Network::Network(
 	// create K sensing nodes
 	for(int node_id=0; node_id<this->N; node_id++) {
 		int degree = distribution->realization();
-		double pi = degree / ( this->N * distribution->expectation() ); // see (15) in Lin, Liao
+		// for pi formula, see (15) in Lin, Liao
+		double pi = degree / ( this->N * distribution->expectation() );
 
 		this->nodes[node_id] = Node(x(this->rng), y(this->rng), degree, pi);
 
@@ -103,37 +104,43 @@ void Network::spread_packets() {
 		node->add_packet(pkt);
 	}
 }
-//
-// void Network::collector(){
-// 	vector<Node> nodes = this->get_nodes();
-//
-// 	vector<int> choices(this->N);
-// 	for(int i=0;i<this->N;i++){
-// 		choices[i] = i;
-// 	}
-// 	int h = 10;
-// 	// for(int h = 1; h <= round(2*this->K); h++){
-// 		random_shuffle(choices.begin(), choices.end());
-// 		/** Definition and building of the encoding matrix */
-// 		vector<vector<int>> en_matrix(h,vector<int>(this->K,0));
-// 		/** Pick randomly h nodes from the network */
-// 		for(int i=0;i<h;i++){
-// 			/** Get packets of each visited node */
-// 			vector<int>* packets_ids = this->nodes[choices[i]].get_packets_ids();
-// 			/** Fill the encoding matrix */
-// 			cout << "\n" << "Packets of node " << i << " : [";
-// 			for(unsigned int j=0;j<packets_ids->size();j++){
-// 				int original_packet = this->packets[packets_ids->at(j)].get_origin_id();
-// 				cout << original_packet << " ";
-// 				en_matrix[i][original_packet] = 1;
-// 			}
-// 			cout << "]";
-// 		}
-// 		// for(int i=0;i<h;i++){
-// 		// 	cout << "\n";
-// 		// 	for(unsigned int j=0;j<en_matrix[i].size();j++){
-// 		// 		cout << en_matrix[i][j] << " ";
-// 		// 	}
-// 		// }
-// 	// }
-// }
+
+vector<vector<int>> Network::collector(int h) {
+	/** Pick randomly h nodes from the network */
+	vector<int> visits(this->N);
+	for(int i = 0; i < this->N; i++) {
+		visits[i] = i;
+	}
+	random_shuffle(visits.begin(), visits.end());
+
+	/** Definition and building of the encoding matrix */
+	vector<vector<int>> en_matrix(h, vector<int>(this->K, 0));
+
+	// iter through visited nodes
+	for (int i = 0; i < h && i < this->get_nodes_size(); i++) {
+		Node* node = &this->nodes[visits[i]];
+
+		// retrieve origin of each packet and its position in nodes array
+		for (Packet* pkt: node->get_packets()) {
+			Node* origin = pkt->get_origin();
+
+			// find origin id in nodes array of pointers
+			int origin_position = -1;
+			for (int j = 0; j < this->get_nodes_size(); j++) {
+				// NOTE that this checks ignores automatically duplicates from same origin
+				if (origin == &this->nodes[j]) {
+					origin_position = j;
+				}
+			}
+
+			// mark packet reception in node i from node origin in matrix
+			if (origin_position != -1) {
+				en_matrix[i][origin_position] = 1;
+			}
+			else {
+				cerr << "--->ERROR<--- Packet " << *pkt << "not in Network" << "\n";
+			}
+		}
+	}
+	return en_matrix;
+}

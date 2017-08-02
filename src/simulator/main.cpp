@@ -3,14 +3,14 @@
 #include <iostream>
 
 int main() {
-	int N = 2000;
-	int K = 1000;
+	int N = 200;
+	int K = 100;
 	double len_x = 10;
 	double len_y = 10;
 	double neighThresh = 15;
 	double c = 0.01;
 	double delta = 0.05;
-	double seed = 6;
+	int seed = 1;
 
 	/** Overhead coefficients */
 	vector<double> x(K, 1.1);
@@ -36,5 +36,15 @@ int main() {
 	//
 	// net.spread_packets();
 
-	// net.collector();
+	vector<vector<int>> en_matrix = net.collector(100);
+	for (vector<int> row: en_matrix) {
+		int degree = 0;
+		for (int i: row) {
+			degree += i;
+			cout << i << ", ";
+		}
+		cout << "\n";
+		cout << "degree = " << degree;
+		cout << "\n";
+	}
 }
