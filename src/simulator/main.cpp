@@ -23,9 +23,10 @@ int main() {
 	net.spread_packets();
 	cout << net << "\n";
 
-	// for (Packet* p: net.get_packets()) {
-	// 	std::cout << p-> << "\n";
-	// }
+	Node* nodes = net.get_nodes();
+	for (int i = 0; i < net.get_nodes_size(); i++) {
+		cout << nodes[i].get_packets().size() << "\n";
+	}
 	//
 	// Distribution* d1 = new OverheadRobustSoliton(x, c, delta, K, seed);
 	// Network net1 = Network(N, K, len_x, len_y, neighThresh, d1);
@@ -36,15 +37,15 @@ int main() {
 	//
 	// net.spread_packets();
 
-	vector<vector<int>> en_matrix = net.collector(100);
-	for (vector<int> row: en_matrix) {
-		int degree = 0;
-		for (int i: row) {
-			degree += i;
-			cout << i << ", ";
-		}
-		cout << "\n";
-		cout << "degree = " << degree;
-		cout << "\n";
-	}
+	// vector<vector<int>> en_matrix = net.collector(100);
+	// for (vector<int> row: en_matrix) {
+	// 	int degree = 0;
+	// 	for (int i: row) {
+	// 		degree += i;
+	// 		cout << i << ", ";
+	// 	}
+	// 	cout << "\n";
+	// 	cout << "degree = " << degree;
+	// 	cout << "\n";
+	// }
 }

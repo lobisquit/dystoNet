@@ -103,6 +103,7 @@ void Network::spread_packets() {
 		// add pkt to the final step of random walk
 		node->add_packet(pkt);
 	}
+	cout << "\n";
 }
 
 vector<vector<int>> Network::collector(int h) {

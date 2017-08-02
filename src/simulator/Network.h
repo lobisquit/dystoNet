@@ -43,34 +43,16 @@ class Network {
 			Distribution* distribution);
 
 		friend std::ostream& operator<<(std::ostream &strm, Network &obj) {
-			strm << "<Network(\nnodes=[";
-
-			int MAX_LENGTH = 50;
-			for (int i=0; i<obj.N; i++) {
-				if (i<MAX_LENGTH) {
-					strm << "\n\t" << obj.nodes[i] << ", ";
+			Node* nodes = obj.get_nodes();
+			strm << "<Network(nodes=[\n";
+			for (int i = 0; i < obj.get_nodes_size(); i++) {
+				strm << "\t" << nodes[i] << " {\n";
+				for (Packet* pkt: nodes[i].get_packets()) {
+					strm << "\t\t" << *pkt << "\n";
 				}
-				else {
-					strm << "...";
-					break;
-				}
+				strm << "\t}\n";
 			}
-			strm << "], ";
-
-			MAX_LENGTH = 20;
-			strm << "\npackets=[";
-			for (int i=0; i<obj.b * obj.K; i++) {
-				if (i<MAX_LENGTH) {
-					strm << "\n\t" << obj.packets[i] << ", ";
-				}
-				else {
-					strm << "...";
-					break;
-				}
-			}
-			strm << "])>";
-
-			return strm;
+			return strm << "])>";
 		}
 
 		int get_packets_size();

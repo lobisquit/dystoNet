@@ -54,19 +54,7 @@ class Node {
 			strm << "<Node("
 				"x="      << obj.x      << ", " <<
 				"y="      << obj.y      << ", " <<
-				"degree=" << obj.degree << ", ";
-
-			unsigned int MAX_LENGTH = 2;
-			strm << "packets=[";
-			for (unsigned int i=0; i<obj.packets.size(); i++) {
-				if (i<MAX_LENGTH) {
-					strm << obj.packets[i] << ", ";
-				}
-				else {
-					strm << "...";
-					break;
-				}
-			}
+				"degree=" << obj.degree;
 			return strm << "])>";
 		}
 };
