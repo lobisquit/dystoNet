@@ -18,4 +18,3 @@ install:
 
 script:
   - python3.6 make.py --package utils --mode test
-  - python3.6 make.py --package first_coefficients --mode test
