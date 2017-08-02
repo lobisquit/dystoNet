@@ -4,6 +4,7 @@ from __future__ import print_function
 import argparse
 import os
 import subprocess
+import sys
 import webbrowser
 from pathlib import Path
 
@@ -80,7 +81,7 @@ def build(package, dependencies):
 			# avoid main file of dependencies
 			if not cpp_file.name == 'main.cpp':
 				# compile including all dependencies, to be sure
-				single_compile(cpp_file, dependencies=dependencies)
+				result = single_compile(cpp_file, dependencies=dependencies)
 
 	# compile package files
 	if package.parent == TEST_DIR:
@@ -155,10 +156,14 @@ if __name__ == '__main__':
 		build_result = build(
 			package=package,
 			dependencies=dep_paths)
+		if build_result != 0:
+			sys.exit(build_result)
 
 		# run only if build was successfull
 		if build_result == 0 and cmd_args.mode in ['run', 'test']:
-			run(package)
+			run_result = run(package)
+			if run_result != 0:
+				sys.exit(run_result)
 
 	if cmd_args.mode == 'docs':
 		docs_result = docs()
@@ -167,3 +172,5 @@ if __name__ == '__main__':
 		if docs_result == 0:
 			index_html_path = Path('doc/html/index.html')
 			webbrowser.open_new_tab(str(index_html_path))
+		else:
+			sys.exit(docs_result)
