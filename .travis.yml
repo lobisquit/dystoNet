@@ -9,12 +9,12 @@ compiler:
   - gcc
 
 before_install:
+  - sudo add-apt-repository ppa:jonathonf/python-3.6 -y
   - sudo apt-get update
-  - sudo apt-get install python3
+  - sudo apt-get install python3.6 python3-pip
 
 install:
   - pip3 install pathlib --user
 
 script:
-  - python3 make.py --package utils --mode test
-  - python3 make.py --package first_coefficients --mode test
+  - python3.6 make.py --package utils --mode test

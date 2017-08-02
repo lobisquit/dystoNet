@@ -1,14 +1,22 @@
 #include <map>
 #include <vector>
 #include "Node.h"
+#include <array>
 
 using namespace std;
 
+Node::Node() {
+	this->degree = 0;
+	this->pi = 1;
+	this->x = 0;
+	this->y = 0;
+}
+
 Node::Node(double x, double y, int degree, double pi) {
-		this->degree = degree;
-		this->pi = pi;
-		this->x = x;
-		this->y = y;
+	this->degree = degree;
+	this->pi = pi;
+	this->x = x;
+	this->y = y;
 }
 
 double Node::get_x() {
@@ -30,39 +38,47 @@ double Node::distance(Node other) {
 	return sqrt(pow(delta_x, 2) + pow(delta_y, 2));
 }
 
-vector<int>* Node::get_neighbour_ids() {
-	return &this->neighbour_ids;
+vector<Node*> Node::get_neighbours() {
+	return this->neighbours;
 }
 
-vector<int>* Node::get_packets_ids() {
-	return &this->packets_ids;
+vector<Packet*> Node::get_packets() {
+	return this->packets;
 }
 
-void Node::add_neighbour(int other) {
-	this->neighbour_ids.push_back(other);
+void Node::add_neighbour(Node* other) {
+	this->neighbours.push_back(other);
 }
 
-void Node::add_packet(int packet_id) {
-	// store only if packet was not in node
+void Node::add_packet(Packet* new_pkt) {
+	Node* origin = new_pkt->get_origin();
+
+	// store only if packet (or any of its duplicates
+	// from same source) was not in node
 	bool contains_packet = false;
-	for (int i : this->packets_ids) {
-		if (packet_id == i) {
+	for (Packet* p : this->packets) {
+		if (origin == p->get_origin()) {
 			contains_packet = true;
 			break;
 		}
 	}
 	if (!contains_packet) {
-		this->packets_ids.push_back(packet_id);
+		this->packets.push_back(new_pkt);
 	}
 }
 
-Packet::Packet(int origin_id, int packet_id) {
-	this->origin_id = origin_id;
+Packet::Packet() {
+	this->origin = NULL;
+	this->packet_id = 0;
+}
+
+Packet::Packet(Node* origin, int packet_id) {
+	this->origin = origin;
 	this->packet_id = packet_id;
 }
 
-int Packet::get_origin_id() {
-	return this->origin_id;
+Node* Packet::get_origin() {
+	return this->origin;
 }
 
 int Packet::get_id() {
