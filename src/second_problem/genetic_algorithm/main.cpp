@@ -62,18 +62,14 @@ int main() {
 		/* robust_soliton */ &rs,
 		/* max_failure_probability */ 0.05,
 		/* num_generations */ 80000,
+		/** ATTENTION!!!! In this version, dim_population has to be integer multiple
+		* of the inverse of the survival_rate */
 		/* dim_population*/ 20,
 		/* survival_rate */ 0.25
 	);
 
-	vector<double> no_redundancy(K, 1);
-
 	std::cout << GA << "\n";
 
 	vector<double> best_redundancy = GA.run_search();
-		std::cout << "Arriving to   score "
-			<< (
-				GA.objective_function(best_redundancy) / GA.objective_function(no_redundancy)
-			) << "\n";
 
 }

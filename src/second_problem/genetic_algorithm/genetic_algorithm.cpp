@@ -31,11 +31,12 @@ GeneticAlgorithm::GeneticAlgorithm(int K,
 	this->survival_rate = survival_rate;
 }
 
-vector<vector<double>> GeneticAlgorithm::get_initial_population() {
-	vector<vector<double>>
-		population(this->dim_population, vector<double>(this->K));
+vector<individual> GeneticAlgorithm::get_initial_population() {
+	vector<individual>
+		population(this->dim_population);
 	for(int i = 0; i < this->dim_population; i++){
-		population[i] = SecondProblem::get_initial_solution();
+		population[i].values = SecondProblem::get_initial_solution();
+		population[i].obj_function = this->approximate_objective_function(population[i].values);
 		cerr
 			<< "Created "
 			<< i+1 << "/" << this->dim_population
@@ -48,53 +49,57 @@ vector<vector<double>> GeneticAlgorithm::get_initial_population() {
 vector<double> GeneticAlgorithm::run_search() {
 	int generation = 0;
 
-	vector<vector<double>> population = get_initial_population();
+	vector<individual> population = get_initial_population();
 
 	/** Selection */
 	/** fraction of individuals picked for the next generation */
 	int part_size = ceil(this->dim_population * this->survival_rate);
 
-	uniform_real_distribution<double> mutation(-20, 20);
-	uniform_int_distribution<int> index_choice(0, K-1);
-
-	vector<double> no_redundancy(this->K,1);
-
-	double b0 = objective_function(no_redundancy);
+	uniform_int_distribution<int> index_choice(0, this->K-1);
 
 	while(generation < this->num_generations){
 		/** Sorting of the population */
-		std::sort(population.begin(), population.end(),
-			[this](vector<double> s1, vector<double> s2) -> bool {
-				return this->objective_function(s1) < this->objective_function(s2);
-			});
+		std::sort(population.begin(), population.end(), by_obj_function());
 
+		Distribution* v_distribution = new Distribution(population[0].values, 1);
 			cerr << "=====> "
 				<< generation << "/" << this->num_generations
-				<< " ==> g1 = "
+				<< " ==> g2 = "
 				/** Best score for this generation, since vectors are sorted */
-				<< this->objective_function(population[0]) / b0 << "\n";
+				<< v_distribution->expectation() / robust_soliton->expectation() << "\n";
 
 		/** Copy of the best individuals in the whole population, and then perturbe it, checking you are respecting
 		* constraints.
 		*/
+		int first_d, second_d;
 		for(int j = 1; j < round(1/this->survival_rate); j++){
 			for(int i = 0; i<part_size; i++){
-				int chosen_d = index_choice(rng);
-				population[j*part_size+i] = population[i];
-
 				/** Mutation of */
-				vector<double> candidate = population[j*part_size+i];
+				vector<double> candidate = population[i].values;
 				do{
-					candidate[chosen_d] =
-						population[j*part_size+i][chosen_d] + mutation(rng);
+					do {
+						first_d = index_choice(rng);
+						// first_d must have a non-zero probability
+					} while(candidate[first_d] == 0);
+					do {
+						second_d = index_choice(rng);
+						// second_d can't go beyond 1 after move
+					} while(second_d == first_d);
+					// "move" some probability from start to end point
+					uniform_real_distribution<double> mutation(0, min(candidate[first_d], 1 - candidate[second_d]));
+					double delta = mutation(rng);
+					candidate[first_d] -= delta;
+					candidate[second_d] += delta;
 				}while(!respect_constraints(candidate));
 
-				population[j*part_size+i] = candidate;
+				population[j*part_size+i].values = candidate;
+				population[j*part_size+i].obj_function = this->approximate_objective_function(candidate);
 			}
+
 		}
 		generation++;
 	}
-	return population[0];
+	return population[0].values;
 }
 
 vector<double> get_neighbour(vector<double> v) {

@@ -14,6 +14,17 @@
 
 using namespace std;
 
+struct individual{
+	vector<double> values;
+	double obj_function;
+};
+
+struct by_obj_function {
+	bool operator()(individual const &a, individual const &b) {
+		return a.obj_function < b.obj_function;
+	}
+};
+
 class GeneticAlgorithm : public SecondProblem {
 	public:
 		/** Random numbers generator */
@@ -62,7 +73,7 @@ class GeneticAlgorithm : public SecondProblem {
 		* Create the first generation, with random values within the range of
 		* the possible solution.
 		*/
-		vector<vector<double>> get_initial_population();
+		vector<individual> get_initial_population();
 
 		vector<double> get_individual();
 
