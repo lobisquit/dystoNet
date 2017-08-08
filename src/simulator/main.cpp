@@ -47,7 +47,7 @@ int main() {
 	// 	cout << "\n";
 	// }
 	cout << "N = " << N << ", K = " << K << ", Ps = [";
-	int ms, h, m=200, steps = 16;
+	int ms, h, m=500, steps = 16;
 	/** Compute delta to build the linspace */
 	double delta_step = (2.5 - 1)/(steps - 1);
 	for(int j = 0; j<steps; j++){
