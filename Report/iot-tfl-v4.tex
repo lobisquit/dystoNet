@@ -1,0 +1,173 @@
+\documentclass[journal]{IEEEtran}
+%\documentclass[12pt,journal,draftclsnofoot,onecolumn]{IEEEtran}
+%\documentclass[conference]{IEEEtran}
+
+\IEEEoverridecommandlockouts
+
+\usepackage{etex}
+
+%Fixing IEEEtran.cls bug with [english]{babel}
+\makeatletter
+\def\markboth#1#2{\def\leftmark{\@IEEEcompsoconly{\sffamily}\MakeUppercase{\protect#1}}%
+\def\rightmark{\@IEEEcompsoconly{\sffamily}\MakeUppercase{\protect#2}}}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	CONFIGURE TRACKCHANGES PACKAGES
+
+%	select style of notes
+
+% \usepackage[finalnew,ignoremode]{trackchanges}
+%\usepackage[finalold]{./trackchanges/LatexPackage/trackchanges}
+%\usepackage[footnotes]{./trackchanges/LatexPackage/trackchanges}
+%\usepackage[inline,ignoremode]{trackchanges}
+% \usepackage[inline]{./trackchanges/LatexPackage/trackchanges}
+%\usepackage[margins,ignoremode]{./trackchanges/LatexPackage/trackchanges}
+% \usepackage[margins, movemargins,ignoremode]{trackchanges}
+% \usepackage[margins, adjustmargins]{./trackchanges/LatexPackage/trackchanges}
+%\tcignore{\ref}{1}{1}
+%\tcignore{\eqref}{1}{1}
+%\tcignore{\cite}{1}{1}
+
+% 	add editor profiles
+%\addeditor{Felipe}
+% \addeditor{b}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% \usepackage{t1enc}
+
+%\usepackage[utf8x]{inputenc}
+\usepackage[english]{babel}
+\selectlanguage{english}
+\usepackage{color}
+\usepackage{lipsum}% http://ctan.org/pkg/lipsum
+%\usepackage{caption}
+\usepackage{cite}
+\usepackage[pdftex]{graphicx}
+%\usepackage{subfig}
+%\usepackage{subcaption}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{array}
+\usepackage{verbatim}
+\usepackage{listings}
+%\usepackage{algorithm}
+%\usepackage{algorithmic}
+%\usepackage{algpseudocode}
+%\usepackage{hyperref}
+\usepackage{url}
+\usepackage{enumerate}
+\usepackage{multirow}
+
+\usepackage{epsfig}
+\usepackage{epstopdf}
+\usepackage{multicol}% http://ctan.org/pkg/multicols
+\usepackage[font=footnotesize]{caption}
+\usepackage[font=scriptsize]{subcaption}
+% Tikz
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=newest}
+\pgfplotsset{plot coordinates/math parser=false}
+\newlength\fheight
+\newlength\fwidth
+\usetikzlibrary{patterns,decorations.pathreplacing,backgrounds,calc}
+\definecolor{SchoolColor}{RGB}{0.71, 0, 0.106}%181,0,27} unipd red
+\definecolor{chaptergrey}{rgb}{0.61, 0, 0.09} % dialed back a little
+\definecolor{midgrey}{rgb}{0.4, 0.4, 0.4}
+\definecolor{chaptergreen}{rgb}{0.09, 0.612, 0}
+\definecolor{chapterpurple}{rgb}{0.522, 0, 0.612}
+\definecolor{chapterlightgreen}{rgb}{0, 0.612, 0.522}
+
+%\raggedbottom
+
+% Pseudocode
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode}
+\renewcommand\algorithmicthen{}
+\renewcommand\algorithmicdo{}
+\usepackage{lscape}
+\usepackage{setspace}
+
+\addto\captionsenglish{\renewcommand{\figurename}{Fig.}}
+
+\newcommand{\field}[1]{\mathbb{#1}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\renewcommand{\arraystretch}{2}
+
+\newcommand{\DP}[1]{\textbf{(DP: #1)}}
+\newcommand{\el}[1]{\textr{(EL says: #1)}}
+\newcommand{\fm}[1]{\texbf{(FM says: #1)}}
+
+\usepackage{threeparttable}
+%\usepackage[table,xcdraw]{xcolor}
+\usepackage{tabularx}
+   \usepackage{multirow}
+   \usepackage{booktabs}
+\newcommand{\tabitem}{~~\llap{\textbullet}~~}
+   \usepackage{array, blindtext}
+   \usepackage{wrapfig}
+\usepackage{pdfpages}
+\usepackage[acronym]{glossaries}
+
+% use tikz images or eps
+\newif\iftikz
+\tikztrue
+
+\graphicspath{{./figures/}}
+
+\title{Non-convex optimization for Distributed Storage Network techniques}
+\author{\IEEEauthorblockN{Federico Mason$^*$, Davide Peron$^*$, Enrico Lovisotto$^*$}\\
+\small{{$^*$Department of Information Engineering, University of Padova -- Via Gradenigo, 6/b, 35131 Padova, Italy\\
+Email: {\tt\{masonfed,perondav,lovisott\}@dei.unipd.it}\\}}
+}
+
+% Reduce the space below figs.
+%\setlength{\belowcaptionskip}{-0.7cm}
+
+%% Glossary
+
+\begin{document}
+
+\setlength{\belowcaptionskip}{-0.2cm}
+
+% reduce space after title
+\makeatletter
+\patchcmd{\@maketitle}
+  {\addvspace{0.5\baselineskip}\egroup}
+  {\addvspace{-1.2\baselineskip}\egroup}
+  {}
+  {}
+\makeatother
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\begin{IEEEkeywords}
+Distributed, Storage, Networks, sensors, optimization
+\end{IEEEkeywords}
+
+\glsresetall
+\section{Introduction}
+\label{sec:introduction}
+~\cite{Lin2007}
+
+\section{Technical Approach}
+\label{sec:tech_approach}
+
+\section{Results}
+\label{sec:results}
+
+\section{Conclusions And Future Work}
+\label{sec:conclusions}
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
+
+\end{document}
