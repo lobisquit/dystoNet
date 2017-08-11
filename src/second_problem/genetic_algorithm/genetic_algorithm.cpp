@@ -56,7 +56,7 @@ vector<double> GeneticAlgorithm::run_search() {
 	int part_size = ceil(this->dim_population * this->survival_rate);
 
 	uniform_int_distribution<int> index_choice(0, this->K-1);
-
+	double E = robust_soliton->expectation();
 	while(generation < this->num_generations){
 		/** Sorting of the population */
 		std::sort(population.begin(), population.end(), by_obj_function());
@@ -66,7 +66,7 @@ vector<double> GeneticAlgorithm::run_search() {
 				<< generation << "/" << this->num_generations
 				<< " ==> g2 = "
 				/** Best score for this generation, since vectors are sorted */
-				<< v_distribution->expectation() / robust_soliton->expectation() << "\n";
+				<< v_distribution->expectation() / E << "\n";
 
 		/** Copy of the best individuals in the whole population, and then perturbe it, checking you are respecting
 		* constraints.
