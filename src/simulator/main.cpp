@@ -47,21 +47,30 @@ int main() {
 	// 	cout << "\n";
 	// }
 	cout << "N = " << N << ", K = " << K << ", Ps = [";
-	int ms, h, m=500, steps = 16;
+	/** Number of times in which I pick randomly h nodes */
+	int m=1000;
+	/** Number of times I repeat the random process, to ensure the convergence,
+	* take the mean of the set of taken measures*/
+	int t = 10;
+	int ms, h, steps = 16;
 	/** Compute delta to build the linspace */
 	double delta_step = (2.5 - 1)/(steps - 1);
 	for(int j = 0; j<steps; j++){
-		ms = 0;
 		h = round(K * (1+j*delta_step));
 		vector<vector<int>> en_matrix;
 		/** Random number generator used in random_shuffle function */
 		srand(time(0));
-		for(int i = 0; i < m; i++){
-			en_matrix = net.collector(h);
-			ms += net.message_passing(h, en_matrix);
+		double mean = 0;
+		for(int z = 0; z < t; z++){
+			ms = 0;
+			for(int i = 0; i < m; i++){
+				en_matrix = net.collector(h);
+				ms += net.message_passing(h, en_matrix);
+			}
+			mean += (double)ms/m;
 		}
 
-		cout << (double)ms/m << ", ";
+		cout << mean/t << ", ";
 	}
 	cout << "]\n";
 
