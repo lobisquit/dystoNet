@@ -60,7 +60,7 @@ vector<double> GeneticAlgorithm::run_search() {
 	while(generation < this->num_generations){
 		/** Sorting of the population */
 		std::sort(population.begin(), population.end(), by_obj_function());
-
+		cout << "Obj function: " << population[0].obj_function << "\n";
 		Distribution* v_distribution = new Distribution(population[0].values, 1);
 			cerr << "=====> "
 				<< generation << "/" << this->num_generations
