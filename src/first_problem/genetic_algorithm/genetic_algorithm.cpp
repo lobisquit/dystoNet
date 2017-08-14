@@ -67,11 +67,11 @@ vector<double> GeneticAlgorithm::run_search() {
 				return this->objective_function(s1) < this->objective_function(s2);
 			});
 
-		cerr << "=====> "
-			<< generation << "/" << this->num_generations
-			<< " ==> g1 = "
-			/** Best score for this generation, since vectors are sorted */
-			<< this->objective_function(population[0]) / b0 << "\n";
+		// cerr << "=====> "
+		// 	<< generation << "/" << this->num_generations
+		// 	<< " ==> g1 = "
+		// 	/** Best score for this generation, since vectors are sorted */
+		// 	<< this->objective_function(population[0]) / b0 << "\n";
 
 		/** Copy the best individuals in the population, and then
 		* perturbe them checking constraints are still met.
