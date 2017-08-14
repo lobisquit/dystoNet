@@ -69,12 +69,6 @@ int main() {
 		/* delta 	*/	0.05,
 						K);
 
-	// TheoreticBound TB = TheoreticBound(
-	// 							K,
-	// 							N,
-	// 							&rs,
-	// 							0.05);
-	// std::cout << TB << "\n";
 	double x[K];
 	// TB.run_search(x);
 	// print_array(x, K);

@@ -16,25 +16,30 @@ int main() {
 	RobustSoliton rs = RobustSoliton(
 		/* c     */ 0.01,
 		/* delta */ 0.05,
-		            K, 1);
+		            K, 9);
 
 	GeneticAlgorithm GA = GeneticAlgorithm(
 		/* K */ K,
 		/* N */ N,
 		/* robust_soliton */ &rs,
 		/* max_failure_probability */ 0.05,
-		/* num_generations */ 80000,
-		/* dim_population*/ 20,
+		/* num_generations */ 150000,
+		/* dim_population*/ 24,
 		/* survival_rate */ 0.25
 	);
 
 	vector<double> no_redundancy(K, 1);
 
-	std::cout << GA << "\n";
+	cout << GA << "\n";
 
 	vector<double> best_redundancy = GA.run_search();
-		std::cout << "Arriving to score "
-			<< (
-				GA.objective_function(best_redundancy) / GA.objective_function(no_redundancy)
-			) << "\n";
+	cout << "Arriving to score "
+		<< (
+			GA.objective_function(best_redundancy) / GA.objective_function(no_redundancy)
+		) << "\n";
+	cout << "x_d = [";
+	for(int i = 0; i < K; i++){
+		cout << best_redundancy[i] << ", ";
+	}
+	cout << "]\n";
 }

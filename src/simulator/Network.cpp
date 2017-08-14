@@ -112,7 +112,7 @@ vector<vector<int>> Network::collector(int h) {
 	for(int i = 0; i < this->N; i++) {
 		visits[i] = i;
 	}
-	
+
 	random_shuffle(visits.begin(), visits.end());
 
 	/** Definition and building of the encoding matrix */
