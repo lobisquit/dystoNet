@@ -52,7 +52,7 @@ class Node {
 				"y="      << obj.y      << ", " <<
 				"degree=" << obj.degree << ", ";
 
-			strm << "neighbours=[";
+			strm << "\n\tneighbours=[";
 
 			// print no more than MAX_LENGTH entries, otherwise ...
 			unsigned int MAX_LENGTH = 15;
@@ -67,7 +67,7 @@ class Node {
 			}
 			strm << "], ";
 
-			strm << "packets=[";
+			strm << "\n\tpackets=[";
 
 			// print no more than MAX_LENGTH entries, otherwise ...
 			for (unsigned int i=0; i<obj.packets_ids.size(); i++) {

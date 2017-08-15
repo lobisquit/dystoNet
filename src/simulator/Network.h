@@ -50,10 +50,12 @@ class Network {
 				}
 			}
 			strm << "], ";
+
+			MAX_LENGTH = 10;
 			strm << "\npackages=[";
 			for (unsigned int i=0; i<obj.packets.size(); i++) {
 				if (i<MAX_LENGTH) {
-					strm << "\n\t" << obj.packets[i] << ", ";
+					strm << obj.packets[i] << ", ";
 				}
 				else {
 					strm << "...";

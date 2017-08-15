@@ -1,6 +1,7 @@
 #include <math.h>
 #include <random>
 #include "soliton.h"
+#include <iostream>
 
 using namespace std;
 
@@ -10,23 +11,24 @@ Distribution::Distribution(int seed) {
 }
 
 Distribution::Distribution(vector<double> probabilities, int seed) {
+	// TODO check probabilities
 	this->probabilities = probabilities;
 
 	// set random number generator
 	this->rng.seed(seed);
 }
 
-double Distribution::get(int degree) {
+double Distribution::probability(int degree) {
 	if (degree >= 1 && degree <= (int) this->probabilities.size()) {
 		return this->probabilities[degree - 1];
 	}
 	return 0;
 }
 
-double Distribution::exp() {
+double Distribution::expectation() {
 	double E = 0;
 	for(unsigned int degree = 1; degree <= this->probabilities.size(); degree++) {
-		E += degree * this->get(degree);
+		E += degree * this->probability(degree);
 	}
 	return E;
 }
@@ -41,7 +43,7 @@ int Distribution::realization() {
 
 	for(unsigned int degree = 1; degree <= this->probabilities.size(); degree++) {
 		// get to the next step
-		sum += this->get(degree);
+		sum += this->probability(degree);
 
 		// if in current degree interval, return
 		if (choice < sum) {
@@ -50,6 +52,10 @@ int Distribution::realization() {
 	}
 	// unreachable code (in theory)
 	return -1;
+}
+
+vector<double> Distribution::get_probabilities() {
+	return this->probabilities;
 }
 
 IdealSoliton::IdealSoliton(int K, int seed) : Distribution(seed) {
@@ -90,10 +96,10 @@ RobustSoliton::RobustSoliton(
 	IdealSoliton rho = IdealSoliton(K, seed);
 
 	// compute relevant quantities (beta and R), needed later
-	double R = c * log(K / delta) * sqrt(K);
+	this->R = c * log(K / delta) * sqrt(K);
 	double beta = 0;
 	for(int d = 1; d <= K; d++) {
-		beta += rho.get(d) + get_tau(d, R);
+		beta += rho.probability(d) + get_tau(d, this->R);
 	}
 
 	// set capacity of probabilities to K
@@ -104,7 +110,7 @@ RobustSoliton::RobustSoliton(
 		// compute probability of current degree
 		double prob;
 		if (degree >= 1 && degree <= K ) {
-			prob = (rho.get(degree) + this->get_tau(degree, R)) / beta;
+			prob = (rho.probability(degree) + this->get_tau(degree, R)) / beta;
 		}
 		else {
 			prob = 0;
@@ -125,4 +131,37 @@ double RobustSoliton::get_tau(int degree, double R) {
 		return R * log(R / delta) / K;
 	}
 	return 0;
+}
+
+OverheadRobustSoliton::OverheadRobustSoliton(
+	vector<double> x,
+	double c,
+	double delta,
+	int K,
+	int seed) : RobustSoliton(c, delta, K, seed) {
+
+	if (x.size() != (unsigned int) K) {
+		throw invalid_argument( "x (overheads vector) must be of lenght K" );
+	}
+	this->x = x;
+}
+
+int OverheadRobustSoliton::realization() {
+	int realization = RobustSoliton::realization();
+	// add overhead, round to nearest integer
+	return (int) ( realization * this->x[realization - 1] );
+}
+
+double OverheadRobustSoliton::expectation() {
+	double E = 0;
+	for(unsigned int degree = 1; degree <= this->probabilities.size(); degree++) {
+		E += degree * RobustSoliton::probability(degree) * this->x[degree - 1];
+	}
+	return E;
+}
+
+double OverheadRobustSoliton::probability(int degree) {
+	std::cerr
+		<< "WARNING: probability of OverheadRobustSoliton has un-overheaded degree as its input\n";
+	return RobustSoliton::probability(degree);
 }

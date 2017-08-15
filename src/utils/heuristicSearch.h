@@ -7,6 +7,8 @@
 #ifndef _HEURISTIC_SEARCH_H_
 #define _HEURISTIC_SEARCH_H_
 
+using namespace std;
+
 /**
 * This class interface describes in the most general way the
 * algorithm family of heuristic search tecniques, whose aim is to find the minimum
@@ -24,27 +26,27 @@ class HeuristicSearch {
 		* @param x coordinate in solution space
 		* @returns objective function computed in x
 		*/
-		double objective_function(double x[]);
+		double objective_function(vector<double> x);
 
 		/**
 		* Retrieve an initial suitable starting point for heuristic search
 		* @param x array to fill with solution
 		*/
-		void get_initial_solution(double* x);
+		vector<double> get_initial_solution();
 
 		/**
 		* Check if a new possible solution respects problem constratins
 		* @param candidate_x new candidate solution
 		* @returns true if conditions are met, false otherwise
 		*/
-		bool respect_constraints(double* candidate_x);
+		bool respect_constraints(vector<double> candidate_x);
 
 		/**
 		* Retrieve a new suitable solution nearby current one
 		* @param x valid point in solutions space
 		* @param new_x array to fill with valid neighbour of x
 		*/
-		void get_neighbour(double* x, double* new_x);
+		vector<double> get_neighbour(vector<double> x);
 
 		/**
 		* Find the probability that the previous solution is replaced by a new
@@ -53,13 +55,13 @@ class HeuristicSearch {
 		* @param new_x candidate next solution
 		* @returns probability that new_x takes old_x place in the next step
 		*/
-		double acceptance_probability(double* old_x, double* new_x);
+		double acceptance_probability(vector<double> old_x, vector<double> new_x);
 
 		/**
 		* Try to find the valid solution that minimizes objective function
 		* @param best_x array to fill with best point found by the algorithm
 		*/
-		void run_search(double* best_x);
+		vector<double> run_search();
 };
 
 #endif

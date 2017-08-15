@@ -7,12 +7,25 @@
 #include <sstream>
 
 #include "soliton.h"
-#include "theoretic_bound.h"
+#include "second_problem.h"
 
 #ifndef _GENETIC_ALGORITHM_H_
 #define _GENETIC_ALGORITHM_H_
 
-class GeneticAlgorithm : public TheoreticBound {
+using namespace std;
+
+struct individual{
+	vector<double> values;
+	double obj_function;
+};
+
+struct by_obj_function {
+	bool operator()(individual const &a, individual const &b) {
+		return a.obj_function < b.obj_function;
+	}
+};
+
+class GeneticAlgorithm : public SecondProblem {
 	public:
 		/** Random numbers generator */
 		std::mt19937 rng;
@@ -22,6 +35,9 @@ class GeneticAlgorithm : public TheoreticBound {
 
 		/** Number of possible solutions in the population */
 		int dim_population;
+
+		/** Percentage of population that survives the next turn */
+		double survival_rate;
 
 		/**
 		* Custom overload of << operator, to print debug info
@@ -37,32 +53,31 @@ class GeneticAlgorithm : public TheoreticBound {
 			return strm;
 		}
 
-		GeneticAlgorithm(	int _K,
-							int _N,
-							RobustSoliton* _robust_soliton,
-							double _max_failure_probability,
-							int _num_generations,
-							int _dim_population);
+		GeneticAlgorithm(int K,
+							int N,
+							RobustSoliton* robust_soliton,
+							double max_failure_probability,
+							int num_generations,
+							int dim_population,
+							double survival_rate);
 
 		// these functions are taken as they are from upper class
-		using TheoreticBound::objective_function;
+		using SecondProblem::objective_function;
+		using SecondProblem::respect_constraints;
+		using SecondProblem::get_initial_solution;
 
-		using TheoreticBound::respect_constraints;
+		vector<double> get_neighbour(vector<double> v);
+		double acceptance_probability(vector<double> old_v, vector<double> new_v);
 
-		// these are implemented in cpp
 		/**
 		* Create the first generation, with random values within the range of
 		* the possible solution.
 		*/
-		//void GeneticAlgorithm::get_initial_population(std::vector < std::vector<double> >* population);
-		void get_initial_population(double** population);
+		vector<individual> get_initial_population();
 
-		void get_individual(double individual[]);
+		vector<double> get_individual();
 
-		bool sortByObjFunction(double individual_i[], double individual_j[]);
-
-		void run_search(double x[]);
-
+		vector<double> run_search();
 };
 
 #endif

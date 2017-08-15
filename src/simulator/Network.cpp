@@ -10,6 +10,7 @@ Network::Network(
 	double len_y,
 	double max_distance,
 	Distribution* distribution) {
+	cout << "======> Building network\n";
 
 	// setup random number generation
 	this->rng = distribution->get_rng();
@@ -17,12 +18,12 @@ Network::Network(
 	uniform_real_distribution<double> x(0, len_x);
 	uniform_real_distribution<double> y(0, len_y);
 
-	double b = N * distribution->exp() / K;             // see (14) in Lin, Liao
-	std::cout << b << '\n';
+	double b = N * distribution->expectation() / K;             // see (14) in Lin, Liao
+
 	// create K sensing nodes
 	for(int node_id=0; node_id<K; node_id++) {
 		int degree = distribution->realization();
-		double pi = degree / ( N * distribution->exp() ); // see (15) in Lin, Liao
+		double pi = degree / ( N * distribution->expectation() ); // see (15) in Lin, Liao
 
 		this->nodes.push_back(Node(x(this->rng), y(this->rng), degree, pi));
 
@@ -35,7 +36,7 @@ Network::Network(
 	// create N-K normal nodes
 	for(int i=K; i<N; i++) {
 		int degree = distribution->realization();
-		double pi = degree / ( N * distribution->exp() ); // see (15) in Lin, Liao
+		double pi = degree / ( N * distribution->expectation() ); // see (15) in Lin, Liao
 
 		this->nodes.push_back(Node(x(this->rng), y(this->rng), degree, pi));
 	}
@@ -52,6 +53,8 @@ Network::Network(
 			}
 		}
 	}
+
+	cout << "======> Network built \n";
 }
 
 vector<Node> Network::get_nodes() {
@@ -65,13 +68,14 @@ vector<Packet> Network::get_packets() {
 void Network::spread_packets() {
 	// perform a random walk for each packet
 	for (unsigned int i=0; i<this->packets.size(); i++) {
+		cout << "Packet " << i << "/" << this->packets.size() << "\r";
 		// add packet to sensing (source) node
 		Node* node = &this->nodes[this->packets[i].get_origin_id()];
 		node->add_packet(i);
 
 		// randomly choose wheater to stop or proceed to one of the neighbours
 		uniform_real_distribution<double> toss(0, 1);
-		while (toss(this->rng) < node->get_pi()) {
+		while (toss(this->rng) > node->get_pi()) {
 			vector<int>* neighbours = node->get_neighbour_ids();
 
 			// if we are proceeding, choose randomly a neighbour

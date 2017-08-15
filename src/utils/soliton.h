@@ -33,14 +33,14 @@ class Distribution {
 		* Get expected value of random variable described by Distribution
 		* @return expected value
 		*/
-		double exp();
+		virtual double expectation();
 
 		/**
 		* Compute probability Distribution (given parameters)
 		* @param degree node degree
 		* @return probability of having given degree
 		*/
-		double get(int degree);
+		double probability(int degree);
 
 		/**
 		* @return retrieve rng for use outside of distribution
@@ -48,6 +48,8 @@ class Distribution {
 		mt19937 get_rng() {
 			return this->rng;
 		}
+
+		vector<double> get_probabilities();
 };
 
 class IdealSoliton : public Distribution {
@@ -58,9 +60,9 @@ class IdealSoliton : public Distribution {
 		*/
 		IdealSoliton(int K, int seed);
 
-		using Distribution::get;
+		using Distribution::probability;
 		using Distribution::realization;
-		using Distribution::exp;
+		using Distribution::expectation;
 };
 
 class RobustSoliton : public Distribution {
@@ -78,6 +80,8 @@ class RobustSoliton : public Distribution {
 
 		/** Robust Soliton maximal failure probability */
 		double delta;
+
+		double R;
 
 		/** Ideal Soliton parameter: Distribution is defined then in [0, K] */
 		int K;
@@ -101,9 +105,47 @@ class RobustSoliton : public Distribution {
 		*/
 		RobustSoliton(double c, double delta, int K, int seed);
 
-		using Distribution::get;
+		using Distribution::probability;
 		using Distribution::realization;
-		using Distribution::exp;
+		using Distribution::expectation;
 };
+
+class OverheadRobustSoliton : public RobustSoliton {
+	private:
+		/**
+		* Overhead coefficients
+		*/
+		vector<double> x;
+
+	public:
+		/**
+		* Make RobustSoliton objects printable, for debug
+		*/
+		friend std::ostream& operator<<(std::ostream &strm, OverheadRobustSoliton &obj) {
+			strm << "<OverheadRobustSoliton("
+				"c="      << obj.c      << ", " <<
+				"delta="  << obj.delta  << ", " <<
+				"K="      << obj.K      << ")>";
+			return strm;
+		}
+
+		/**
+		* Build Robust Soliton generator object
+		* @param c constant
+		* @param delta maximal failure probability
+		* @param K highest integer for which the Distribution is defined
+		*/
+		OverheadRobustSoliton(
+			vector<double> x,
+			double c,
+			double delta,
+			int K,
+			int seed);
+
+		int realization();
+		double probability(int degree);
+		double expectation();
+};
+
 
 #endif
