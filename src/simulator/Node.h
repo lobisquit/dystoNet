@@ -8,6 +8,8 @@
 
 using namespace std;
 
+class Packet;
+
 class Node {
 	private:
 		/** Coordinates of the node */
@@ -21,23 +23,25 @@ class Node {
 		double pi;
 
 		/** neighbour_ids id of current node */
-		vector<int> neighbour_ids;
+		vector<Node*> neighbours;
 
 		/** packets ids received by current node */
-		vector<int> packets_ids;
+		vector<Packet*> packets;
 
 	public:
+		Node();
+
 		Node(double x, double y, int degree, double pi);
 
 		double get_x();
 		double get_y();
 		double get_pi();
 
-		vector<int>* get_neighbour_ids();
-		vector<int>* get_packets_ids();
+		vector<Node*> get_neighbours();
+		vector<Packet*> get_packets();
 
-		void add_neighbour(int other);
-		void add_packet(int packet_id);
+		void add_neighbour(Node* other);
+		void add_packet(Packet* new_pkt);
 
 		/**
 		* Compute distance from another node
@@ -50,35 +54,7 @@ class Node {
 			strm << "<Node("
 				"x="      << obj.x      << ", " <<
 				"y="      << obj.y      << ", " <<
-				"degree=" << obj.degree << ", ";
-
-			strm << "\n\tneighbours=[";
-
-			// print no more than MAX_LENGTH entries, otherwise ...
-			unsigned int MAX_LENGTH = 15;
-			for (unsigned int i=0; i<obj.neighbour_ids.size(); i++) {
-				if (i<MAX_LENGTH) {
-					strm << obj.neighbour_ids[i] << ", ";
-				}
-				else {
-					strm << "...";
-					break;
-				}
-			}
-			strm << "], ";
-
-			strm << "\n\tpackets=[";
-
-			// print no more than MAX_LENGTH entries, otherwise ...
-			for (unsigned int i=0; i<obj.packets_ids.size(); i++) {
-				if (i<MAX_LENGTH) {
-					strm << obj.packets_ids[i] << ", ";
-				}
-				else {
-					strm << "...";
-					break;
-				}
-			}
+				"degree=" << obj.degree;
 			return strm << "])>";
 		}
 };
@@ -86,7 +62,7 @@ class Node {
 class Packet {
 	private:
 		/** Source of the packet */
-		int origin_id;
+		Node* origin;
 
 		/**
 		* Unique id of the packet, since each source
@@ -95,14 +71,16 @@ class Packet {
 		int packet_id;
 
 	public:
-		Packet(int origin_id, int id);
+		Packet();
 
-		int get_origin_id();
+		Packet(Node* origin, int id);
+
+		Node* get_origin();
 		int get_id();
 
 		friend std::ostream& operator<<(std::ostream &strm, Packet obj) {
 			strm << "<Packet("
-				"origin_id=" << obj.origin_id << ", " <<
+				"origin="    << *obj.origin    << ", " <<
 				"packet_id=" <<  obj.packet_id << ")>";
 			return strm;
 		}

@@ -11,8 +11,14 @@ using namespace std;
 class Network {
 	private:
 		/** List of nodes in the network */
-		vector<Node> nodes;
-		vector<Packet> packets;
+		Node* nodes;
+		Packet* packets;
+
+		int N;
+
+		int K;
+
+		int b;
 
 		/** Random numbers generator */
 		mt19937 rng;
@@ -37,38 +43,27 @@ class Network {
 			Distribution* distribution);
 
 		friend std::ostream& operator<<(std::ostream &strm, Network &obj) {
-			strm << "<Network(\nnodes=[";
-
-			unsigned int MAX_LENGTH = 50;
-			for (unsigned int i=0; i<obj.nodes.size(); i++) {
-				if (i<MAX_LENGTH) {
-					strm << "\n\t" << obj.nodes[i] << ", ";
+			Node* nodes = obj.get_nodes();
+			strm << "<Network(nodes=[\n";
+			for (int i = 0; i < obj.get_nodes_size(); i++) {
+				strm << "\t" << nodes[i] << " {\n";
+				for (Packet* pkt: nodes[i].get_packets()) {
+					strm << "\t\t" << *pkt << "\n";
 				}
-				else {
-					strm << "...";
-					break;
-				}
+				strm << "\t}\n";
 			}
-			strm << "], ";
-
-			MAX_LENGTH = 10;
-			strm << "\npackages=[";
-			for (unsigned int i=0; i<obj.packets.size(); i++) {
-				if (i<MAX_LENGTH) {
-					strm << obj.packets[i] << ", ";
-				}
-				else {
-					strm << "...";
-					break;
-				}
-			}
-			strm << "])>";
-
-			return strm;
+			return strm << "])>";
 		}
 
-		vector<Node> get_nodes();
-		vector<Packet> get_packets();
+		int get_packets_size();
+		int get_nodes_size();
+
+		Node* get_nodes();
+		Packet* get_packets();
 
 		void spread_packets();
+
+		/** Visit to the network */
+		vector<vector<int>> collector(int h);
+		bool message_passing(int h, vector<vector<int>> en_matrix);
 };

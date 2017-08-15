@@ -3,26 +3,50 @@
 #include <iostream>
 
 int main() {
-	int N = 200;
-	int K = 100;
+	int N = 100;
+	int K = 20;
 	double len_x = 10;
 	double len_y = 10;
-	double neighThresh = 5;
+	double neighThresh = 15;
 	double c = 0.01;
 	double delta = 0.05;
+	int seed = 1;
+
+	/** Overhead coefficients */
 	vector<double> x(K, 1.1);
 
-	Distribution* d = new RobustSoliton(c, delta, K, 10);
+	Distribution* d = new RobustSoliton(c, delta, K, seed);
 	Network net = Network(N, K, len_x, len_y, neighThresh, d);
-	int b0 = net.get_packets().size();
+
+	int b0 = net.get_packets_size();
 	std::cout << "b0 = " << b0 << '\n';
 	net.spread_packets();
 
-	Distribution* d1 = new OverheadRobustSoliton(x, c, delta, K, 10);
-	Network net1 = Network(N, K, len_x, len_y, neighThresh, d1);
-	int b = net1.get_packets().size();
-	std::cout << "b = " << b << '\n';
+	cout << "N = " << N << ", K = " << K << ", Ps = [";
+	/** Number of times in which I pick randomly h nodes */
+	int m = 10000;
+	/** Number of times I repeat the random process, to ensure the convergence,
+	* take the mean of the set of taken measures */
+	int t = 20;
+	int ms, h, steps = 16;
+	/** Compute delta to build the linspace */
+	double delta_step = (2.5 - 1)/(steps - 1);
+	for (int j = 0; j<steps; j++) {
+		h = round(K * (1+j*delta_step));
+		vector<vector<int>> en_matrix;
+		/** Random number generator used in random_shuffle function */
+		srand(time(0));
+		double mean = 0;
+		for(int z = 0; z < t; z++){
+			ms = 0;
+			for(int i = 0; i < m; i++){
+				en_matrix = net.collector(h);
+				ms += net.message_passing(h, en_matrix);
+			}
+			mean += (double)ms/m;
+		}
 
-	std::cout << "g1 = " << (b / (double) b0) << "\n";
-	std::cout << net << "\n";
+		cout << mean/t << ", ";
+	}
+	cout << "]\n";
 }
