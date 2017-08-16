@@ -14,6 +14,9 @@
 
 % \usepackage{t1enc}
 
+\usepackage{listings}
+\lstset{language=Pascal}
+
 %\usepackage[utf8x]{inputenc}
 \usepackage[english]{babel}
 \selectlanguage{english}
@@ -113,6 +116,16 @@ Email: {\tt\{masonfed,perondav,lovisott\}@dei.unipd.it}\\}}
 \newacronym{ga}{GA}{Genetic Algorithm}
 \newacronym{jb}{JB}{Jumping Ball}
 \newacronym{wsn}{WSN}{Wireless Sensor Network}
+\newacronym{dsn}{DSN}{Distributed Storage Network}
+\newacronym{fp}{FP}{First Problem}
+\newacronym{sp}{SP}{Second Problem}
+\newacronym{of}{OF}{Objective Function}
+\newacronym{cr}{CR}{Cooling Rate}
+\newacronym{t}{T}{Temperature}
+\newacronym{oc}{OC}{Old Candidate}
+\newacronym{nc}{NC}{New Candidate}
+
+>>>>>>> 3d2e1d94a5f8721ca0c2f1db1eec212146610bff
 \glsresetall
 \begin{document}
 
@@ -173,11 +186,69 @@ In \autoref{sec:results} we present the results obtained using the optimal param
 \section{Technical Approach}
 \label{sec:tech_approach}
 
+The correct working of the algorithms \gls{edfc} and \gls{adfc} requires knowledge of $x_d$ and $\nu(d)$. $x_d$ is called \textit{redundancy coefficent} and is the solution of the following optimization problem.
+
+\begin{equation}
+	\label{firstproblem}
+	\begin{split}
+		minimize & \quad \sum_{d=1}^K x_d d \mu (d) \\
+		subject \ to & \quad \begin{cases}
+			Pr(Y<d|X=d) \leq \delta_d \\
+			x_d \geq 1 \quad for \quad d = 1,...,K
+		\end{cases}
+	\end{split}
+\end{equation}
+
+$\nu(d)$ is a specific distribution and is the solution of the following optimization problem.
+
+\begin{equation}
+	\label{secondproblem}
+	\begin{split}
+		minimize & \quad \sum_{i=1}^{K/R}(\nu'(i)-\mu(i))^2 \\
+		subject \ to & \quad \begin{cases}
+			\sum_{i=1}^K \nu(i) = 1 \\
+			\nu(i) \geq 0 \quad for \quad i=1,...,K
+		\end{cases}
+	\end{split}
+\end{equation}
+
+From now we call \ref{firstproblem} and \ref{secondproblem} simply \gls{fp} and \gls{sp}. The different parametrs that appear in \gls{fp} and in \gls{sp} are specified in ~\cite{Lin2007}. Both \gls{fp} and \gls{sp} have \textit{non-convex objective functions} and so it is impossible to determine the exact solution of these problems. To overcome this we build a series of heuristic algorithms.
+
+The techniques we implement doesn't lead to exact solutions but to approximate solutions that are still optimal for our purposes. In particular these techniques are search algorithms that do not stop at the first localized local minimum. They continue to vary the outcome of the objective function, hoping to find a better local minimum than the one previously found. The first algorithm that we have implemented is \gls{sa}. \gls{sa} is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects.
+
+In \gls{sa}, \gls{of} of the optimization problem is compared to the internal energy of a metallic material. Our algorithm is based on a parameter called \gls{t}. \gls{t} is initialized at a sufficient high value and then it is reduced until it reaches zero. Every new reduction of \gls{t} corresponds to a new step of the algorithm. At the first step the algorithm attribuites to the independent variable of \gls{of} a random value so that \gls{of} respects the constraints of the problem. This value becomes the \textit{candidate} to be the minimum value of \gls{of}. Then the \textit{candidate} is perturbed in an unique direction. If the new value found respect the constraints of \gls{of}, we keep it. If the new value found doesn't respect the constraints of \gls{of} we make a new perturbation. We call the process just described the search of a neighbour of the \textit{candidate}. Once a new admittable value of the \gls{of} is found, the algorithm has to establish if it want move to the neighbour of the \textit{candidate} or not. To make this decision \gls{sa} compares the value of \textit{oc} with the value of \textit{nc}.
+
+ In case of \gls{nc} has better performance of \gls{oc}, that means that \gls{of} given by \gls{oc} is higher than \gls{of} given by \gls{nc}, the algorithm moves to \gls{nc} for sure. In case that \gls{nc} has worse performance than \gls{oc} the algorithm moves to \gls{nc} only with a certain probability that we call \textit{Acceptance Probability} $P_A$. This is done so that the algorithm has always the possibility to move away from a local minimum in search of a new solution. The value of the $P_A$ depends on the value of the dofference between the energy of \gls{nc} and the energy of \gls{oc} and is given in what follows.
+
+ \begin{equation}
+ 	\label{accept_prob}
+	P_A = \begin{cases}
+		1 & \quad F(x_n)-F(x_o) < 0 \\
+		e^{\psi(T)\cdot(F(x_n)-F(x_o))/T } & \quad F(x_n)-F(x_o) \geq 0
+\end{cases}
+ \end{equation}
+
+In \ref{accept_prob} $x_n$ and $x_o$ represent the value of \gls{nc} and of \gls{oc} while $\psi(T)$ is a parameter depending on \gls{t} called \textit{Acceptance Coefficient}.
+
+For every new value of \gls{t} the algorithm makes trys to move from the actual candidate a number of times equals to \textit{Steps Coefficient}. We note that \textit{Steps Coefficient} and the perturbation to which the candidates are subjected depend on \gls{t} as \textit{Acceptance Coefficient}. In particular all these paraeters decreases as the temperature decreases. This means that in initial steps of \gls{sa} is very easy for the result to change from the starting position while in the final steps is more likely that \gls{sa} stops at a local minimum.
+
+When \gls{t} finally reach the zero values \gls{sa} esmines all the crossed candidates and returns the candidate with better performance.
+It is therefore essential to always keep in mind the value of the best result going through right now.
+
+\begin{lstlisting}[frame=single]
+	T = Starting temperature
+	x = Starting candidate
+	Step coefficient = Starting step coefficient
+	Accepatnce coefficient = Starting acceptance coefficient
+	while(T>0)
+
+\end{lstlisting}
+
 \section{Results}
 \label{sec:results}
 \begin{figure}
   \centering
-    \includegraphics[width=0.9\columnwidth]{ratiovsprob.eps}
+	    \includegraphics[width=0.9\columnwidth]{ratiovsprob.eps}
   \caption{Successfull decoding probability $P_s$ for different values of $N$, $K$ and decoding ratio $\nu$.}
   \label{fig:ratiovsprob}
 \end{figure}
