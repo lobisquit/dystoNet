@@ -212,7 +212,10 @@ $\nu(d)$ is a specific distribution and is the solution of the following optimiz
 
 From now we call \ref{firstproblem} and \ref{secondproblem} simply \gls{fp} and \gls{sp}. The different parametrs that appear in \gls{fp} and in \gls{sp} are specified in ~\cite{Lin2007}. Both \gls{fp} and \gls{sp} have \textit{non-convex objective functions} and so it is impossible to determine the exact solution of these problems. To overcome this we build a series of heuristic algorithms.
 
-The techniques we implement doesn't lead to exact solutions but to approximate solutions that are still optimal for our purposes. In particular these techniques are search algorithms that do not stop at the first localized local minimum. They continue to vary the outcome of the objective function, hoping to find a better local minimum than the one previously found. The first algorithm that we have implemented is \gls{sa}. \gls{sa} is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects.
+The techniques we implement doesn't lead to exact solutions but to approximate solutions that are still optimal for our purposes. In particular these techniques are search algorithms that do not stop at the first localized local minimum. They continue to vary the outcome of the objective function, hoping to find a better local minimum than the one previously found.
+
+\subsection{Simulated Annealing}
+The first algorithm that we have implemented is \gls{sa}. \gls{sa} is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects.
 
 In \gls{sa}, \gls{of} of the optimization problem is compared to the internal energy of a metallic material. Our algorithm is based on a parameter called \gls{t}. \gls{t} is initialized at a sufficient high value and then it is reduced until it reaches zero. Every new reduction of \gls{t} corresponds to a new step of the algorithm. At the first step the algorithm attribuites to the independent variable of \gls{of} a random value so that \gls{of} respects the constraints of the problem. This value becomes the \textit{candidate} to be the minimum value of \gls{of}. Then the \textit{candidate} is perturbed in an unique direction. If the new value found respect the constraints of \gls{of}, we keep it. If the new value found doesn't respect the constraints of \gls{of} we make a new perturbation. We call the process just described the search of a neighbour of the \textit{candidate}. Once a new admittable value of the \gls{of} is found, the algorithm has to establish if it want move to the neighbour of the \textit{candidate} or not. To make this decision \gls{sa} compares the value of \textit{oc} with the value of \textit{nc}.
 
@@ -241,6 +244,16 @@ It is therefore essential to always keep in mind the value of the best result go
 	while(T>0)
 
 \end{lstlisting}
+
+\subsection{Genetic Algorithm}
+The third technique is called Genetic Algorithm.
+The algorithm takes randomly an initial set of solution for the problem, called \textit{population}, and tries to evolve it toward better solutions.
+Each candidate solution is called \textit{individual}, that is usually a multi-dimensional array. In biological applications, each component of the individual is a \textit{chromosome} or a \textit{genotype}, in our case it is simply an entry for the array.
+
+\gls{ga} is an iterative process, in each iteration, the population is evolved in a new \textit{generation}.
+In each generation, the objective function of each individual is evaluated. The best individuals (in terms of objective function) are selected and mutated to create the next generation.
+The way in which an individual is mutated can be arbitrarily chosen.
+Usually a single component is perturbated randomly, or parts of different solutions are joined togheter, to maintain the properties of the old solutions trying to improve it.
 
 \section{Results}
 \label{sec:results}
