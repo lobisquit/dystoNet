@@ -122,6 +122,11 @@ Email: {\tt\{masonfed,perondav,lovisott\}@dei.unipd.it}\\}}
 \newacronym{t}{T}{Temperature}
 \newacronym{oc}{OC}{Old Candidate}
 \newacronym{nc}{NC}{New Candidate}
+\newacronym{sc}{SC}{Step Coefficient}
+\newacronym{ac}{AC}{Acceptance Coefficient}
+\newacronym{ap}{$P_A$}{Acceptance Probability}
+\newacronym{ws}{$N_{WS}$}{Number of Worsening Steps}
+\newacronym{wsmax}{$N_{WS}^{MAX}$}{ Maxiumum Number of Worsening Steps}
 
 \glsresetall
 \begin{document}
@@ -213,6 +218,8 @@ From now we call \ref{firstproblem} and \ref{secondproblem} simply \gls{fp} and 
 
 The techniques we implement doesn't lead to exact solutions but to approximate solutions that are still optimal for our purposes. In particular these techniques are search algorithms that do not stop at the first localized local minimum. They continue to vary the outcome of the objective function, hoping to find a better local minimum than the one previously found.
 
+\pagebreak
+
 \subsection{Simulated Annealing}
 The first algorithm that we have implemented is \gls{sa}. \gls{sa} is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects.
 
@@ -257,29 +264,39 @@ while(T>0)
 T = get_new(Temperature)
 SC = get_new(Step coefficent)
 PA = get_new(PA)
-if FO(x)<FO(Best_x)
+if OF(x)<OF(Best_x)
  Best_x = x
 end
 end
 return Best_x
-\end{lstlisting} \captionof{lstlisting}{Simulated Alleaning}
+\end{lstlisting} \captionof{lstlisting}{Simulated Alleaning} \label{code_sa}
+
+\subsection{Jumping Ball}
+
+The second technique that we implent is called \gls{jb}. \gls{jb} is a variant of \gls{sa} and it follows the same operating model. The only difference between \gls{jb} and \gls{sa} is that the searching for the best results could make a jump in some circumstannces. This jumps make the search of the candidate move along the function domain in a greater way than what happens in \gls{sa}.
+
+Let's compare the code of \gls{sa} with the code of \gls{jb}. We note that have almost the same pattern. As in \gls{sa}, \gls{jb} uses the parameter \gls{t} which decrases as the algorithm goes on. At every new step \gls{t} is uptated as \gls{sc}, \gls{ac} and consequently \gls{ap}. For every new value of \gls{t} th algorithm moves throgh the domain of \gls{of} choosing new candidates.
+
+Unlike \gls{sa}, \gls{jb} uses two more paramters that are called \gls{ws} and \gls{wsmax}. \gls{wsmax} is a fixed parameter while \gls{ws} changes value as the algorithm goes on. At the beginning the value of \gls{ws} is set to zero. Now we suppone that the algorithm moves to new caandidate with the probability \gls{ap}. If the new candidate has better performance than the previous one the values of \gls{ws} is immediately set to zero. Instead if the new candidate ha worse performance than the previous one the values of \gls{ws} in increase of one. Now we imagine that the algorithm moves for a great number of steps to candidate always worse than the previous one. In this case the value of \gls{ws} encreases al lot, untill it become close to \gls{wsmax}. When \gls{ws} beacomes greater than \gls{wsmax} the algorithm makes the jump. this mean that the searching of a new candidate doesn't happen as before. In particular the perturbation of the candidater is much bigger and does not envolve only one component of the candidate but a random number of them. Ina simply way we can say that the algorithm starts again the search froma point of the function domain very far from the previous one.
+
+This happen in order to avoid that the lagoruthm moves to point of the function domain always worse than the point already crossed. 
 
 \pagebreak
 
-\begin{lstlisting}[frame=single]
+\begin{lstlisting}[mathescape=true,frame=single]
 T = Temperature
 x = Candidate
 Best_x = x
 SC = Step coefficient
 PA = Acceptance probability
-WS = 0
+$ N_{WS} $ = 0
 while(T>0)
  for i = 1 to i = SC
   OC = x
   NC = Neighbour(x)
   while (NC doesn't respect costraints)
-   WS = WS+1
-   if WS<WS_MAX
+   N_{WS} = N_{WS}+1
+   if $N_{WS}<N_{WS}^{MAX}$
     NC = Neighbour(x)
    else
     NC = Jump(x)
@@ -293,8 +310,8 @@ while(T>0)
 T = get_new(Temperature)
 SC = get_new(Step coefficent)
 PA = get_new(PA)
-WS = 0
-if FO(x)<FO(Best_x)
+$N_{WS}$ = 0
+if OF(x)<OF(Best_x)
  Best_x = x
 end
 end
