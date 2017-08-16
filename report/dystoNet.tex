@@ -15,7 +15,6 @@
 % \usepackage{t1enc}
 
 \usepackage{listings}
-\lstset{language=Pascal}
 
 %\usepackage[utf8x]{inputenc}
 \usepackage[english]{babel}
@@ -236,14 +235,77 @@ For every new value of \gls{t} the algorithm makes trys to move from the actual 
 When \gls{t} finally reach the zero values \gls{sa} esmines all the crossed candidates and returns the candidate with better performance.
 It is therefore essential to always keep in mind the value of the best result going through right now.
 
-\begin{lstlisting}[frame=single]
-	T = Starting temperature
-	x = Starting candidate
-	Step coefficient = Starting step coefficient
-	Accepatnce coefficient = Starting acceptance coefficient
-	while(T>0)
+\pagebreak
 
-\end{lstlisting}
+\begin{lstlisting}[frame=single]
+T = Temperature
+x = Candidate
+Best_x = x
+SC = Step coefficient
+PA = Acceptance probability
+while(T>0)
+ for i = 1 to i = SC
+  OC = x
+  NC = Neighbour(x)
+  while (NC doesn't respect costraints)
+   NC = Neighbour(x)
+  end
+  with probability PA
+   x = NC
+  end
+ end
+T = get_new(Temperature)
+SC = get_new(Step coefficent)
+PA = get_new(PA)
+if FO(x)<FO(Best_x)
+ Best_x = x
+end
+end
+return Best_x
+\end{lstlisting} \captionof{lstlisting}{Simulated Alleaning}
+
+\pagebreak
+
+\begin{lstlisting}[frame=single]
+T = Temperature
+x = Candidate
+Best_x = x
+SC = Step coefficient
+PA = Acceptance probability
+WS = 0
+while(T>0)
+ for i = 1 to i = SC
+  OC = x
+  NC = Neighbour(x)
+  while (NC doesn't respect costraints)
+   WS = WS+1
+   if WS<WS_MAX
+    NC = Neighbour(x)
+   else
+    NC = Jump(x)
+    WS = 0
+   end
+  end
+  with probability PA
+   x = NC
+  end
+ end
+T = get_new(Temperature)
+SC = get_new(Step coefficent)
+PA = get_new(PA)
+WS = 0
+if FO(x)<FO(Best_x)
+ Best_x = x
+end
+end
+return Best_x
+\end{lstlisting} \captionof{lstlisting}{Jumping ball}
+
+\pagebreak
+
+\begin{lstlisting}[frame=single]
+\end{lstlisting} \captionof{lstlisting}{Genetic algorithm}
+
 
 \subsection{Genetic Algorithm}
 The third technique is called Genetic Algorithm.
