@@ -2,6 +2,8 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include "functionCSV.h"
+
 using namespace std;
 
 //Function writeCSV: it receives as input a vector of double and the path in which
@@ -26,7 +28,9 @@ vector<double> readCSV(string path_in) {
 
 	while(infile.good()) {
 		getline(infile, line, '\n');
-		v_in.push_back(atof(line.c_str()));
+		if (!line.empty()) {
+			v_in.push_back(atof(line.c_str()));
+		}
 	}
 	return v_in;
 }
