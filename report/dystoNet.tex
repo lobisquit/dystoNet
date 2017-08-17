@@ -117,16 +117,17 @@ Email: {\tt\{masonfed,perondav,lovisott\}@dei.unipd.it}\\}}
 \newacronym{wsn}{WSN}{Wireless Sensor Network}
 \newacronym{fp}{FP}{First Problem}
 \newacronym{sp}{SP}{Second Problem}
-\newacronym{of}{OF}{Objective Function}
-\newacronym{cr}{CR}{Cooling Rate}
+\newacronym{of}{$F_O$}{Objective Function}
 \newacronym{t}{T}{Temperature}
-\newacronym{oc}{OC}{Old Candidate}
-\newacronym{nc}{NC}{New Candidate}
-\newacronym{sc}{SC}{Step Coefficient}
-\newacronym{ac}{AC}{Acceptance Coefficient}
+\newacronym{oc}{$x_o$}{Old Candidate}
+\newacronym{nc}{$x_n$}{New Candidate}
+\newacronym{sc}{$C_S(T)$}{Step Coefficient}
+\newacronym{ac}{$C_A(T)$}{Acceptance Coefficient}
 \newacronym{ap}{$P_A$}{Acceptance Probability}
 \newacronym{ws}{$N_{WS}$}{Number of Worsening Steps}
 \newacronym{wsmax}{$N_{WS}^{MAX}$}{ Maxiumum Number of Worsening Steps}
+\newacronym{x}{x}{Candidate}
+\newacronym{bestx}{$x_{best}$}{Best candidate}
 
 \glsresetall
 \begin{document}
@@ -176,8 +177,9 @@ The challenge here is to keep the communication cost at a minimum level, while k
 Traditional but expensive two-way packet delivery is then discarded, in favour of one-way \emph{random walks}, where only neighbours knowledge is required locally.
 Random walks are designed according to \emph{Metropolis algorithm} such that the number of packets reaching each node resembles the Robust Soliton distribution, whose optimal decoding properties are known\cite{Luby}.
 
-In this paper, we are going to find the optimal $x_d$ parameter for \gls{edfc} with three heuristic tecniques.
+In this paper, we are going to find the optimal $x_d$ parameter for \gls{edfc} with three heuristic techniques.
 The optimal configurations are then tested with a network simulator, and further analysis is performed.
+Unfortunately the heuristic techniques uses to extimate $x_d$, don't prove useful to find the optimal $\nu(d)$ parameter for \gls{adfc}.
 
 The article is structured in three sections.
 
@@ -188,7 +190,7 @@ In \autoref{sec:results} we present the results obtained using the optimal param
 \section{Technical Approach}
 \label{sec:tech_approach}
 
-The correct working of the algorithms \gls{edfc} and \gls{adfc} requires knowledge of $x_d$ and $\nu(d)$. $x_d$ is called \textit{redundancy coefficent} and is the solution of the following optimization problem.
+The correct working of the algorithms \gls{edfc} and \gls{adfc} requires knowledge of $x_d$ and $\nu(d)$. $x_d$ is a K-dimensional variable of \gls{edfc} called \textit{redundancy coefficent}. Given a node with \textit{code degree} $d$, $x_d \cdot d$ represents the number of packets received by the node itself at the end of packets spread. The best value of $x_d$ is the solution of the following optimization problem.
 
 \begin{equation}
 	\label{firstproblem}
@@ -201,7 +203,7 @@ The correct working of the algorithms \gls{edfc} and \gls{adfc} requires knowled
 	\end{split}
 \end{equation}
 
-$\nu(d)$ is a specific distribution and is the solution of the following optimization problem.
+$\nu(d)$ is a variable of \gls{adfc}. It is a \textit{hypothetical} degree distribution of nodes of network such that the \textit{actual} degree distribution of them is close to the \textit{Robust Solition Distribution}. We note that $\nu(d)$ as $x_d$ is a K-dimensional element which means that it has K possibile outcomes. The best value of $\nu(d)$ is the solution of the following optimization problem.
 
 \begin{equation}
 	\label{secondproblem}
@@ -214,61 +216,62 @@ $\nu(d)$ is a specific distribution and is the solution of the following optimiz
 	\end{split}
 \end{equation}
 
-From now we call \ref{firstproblem} and \ref{secondproblem} simply \gls{fp} and \gls{sp}. The different parametrs that appear in \gls{fp} and in \gls{sp} are specified in ~\cite{Lin2007}. Both \gls{fp} and \gls{sp} have \textit{non-convex objective functions} and so it is impossible to determine the exact solution of these problems. To overcome this we build a series of heuristic algorithms.
+From now we call \eqref{firstproblem} and \eqref{secondproblem} simply \gls{fp} and \gls{sp}. The different parameters that appear in \gls{fp} and in \gls{sp} are specified in details in ~\cite{Lin2007}. We note immediately that \gls{fp} and \gls{sp} have \textit{non-convex objective functions}. So it is impossible to determine the exact solution of both the problems. To overcome this obstacle we choose to design a series of heuristic algorithms.
 
-The techniques we implement doesn't lead to exact solutions but to approximate solutions that are still optimal for our purposes. In particular these techniques are search algorithms that do not stop at the first localized local minimum. They continue to vary the outcome of the objective function, hoping to find a better local minimum than the one previously found.
-
-\pagebreak
+The heuristic algorithms we implement are not able to compute the exact solutions of \eqref{firstproblem} and \eqref{secondproblem}. Despite that they can theorically reach approximate solutions still optimal for our purposes. In particular our techniques correspond to search algorithms that consider the possibility that a function could have more than one minimum point. Our techniques don't stop at the first local minimum that they localize as in a convex function. They continue to vary the outcome of the \textit{objective function}, hoping to find a better local minimum than the one previously found.
 
 \subsection{Simulated Annealing}
-The first algorithm that we have implemented is \gls{sa}. \gls{sa} is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects.
 
-In \gls{sa}, \gls{of} of the optimization problem is compared to the internal energy of a metallic material. Our algorithm is based on a parameter called \gls{t}. \gls{t} is initialized at a sufficient high value and then it is reduced until it reaches zero. Every new reduction of \gls{t} corresponds to a new step of the algorithm. At the first step the algorithm attribuites to the independent variable of \gls{of} a random value so that \gls{of} respects the constraints of the problem. This value becomes the \textit{candidate} to be the minimum value of \gls{of}. Then the \textit{candidate} is perturbed in an unique direction. If the new value found respect the constraints of \gls{of}, we keep it. If the new value found doesn't respect the constraints of \gls{of} we make a new perturbation. We call the process just described the search of a neighbour of the \textit{candidate}. Once a new admittable value of the \gls{of} is found, the algorithm has to establish if it want move to the neighbour of the \textit{candidate} or not. To make this decision \gls{sa} compares the value of \textit{oc} with the value of \textit{nc}.
+The first algorithm we implement is a version of the technique known as \gls{sa}. \gls{sa} is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects. In the physicall alleaning a metal is warmed at high temperatures and then slowly cooled. In this way it is possible to achieve the molecolar equilibrium inside the material itself.
 
- In case of \gls{nc} has better performance of \gls{oc}, that means that \gls{of} given by \gls{oc} is higher than \gls{of} given by \gls{nc}, the algorithm moves to \gls{nc} for sure. In case that \gls{nc} has worse performance than \gls{oc} the algorithm moves to \gls{nc} only with a certain probability that we call \textit{Acceptance Probability} $P_A$. This is done so that the algorithm has always the possibility to move away from a local minimum in search of a new solution. The value of the $P_A$ depends on the value of the dofference between the energy of \gls{nc} and the energy of \gls{oc} and is given in what follows.
+In \gls{sa}, we compare \gls{of} of the optimization problem to the internal energy of a metallic material. As in the physicall process we want to quickly change the function energy and the slowly bring it to a stable value. In other words we want first cross widly the function domain and then concentrate in the points which have more probability to be absolute minimum of \gls{of}.
+
+\gls{sa} is based on a parameter called \gls{t}. At the beginning \gls{t} is initialized at a sufficient high value and then it is reduced until it reaches zero. Every new reduction of \gls{t} corresponds to a new step of the algorithm. After that the algorithm choose a random point of the function domain. This point is saved in the parameter \gls{x}, which means that is examined by the algorithms by this time. The same point contained in \gls{x} is saved in the parameter \gls{bestx}. During all the algorithm working \gls{bestx} contains the minimum between all the points crossed by the algorithm untill now. At the end of the \textit{inizialization phase} the algorithm set the values of \gls{sc} and \gls{ac}. Both these parameters depend on \gls{t} and will change their values as the algorithm goes on.
+
+Terminated the \textit{inizialization phase}, the first step of the algorithm begins. All algorithm steps have the  same pattern, which is described in what follows. \gls{x} is copied in the parameter \gls{oc} and then is perturbed in an unique direction. This means that one of the components of \gls{x} changes is value. We note that whataver is the problem we consider, \gls{x} is always a K-dimensional element. The new element found is saved in the parameter \gls{nc}. At this point the algorithm verifies if the value of \gls{nc} belongs to the function domain or not. Indeed the algorithm can work correctly only if every new value of \gls{nc} respect the constraints of the problem. If this doesn't happen the algorithm discargs the value of \gls{nc} and makes a new perturbation. We call the process just described the search of a neighbour of \gls{x}. Once an admittable \gls{nc} is found, the algorithm has to establish if it want move to the neighbour of \gls{x} or not. To make this decision \gls{sa} compares the value of \gls{oc} with the value of \gls{nc}. In particular the algorithm verifies which between \gls{oc} and \gls{nc} has better performance.
+
+We know that the aim of \gls{sa} in find the minimum point of \gls{of}. Consequently if the value of \gls{of} given by \gls{oc} is higher than the value of \gls{of} given by \gls{nc}, the algorithm moves to \gls{nc} for sure and \gls{nc} becomes the new \gls{x}. Instead if \gls{nc} has worse performance than \gls{oc} the algorithm moves to \gls{nc} only with a certain probability called \gls{ap}. we note that \gls{sa} could move to a worse point of the function domain that the previous point. This happens so that the algorithm has always the possibility to move away from a local minimum in search of a new solution. The value of \gls{ap} depends on the difference between the \gls{of} in \gls{nc} and the \gls{of} in \gls{oc}.
 
  \begin{equation}
  	\label{accept_prob}
 	P_A = \begin{cases}
-		1 & \quad F(x_n)-F(x_o) < 0 \\
-		e^{\psi(T)\cdot(F(x_n)-F(x_o))/T } & \quad F(x_n)-F(x_o) \geq 0
+		1 & \quad F_O (x_n)-F_O (x_o) < 0 \\
+		e^{ C_A(T)  \cdot(F_O (x_n)-F_O (x_o))/T } & \quad F_O (x_n)-F_O(x_o) \geq 0
 \end{cases}
  \end{equation}
 
-In \ref{accept_prob} $x_n$ and $x_o$ represent the value of \gls{nc} and of \gls{oc} while $\psi(T)$ is a parameter depending on \gls{t} called \textit{Acceptance Coefficient}.
+If \gls{sa} choose to move to \gls{nc}, it also verifies if \gls{x} is the point with best performance untill now. To do so \gls{sa} compare \gls{x} with \gls{bestx}. If the value of \gls{x} has better performance than \gls{bestx}, \gls{sa} replaces the value of \gls{bestx} with value of \gls{x} The operations previously described are repeated a number of times equal to \gls{sc}. After that the first step of \gls{sa} ends and \gls{t} is uptated.
 
-For every new value of \gls{t} the algorithm makes trys to move from the actual candidate a number of times equals to \textit{Steps Coefficient}. We note that \textit{Steps Coefficient} and the perturbation to which the candidates are subjected depend on \gls{t} as \textit{Acceptance Coefficient}. In particular all these paraeters decreases as the temperature decreases. This means that in initial steps of \gls{sa} is very easy for the result to change from the starting position while in the final steps is more likely that \gls{sa} stops at a local minimum.
+For every new \gls{t} the algorithm uptades also \gls{sc}, \gls{ac} and \gls{ap}. So a new step begins. At every new step \gls{sa} changes the value of \gls{x} a number of times equals to \gls{sc}. We note that both \gls{sc}, \gls{ac}, \gls{ap} and the perturbation to which the candidates are subjected depend on \gls{t}. In particular all these parameters decrease as the temperature decreases. This means that at the initial steps of \gls{sa} is very easy for \gls{x} to change value widely while at the final steps is more likely that \gls{x} doesn't change value anymore.
 
-When \gls{t} finally reach the zero values \gls{sa} esmines all the crossed candidates and returns the candidate with better performance.
-It is therefore essential to always keep in mind the value of the best result going through right now.
+When \gls{t} finally reach the zero value \gls{sa} returns the value of \gls{bestx}, which is the point with the best performance between all the points crossed.
 
-\pagebreak
-
-\begin{lstlisting}[frame=single]
+\begin{lstlisting}[mathescape=true,frame=single]
 T = Temperature
 x = Candidate
-Best_x = x
-SC = Step coefficient
-PA = Acceptance probability
+$x_{best}$ = x
+$C_S(T)$ = Step coefficient
+$C_A(T)$ = Acceptance coefficient
+$P_A$ = Acceptance probability
 while(T>0)
- for i = 1 to i = SC
-  OC = x
-  NC = Neighbour(x)
-  while (NC doesn't respect costraints)
-   NC = Neighbour(x)
+ for i = 1 to i = $C_S(T)$
+  $x_o$= x
+  $x_n$ = Neighbour(x)
+  while ($x_n$ doesn't respect costraints)
+   $x_n$ = Neighbour(x)
   end
-  with probability PA
-   x = NC
+  with probability $P_A$
+   x = $x_n$
   end
  end
 T = get_new(Temperature)
-SC = get_new(Step coefficent)
-PA = get_new(PA)
-if OF(x)<OF(Best_x)
- Best_x = x
+$C_S(T)$ = get_new(Step coefficent)
+$P_A$ = get_new(Acceptance probability)
+if $F_O(x)$<$F_O($x_{best}$)$
+ $x_{best}$ = x
 end
 end
-return Best_x
+return $x_{best}$
 \end{lstlisting} \captionof{lstlisting}{Simulated Alleaning} \label{code_sa}
 
 \subsection{Jumping Ball}
@@ -279,7 +282,7 @@ Let's compare the code of \gls{sa} with the code of \gls{jb}. We note that have 
 
 Unlike \gls{sa}, \gls{jb} uses two more paramters that are called \gls{ws} and \gls{wsmax}. \gls{wsmax} is a fixed parameter while \gls{ws} changes value as the algorithm goes on. At the beginning the value of \gls{ws} is set to zero. Now we suppone that the algorithm moves to new caandidate with the probability \gls{ap}. If the new candidate has better performance than the previous one the values of \gls{ws} is immediately set to zero. Instead if the new candidate ha worse performance than the previous one the values of \gls{ws} in increase of one. Now we imagine that the algorithm moves for a great number of steps to candidate always worse than the previous one. In this case the value of \gls{ws} encreases al lot, untill it become close to \gls{wsmax}. When \gls{ws} beacomes greater than \gls{wsmax} the algorithm makes the jump. this mean that the searching of a new candidate doesn't happen as before. In particular the perturbation of the candidater is much bigger and does not envolve only one component of the candidate but a random number of them. Ina simply way we can say that the algorithm starts again the search froma point of the function domain very far from the previous one.
 
-This happen in order to avoid that the lagoruthm moves to point of the function domain always worse than the point already crossed. 
+This happen in order to avoid that the algorithm moves to point of the function domain always worse than points already crossed.
 
 \pagebreak
 
