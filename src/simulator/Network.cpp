@@ -32,6 +32,7 @@ Network::Network(
 	// create K sensing nodes
 	for(int node_id=0; node_id<this->N; node_id++) {
 		int degree = distribution->realization();
+
 		// for pi formula, see (15) in Lin, Liao
 		double pi = degree / ( this->N * distribution->expectation() );
 

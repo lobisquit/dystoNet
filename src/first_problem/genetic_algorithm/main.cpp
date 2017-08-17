@@ -6,12 +6,13 @@
 #include <ctime>
 #include "soliton.h"
 #include "genetic_algorithm.h"
+#include "functionCSV.h"
 
 using namespace std;
 
 int main() {
-	int K = 1000;
-	int N = 2000;
+	int K = 20;
+	int N = 100;
 
 	RobustSoliton rs = RobustSoliton(
 		/* c     */ 0.01,
@@ -23,7 +24,7 @@ int main() {
 		/* N */ N,
 		/* robust_soliton */ &rs,
 		/* max_failure_probability */ 0.05,
-		/* num_generations */ 150000,
+		/* num_generations */ 1500,
 		/* dim_population*/ 24,
 		/* survival_rate */ 0.25
 	);
@@ -42,4 +43,7 @@ int main() {
 		cout << best_redundancy[i] << ", ";
 	}
 	cout << "]\n";
+
+	// save result to CSV
+	writeCSV(best_redundancy, "results/GA.csv");
 }

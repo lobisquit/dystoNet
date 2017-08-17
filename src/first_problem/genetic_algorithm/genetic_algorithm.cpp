@@ -61,6 +61,7 @@ vector<double> GeneticAlgorithm::run_search() {
 	double b0 = objective_function(no_redundancy);
 
 	while(generation < this->num_generations){
+		cout << generation << "/" << this->num_generations << "\n";
 		/** Sorting of the population */
 		std::sort(population.begin(), population.end(),
 			[this](vector<double> s1, vector<double> s2) -> bool {
