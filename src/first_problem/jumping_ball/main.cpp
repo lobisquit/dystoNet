@@ -6,6 +6,7 @@
 #include <ctime>
 #include "soliton.h"
 #include "jumping_ball.h"
+#include "functionCSV.h"
 
 int main() {
 	int K = 1000;
@@ -34,22 +35,12 @@ int main() {
 	std::cout << JB << "\n";
 
 	vector<double> best_redundancy = JB.run_search();
-		std::cout << "g1 = "
-			<< (
-				JB.objective_function(best_redundancy) /
-				JB.objective_function(no_redundancy)
-			) << "\n";
+	std::cout << "g1 = "
+						<< (
+								JB.objective_function(best_redundancy) /
+								JB.objective_function(no_redundancy)
+								) << "\n";
 
-	// std::cout << GA << "\n";
-	// GA.run_search(x);
-
-	// std::cout << "Starting from score "
-	// 	<< (GA.objective_function(x)/GA.objective_function(x_farlocco)) << " with point ";
-	// print_array(x, 10);
-
-	// GA.run_search(x);
-	// std::cout << "Arriving to   score "
-	// 	<< (GA.objective_function(x)/GA.objective_function(x_farlocco)) << " with point ";
-	// print_array(x, 10);
-
+	// save result to CSV
+	writeCSV(best_redundancy, "results/JB.csv");
 }

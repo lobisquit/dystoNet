@@ -6,15 +6,18 @@
 #include <ctime>
 #include "soliton.h"
 #include "simulated_annealing.h"
+#include "functionCSV.h"
 
 int main() {
-	int K = 1000;
-	int N = 2000;
+	int K = 20;
+	int N = 100;
+	int seed = 1;
 
 	RobustSoliton rs = RobustSoliton(
-		/* c     */ 0.01,
-		/* delta */ 0.05,
-		            K, 1);
+		/* c     */ 0.1,
+		/* delta */ 0.5,
+		            K,
+		            seed);
 
 	SimulatedAnnealing SA = SimulatedAnnealing(
 		/* K */ K,
@@ -33,8 +36,11 @@ int main() {
 	std::cout << SA << "\n";
 
 	vector<double> best_redundancy = SA.run_search();
-		std::cout << "Arriving to   score "
-			<< (
-				SA.objective_function(best_redundancy) / SA.objective_function(no_redundancy)
-			) << "\n";
+	std::cout << "Arriving to   score "
+		<< (
+			SA.objective_function(best_redundancy) / SA.objective_function(no_redundancy)
+		) << "\n";
+
+	// save result to CSV
+	writeCSV(best_redundancy, "results/SA.csv");
 }

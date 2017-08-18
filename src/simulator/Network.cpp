@@ -32,6 +32,7 @@ Network::Network(
 	// create K sensing nodes
 	for(int node_id=0; node_id<this->N; node_id++) {
 		int degree = distribution->realization();
+
 		// for pi formula, see (15) in Lin, Liao
 		double pi = degree / ( this->N * distribution->expectation() );
 
@@ -104,6 +105,13 @@ void Network::spread_packets() {
 		node->add_packet(pkt);
 	}
 	cout << "\n";
+
+	// keep only "degree" packets for each node
+	for (int i = 0; i < this->get_nodes_size(); i++) {
+		Node* node = &this->nodes[i];
+
+		node->filter_packets();
+	}
 }
 
 vector<vector<int>> Network::collector(int h) {
