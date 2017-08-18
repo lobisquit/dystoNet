@@ -121,8 +121,8 @@ Email: {\tt\{masonfed,perondav,lovisott\}@dei.unipd.it}\\}}
 \newacronym{t}{T}{Temperature}
 \newacronym{oc}{$x_o$}{Old Candidate}
 \newacronym{nc}{$x_n$}{New Candidate}
-\newacronym{sc}{$C_S(T)$}{Step Coefficient}
-\newacronym{ac}{$C_A(T)$}{Acceptance Coefficient}
+\newacronym{sc}{$C_S$}{Step Coefficient}
+\newacronym{ac}{$C_A$}{Acceptance Coefficient}
 \newacronym{ap}{$P_A$}{Acceptance Probability}
 \newacronym{ws}{$N_{WS}$}{Number of Worsening Steps}
 \newacronym{wsmax}{$N_{WS}^{MAX}$}{ Maxiumum Number of Worsening Steps}
@@ -244,7 +244,7 @@ If \gls{sa} choose to move to \gls{nc}, it also verifies if \gls{x} is the point
 
 For every new \gls{t} the algorithm uptades also \gls{sc}, \gls{ac} and \gls{ap}. So a new step begins. At every new step \gls{sa} changes the value of \gls{x} a number of times equals to \gls{sc}. We note that both \gls{sc}, \gls{ac}, \gls{ap} and the perturbation to which the candidates are subjected depend on \gls{t}. In particular all these parameters decrease as the temperature decreases. This means that at the initial steps of \gls{sa} is very easy for \gls{x} to change value widely while at the final steps is more likely that \gls{x} doesn't change value anymore.
 
-When \gls{t} finally reach the zero value \gls{sa} returns the value of \gls{bestx}, which is the point with the best performance between all the points crossed.
+When \gls{t} finally reach the zero value \gls{sa} returns the value of \gls{bestx}, which is the point with the best performance between all the points exmined.
 
 \begin{lstlisting}[mathescape=true,frame=single]
 T = Temperature
@@ -252,7 +252,7 @@ x = Candidate
 $x_{best}$ = x
 $C_S(T)$ = Step coefficient
 $C_A(T)$ = Acceptance coefficient
-$P_A$ = Acceptance probability
+$P_A(C_A)$ = Acceptance probability
 while(T>0)
  for i = 1 to i = $C_S(T)$
   $x_o$= x
@@ -264,25 +264,31 @@ while(T>0)
    x = $x_n$
   end
  end
-T = get_new(Temperature)
-$C_S(T)$ = get_new(Step coefficent)
-$P_A$ = get_new(Acceptance probability)
-if $F_O(x)$<$F_O($x_{best}$)$
- $x_{best}$ = x
-end
+ T = uptade(T)
+ $C_S(T)$ = uptade(Step coefficent)
+ $C_A(T)$ = uptade(Acceptance coefficent)
+ $P_A(C_A)$ = uptade(Acceptance probability)
+ if $F_O(x)$<$F_O(x_{best})$
+  $x_{best}$ = x
+ end
 end
 return $x_{best}$
 \end{lstlisting} \captionof{lstlisting}{Simulated Alleaning} \label{code_sa}
 
 \subsection{Jumping Ball}
 
-The second technique that we implent is called \gls{jb}. \gls{jb} is a variant of \gls{sa} and it follows the same operating model. The only difference between \gls{jb} and \gls{sa} is that the searching for the best results could make a jump in some circumstannces. This jumps make the search of the candidate move along the function domain in a greater way than what happens in \gls{sa}.
+The second technique we implent is called \gls{jb}. \gls{jb} is a variant of \gls{sa} and apparently it follows the same operating model. The difference between \gls{jb} and \gls{sa} is that the searching for the best \gls{x} could make a \textit{jump}. This means that in some circumstances the value of \gls{nc} is not choosen between the neighbours of \gls{x} but between points rather distant from \gls{x}. These \textit{jumps} make the search  varies along the \gls{of} domain widely than what happens in \gls{sa}.
 
-Let's compare the code of \gls{sa} with the code of \gls{jb}. We note that have almost the same pattern. As in \gls{sa}, \gls{jb} uses the parameter \gls{t} which decrases as the algorithm goes on. At every new step \gls{t} is uptated as \gls{sc}, \gls{ac} and consequently \gls{ap}. For every new value of \gls{t} th algorithm moves throgh the domain of \gls{of} choosing new candidates.
+Let's compare pseudocode of \gls{sa} with pseudocode of \gls{jb}. We note immediately that they have almost the same pattern. As \gls{sa}, \gls{jb} is based on the parameter \gls{t}. Every time that \gls{t} decreases a new step of the algorithm begins. At every new step \gls{jb} uptades the values of \gls{sc}, \gls{ac} and consequently \gls{ap}. As in \gls{sa} the values of these parameters determine how the algorithm moves through the function domain searching for a new \gls{nc}.
 
-Unlike \gls{sa}, \gls{jb} uses two more paramters that are called \gls{ws} and \gls{wsmax}. \gls{wsmax} is a fixed parameter while \gls{ws} changes value as the algorithm goes on. At the beginning the value of \gls{ws} is set to zero. Now we suppone that the algorithm moves to new caandidate with the probability \gls{ap}. If the new candidate has better performance than the previous one the values of \gls{ws} is immediately set to zero. Instead if the new candidate ha worse performance than the previous one the values of \gls{ws} in increase of one. Now we imagine that the algorithm moves for a great number of steps to candidate always worse than the previous one. In this case the value of \gls{ws} encreases al lot, untill it become close to \gls{wsmax}. When \gls{ws} beacomes greater than \gls{wsmax} the algorithm makes the jump. this mean that the searching of a new candidate doesn't happen as before. In particular the perturbation of the candidater is much bigger and does not envolve only one component of the candidate but a random number of them. Ina simply way we can say that the algorithm starts again the search froma point of the function domain very far from the previous one.
+Looking more carefully at pseudocode of \gls{jb}, we note that this algorithm uses two parameters that \gls{sa} doesn't. These parameters are called \gls{ws} and \gls{wsmax}. During the \textit{inizialization phase}  \gls{ws} and \gls{wsmax} are respectively set to zero and to a positive value. While \gls{wsmax} is fixed, \gls{ws} changes value as the algorithm goes on. To understand the working of \gls{ws} and \gls{wsmax} we suppone that \gls{jb} moves to \gls{nc}. If \gls{nc} has better performance than \gls{oc} ($P_A=1$) the value of \gls{ws} is immediately set to zero again. Instead if \gls{nc} has worse performance than \gls{oc} ($P_A<1$) the value of \gls{ws} is increased of one. We conclude that \gls{ws} increases as the algorithm moves to points with worse performance than the points already crossed.
 
-This happen in order to avoid that the algorithm moves to point of the function domain always worse than points already crossed.
+Putting ourself in a very unlucky scenario we suppone that for several times consecutively the new value of \gls{x} is worse than the previous one. In this case the value of \gls{ws} increases al lot, untill it becomes close to \gls{wsmax}. When \gls{ws} exceeds \gls{wsmax} the \textit{jump} takes place. This mean that for a single time the searching for \gls{nc} change its working. In particular the perturbation which \gls{x} is subjected is much bigger. In addiction to have more intensity the perturbation doesn't envolve only one component of \gls{x} but a random number of them. Then \gls{nc} is not a neighbour of \gls{x} anymore but is a point very far from it in the functon domain. After the \textit{jump} the value of \gls{ws} is set to zero and the algorithm goes on as nothing happens. In a simply way we can say that at evry \textit{jump} the algorithm changes the starting point of its searching.
+
+We note that in \gls{jb} is fundamental inizialize accurately the value of \gls{wsmax}. If we choose a value to low, the algorithm will make a huge series of consecutives jump without ever stabilizing in a single area. Conversely if we choose a value too high, the algorithm will never find itself in a condition in which it has to \textit{jump}. We can admit that if we let \gls{wsmax} goes to infinity, \gls{jb} becomes identical to \gls{sa}.
+
+In \gls{sa} we risk that the algorithm focus the search in a bad area, without being able to improve the solution already found. In \gls{jb} this unlucky case is always avoid thanks to \textit{jumps}. 
+
 
 \pagebreak
 
