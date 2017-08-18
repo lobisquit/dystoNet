@@ -287,7 +287,7 @@ Putting ourself in a very unlucky scenario we suppone that for several times con
 
 We note that in \gls{jb} is fundamental inizialize accurately the value of \gls{wsmax}. If we choose a value to low, the algorithm will make a huge series of consecutives jump without ever stabilizing in a single area. Conversely if we choose a value too high, the algorithm will never find itself in a condition in which it has to \textit{jump}. We can admit that if we let \gls{wsmax} goes to infinity, \gls{jb} becomes identical to \gls{sa}.
 
-In \gls{sa} we risk that the algorithm focus the search in a bad area, without being able to improve the solution already found. In \gls{jb} this unlucky case is always avoid thanks to \textit{jumps}. 
+In \gls{sa} we risk that the algorithm focus the search in a bad area, without being able to improve the solution already found. In \gls{jb} this unlucky case is always avoid thanks to \textit{jumps}.
 
 
 \pagebreak
@@ -295,36 +295,37 @@ In \gls{sa} we risk that the algorithm focus the search in a bad area, without b
 \begin{lstlisting}[mathescape=true,frame=single]
 T = Temperature
 x = Candidate
-Best_x = x
-SC = Step coefficient
-PA = Acceptance probability
-$ N_{WS} $ = 0
+$x_{best}$ = x
+$C_S(T)$ = Step coefficient
+$C_A(T)$ = Acceptance coefficient
+$P_A(C_A)$ = Acceptance probability
+$N_{WS}$ = 0
 while(T>0)
  for i = 1 to i = SC
-  OC = x
-  NC = Neighbour(x)
-  while (NC doesn't respect costraints)
-   N_{WS} = N_{WS}+1
+  $x_o$ = x
+  $x_n$ = Neighbour(x)
+  while ($x_n$ doesn't respect costraints)
+  $N_{WS}$ = $N_{WS}$+1
    if $N_{WS}<N_{WS}^{MAX}$
-    NC = Neighbour(x)
+    $x_n$ = Neighbour(x)
    else
-    NC = Jump(x)
-    WS = 0
+    $x_n$ = Jump(x)
+    $N_{WS}$ = 0
    end
   end
-  with probability PA
-   x = NC
+  with probability $P_A$
+   x = $x_n$
   end
  end
-T = get_new(Temperature)
-SC = get_new(Step coefficent)
-PA = get_new(PA)
-$N_{WS}$ = 0
-if OF(x)<OF(Best_x)
- Best_x = x
+ T = uptade(T)
+ $C_S(T)$ = uptade(Step coefficent)
+ $C_A(T)$ = uptade(Acceptance coefficent)
+ $P_A(C_A)$ = uptade(Acceptance probability)
+ if $F_O(x)$<$F_O(x_{best})$
+  $x_{best}$ = x
+ end
 end
-end
-return Best_x
+return $x_{best}$
 \end{lstlisting} \captionof{lstlisting}{Jumping ball}
 
 \pagebreak
