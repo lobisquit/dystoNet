@@ -14,7 +14,7 @@ int main() {
 	int seed = 3;
 
 	/** Overhead coefficients */
-	vector<double> x = readCSV("results/SA.csv");
+	vector<double> x = readCSV("results/GA.csv");
 	for (double a: x) {
 		cout << a << "\n";
 	}
@@ -23,8 +23,6 @@ int main() {
 
 	Network net = Network(N, K, len_x, len_y, neighThresh, d);
 
-	int b0 = net.get_packets_size();
-	// std::cout << "b0 = " << b0 << '\n';
 	net.spread_packets();
 
 	Node* nodes = net.get_nodes();
