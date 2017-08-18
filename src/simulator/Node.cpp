@@ -2,6 +2,7 @@
 #include <vector>
 #include "Node.h"
 #include <array>
+#include <algorithm>
 
 using namespace std;
 
@@ -64,6 +65,25 @@ void Node::add_packet(Packet* new_pkt) {
 	}
 	if (!contains_packet) {
 		this->packets.push_back(new_pkt);
+	}
+}
+
+void Node::filter_packets() {
+	// continue only if received packets are more than degree, otherwise keep all
+	if ( (unsigned int) this->degree <= this->packets.size() ) {
+		// uniformly pick packets among available
+		vector<int> picks( this->packets.size() );
+		for(unsigned int i = 0; i < this->packets.size(); i++) {
+			picks[i] = i;
+		}
+		random_shuffle(picks.begin(), picks.end());
+
+		// remove others from package vector
+		vector<Packet*> packets_kept;
+		for (int i = 0; i < degree; i++) {
+			packets_kept.push_back(this->packets[picks[i]]);
+		}
+		this->packets = packets_kept;
 	}
 }
 

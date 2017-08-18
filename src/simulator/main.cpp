@@ -14,7 +14,7 @@ int main() {
 	int seed = 3;
 
 	/** Overhead coefficients */
-	vector<double> x = readCSV("results/GA.csv");
+	vector<double> x = readCSV("results/SA.csv");
 	for (double a: x) {
 		cout << a << "\n";
 	}

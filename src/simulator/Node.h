@@ -43,6 +43,9 @@ class Node {
 		void add_neighbour(Node* other);
 		void add_packet(Packet* new_pkt);
 
+		// filter away packets that exceed degree
+		void filter_packets();
+
 		/**
 		* Compute distance from another node
 		* @param other node to check
