@@ -12,6 +12,17 @@
 #ifndef _SECOND_PROBLEM_H_
 #define _SECOND_PROBLEM_H_
 
+struct individual{
+	vector<double> values;
+	vector<double> v_prime;
+	double obj_function;
+};
+
+struct obj_function_parameters {
+	vector<double> v_prime;
+	double obj_function = 0;
+};
+
 class SecondProblem : public HeuristicSearch {
 	public:
 		/** Random numbers generator */
@@ -49,7 +60,8 @@ class SecondProblem : public HeuristicSearch {
 		}
 
 		double objective_function(vector<double> v);
-		double approximate_objective_function(vector<double> v);
+		individual approximate_objective_function(vector<double> v);
+		individual update_objective_function(individual old_individual, vector<double> v, int first_d, int second_d);
 		vector<double> get_initial_solution();
 		bool respect_constraints(vector<double> candidate_v);
 

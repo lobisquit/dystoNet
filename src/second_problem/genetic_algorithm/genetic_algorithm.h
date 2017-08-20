@@ -14,11 +14,6 @@
 
 using namespace std;
 
-struct individual{
-	vector<double> values;
-	double obj_function;
-};
-
 struct by_obj_function {
 	bool operator()(individual const &a, individual const &b) {
 		return a.obj_function < b.obj_function;
