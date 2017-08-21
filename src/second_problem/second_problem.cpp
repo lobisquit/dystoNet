@@ -62,13 +62,15 @@ individual SecondProblem::approximate_objective_function(vector<double> v) {
 			double p = 1 - pow((1 - d / (this->N * E)), (this->N * E / this->K));
 			increment = v[d - 1] *
 				// compute pdf using difference of subsequent CDF
-				(binomial_CDF(this->K, i-1, p) - binomial_CDF(this->K, i, p));
+				(binomial_CDF(this->K, i, p) - binomial_CDF(this->K, i+1, p));
 			// stop if tail of distribution is reached
 			if (increment == 0 && d > 2) {
 				break;
 			}
 			obj.v_prime[i-1] += increment;
+			// cout << "\n" << obj.v_prime[i-1];
 		}
+		// break;
 		// sum to objective function for each component of v
 		increment = pow(obj.v_prime[i-1] - this->robust_soliton->probability(i), 2);
 		obj.obj_function += increment;
@@ -152,6 +154,8 @@ vector<double> SecondProblem::get_initial_solution() {
 	}
 	// constraints are surely met, since components
 	// are > 0 and sum to 1 by construction
+
+
 	return v;
 }
 
@@ -175,7 +179,7 @@ bool SecondProblem::respect_constraints(vector<double> candidate_v) {
 	for(int i = 1; i<=this->K; i++){
 		sum += candidate_v[i-1];
 	}
-	if(sum - 1.0 > 1e-15) {
+	if(sum - 1.0 > 1e-14) {
 		return false;
 	}
 	return true;
