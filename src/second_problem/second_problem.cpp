@@ -36,7 +36,7 @@ double SecondProblem::objective_function(vector<double> v) {
 			double p = 1 - pow((1 - d / (this->N * E)), (this->N * E / this->K));
 			v_prime += v[d - 1] *
 				// compute pdf using different of subsequent CDF
-				(binomial_CDF(this->K, i, p) - binomial_CDF(this->K, i - 1, p));
+				(binomial_CDF(this->K, i-1, p) - binomial_CDF(this->K, i, p));
 		}
 		// sum to objective function for each component of v
 		obj += pow(v_prime - this->robust_soliton->probability(i), 2);
@@ -45,10 +45,11 @@ double SecondProblem::objective_function(vector<double> v) {
 }
 
 individual SecondProblem::approximate_objective_function(vector<double> v) {
+
+	double E = 0;
 	individual obj;
 	obj.v_prime.resize(this->K,0);
 
-	double E = 0;
 	for(int j=1; j<=this->K; j++){
 		E += j*v[j-1];
 	}
@@ -56,18 +57,20 @@ individual SecondProblem::approximate_objective_function(vector<double> v) {
 	double increment;
 
 	for(int i = 1; i <= this->K; i++) {
-
 		for(int d = 1; d <= this->K; d++) {
+
 			double p = 1 - pow((1 - d / (this->N * E)), (this->N * E / this->K));
 			increment = v[d - 1] *
 				// compute pdf using difference of subsequent CDF
-				(binomial_CDF(this->K, i, p) - binomial_CDF(this->K, i-1, p));
+				(binomial_CDF(this->K, i-1, p) - binomial_CDF(this->K, i, p));
 			// stop if tail of distribution is reached
 			if (increment == 0 && d > 2) {
 				break;
 			}
 			obj.v_prime[i-1] += increment;
+			// cout << "\n" << obj.v_prime[i-1];
 		}
+		// break;
 		// sum to objective function for each component of v
 		increment = pow(obj.v_prime[i-1] - this->robust_soliton->probability(i), 2);
 		obj.obj_function += increment;
@@ -97,14 +100,14 @@ individual SecondProblem::update_objective_function(individual old_individual, v
 		double old_p = 1 - pow((1 - (first_d+1) / (this->N * old_E)), (this->N * old_E / this->K));
 		increment = old_individual.values[first_d] *
 			// compute pdf using difference of subsequent CDF
-			(binomial_CDF(this->K, i, old_p) - binomial_CDF(this->K, i-1, old_p));
+			(binomial_CDF(this->K, i-1, old_p) - binomial_CDF(this->K, i, old_p));
 		if (increment != 0 || first_d <= 2) {
 			new_individual.v_prime[i-1] -= increment;
 		}
 		double new_p = 1 - pow((1 - (first_d+1) / (this->N * E)), (this->N * E / this->K));
 		increment = new_individual.values[first_d] *
 			// compute pdf using difference of subsequent CDF
-			(binomial_CDF(this->K, i, new_p) - binomial_CDF(this->K, i-1, new_p));
+			(binomial_CDF(this->K, i-1, new_p) - binomial_CDF(this->K, i, new_p));
 		if (increment != 0 || first_d <= 2) {
 			new_individual.v_prime[i-1] += increment;
 		}
@@ -113,14 +116,14 @@ individual SecondProblem::update_objective_function(individual old_individual, v
 		old_p = 1 - pow((1 - (second_d+1) / (this->N * old_E)), (this->N * old_E / this->K));
 		increment = old_individual.values[second_d] *
 			// compute pdf using difference of subsequent CDF
-			(binomial_CDF(this->K, i, old_p) - binomial_CDF(this->K, i-1, old_p));
+			(binomial_CDF(this->K, i-1, old_p) - binomial_CDF(this->K, i, old_p));
 		if (increment != 0 || second_d <= 2) {
 			new_individual.v_prime[i-1] -= increment;
 		}
 		new_p = 1 - pow((1 - (second_d+1) / (this->N * E)), (this->N * E / this->K));
 		increment = new_individual.values[second_d] *
 			// compute pdf using difference of subsequent CDF
-			(binomial_CDF(this->K, i, new_p) - binomial_CDF(this->K, i-1, new_p));
+			(binomial_CDF(this->K, i-1, new_p) - binomial_CDF(this->K, i, new_p));
 		if (increment != 0 || second_d <= 2) {
 			new_individual.v_prime[i-1] += increment;
 		}

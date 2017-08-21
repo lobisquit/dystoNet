@@ -15,7 +15,7 @@
 struct individual{
 	vector<double> values;
 	vector<double> v_prime;
-	double obj_function;
+	double obj_function = 0;
 };
 
 struct obj_function_parameters {
