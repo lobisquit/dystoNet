@@ -18,11 +18,6 @@ struct individual{
 	double obj_function = 0;
 };
 
-struct obj_function_parameters {
-	vector<double> v_prime;
-	double obj_function = 0;
-};
-
 class SecondProblem : public HeuristicSearch {
 	public:
 		/** Random numbers generator */

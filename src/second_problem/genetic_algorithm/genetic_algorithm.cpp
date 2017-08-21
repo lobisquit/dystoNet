@@ -36,12 +36,14 @@ vector<individual> GeneticAlgorithm::get_initial_population() {
 		population(this->dim_population);
 	for(int i = 0; i < this->dim_population; i++){
 		vector<double> rnd_solution = SecondProblem::get_initial_solution();
+		cout << "Respect: " << respect_constraints(rnd_solution) << "\n";
 		population[i] = this->approximate_objective_function(rnd_solution);
-		cerr
+		cout
 			<< "Created "
 			<< i+1 << "/" << this->dim_population
-			<< " elements \r";
+			<< " elements \n";
 	}
+	cout << "\n";
 
 	return population;
 }
@@ -75,7 +77,7 @@ vector<double> GeneticAlgorithm::run_search() {
 		for(int j = 1; j < round(1/this->survival_rate); j++){
 			for(int i = 0; i<part_size; i++){
 				individual old_individual = population[i];
-				cout << "Old obj function: " << old_individual.obj_function << ",\t i = "<< i << "\t";
+				// cout << "Old obj function: " << old_individual.obj_function << ",\t i = "<< i << "\t";
 				/** Mutation of */
 				vector<double> candidate;
 				do{
@@ -89,7 +91,7 @@ vector<double> GeneticAlgorithm::run_search() {
 						// second_d can't go beyond 1 after move
 					} while(second_d == first_d);
 					// "move" some probability from start to end point
-					uniform_real_distribution<double> mutation(0, min(candidate[first_d], 1 - candidate[second_d]));
+					uniform_real_distribution<double> mutation(0, min(candidate[first_d], candidate[second_d]));
 					double delta = mutation(rng);
 					candidate[first_d] -= delta;
 					candidate[second_d] += delta;
@@ -97,11 +99,10 @@ vector<double> GeneticAlgorithm::run_search() {
 
 				population[j*part_size+i] = this->approximate_objective_function(candidate);
 				// population[j*part_size+i] = this->update_objective_function(old_individual, candidate, first_d, second_d);
-				cout << "New obj function: " << population[j*part_size+i].obj_function << "\n";
+				// cout << "New obj function: " << population[j*part_size+i].obj_function << "\n";
 			}
 		}
 		generation++;
-		break;
 	}
 	return population[0].values;
 }
