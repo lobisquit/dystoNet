@@ -52,7 +52,7 @@ class JumpingBall : public SimulatedAnnealing {
 		using SimulatedAnnealing::acceptance_probability;
 
 		vector<double> run_search();
-		vector<double> get_neighbour(vector<double> v);
+		individual get_neighbour(individual old_individual);
 
 		/**
 		* Custom overload of << operator, to print debug info

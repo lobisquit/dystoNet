@@ -74,7 +74,7 @@ class SimulatedAnnealing : public SecondProblem {
 		// these are implemented in cpp
 		vector<double> get_initial_solution();
 		bool respect_constraints(vector<double> candidate_v);
-		vector<double> get_neighbour(vector<double> v);
+		individual get_neighbour(individual old_individual);
 
 		double acceptance_probability(double delta);
 

@@ -36,36 +36,39 @@ SimulatedAnnealing::SimulatedAnnealing(
 	this->acceptance_coefficient = acceptance_coefficient;
 }
 
-vector<double> SimulatedAnnealing::get_neighbour(vector<double> v) {
+individual SimulatedAnnealing::get_neighbour(individual old_individual) {
 	// initialization distributions
 	uniform_int_distribution<int> index_choice(0, this->K-1);
 
-	vector<double> candidate;
-	int start_d;
-	int end_d;
+	individual new_individual;
+
+	vector<double> candidate = old_individual.values;
+	int first_d;
+	int second_d;
 	do {
 		// copy x to new array before perturbation
-		candidate = v;
-		for (int i = 0; i < 100; i++) {
-			do {
-				start_d = index_choice(rng);
-				// start_d must have a non-zero probability
-			} while(candidate[start_d] == 0);
+		do {
+			first_d = index_choice(rng);
+			// start_d must have a non-zero probability
+		} while(candidate[first_d] == 0);
 
-			do {
-				end_d = index_choice(rng);
-				// end_d can't go beyond 1 after move
-			} while(end_d == start_d || candidate[end_d] + candidate[start_d] > 1);
+		do {
+			second_d = index_choice(rng);
+			// end_d can't go beyond 1 after move
+		} while(second_d == first_d || candidate[first_d] + candidate[second_d] > 1);
 
-			// "move" some probability from start to end point
-			uniform_real_distribution<double> perturbation(0, candidate[start_d]);
-			double delta = perturbation(rng);
-			candidate[start_d] -= delta;
-			candidate[end_d]   += delta;
-		}
+		// "move" some probability from start to end point
+		uniform_real_distribution<double> perturbation(0, min(candidate[first_d], candidate[second_d]));
+
+		double delta = perturbation(rng);
+		candidate[first_d] -= delta;
+		candidate[second_d]   += delta;
+
 	} while (!SecondProblem::respect_constraints(candidate));
 
-	return candidate;
+	new_individual = update_objective_function(old_individual, candidate, first_d, second_d);
+
+	return new_individual;
 }
 
 double SimulatedAnnealing::acceptance_probability(double delta) {
@@ -93,6 +96,7 @@ double SimulatedAnnealing::temperature_steps() {
 }
 
 vector<double> SimulatedAnnealing::run_search() {
+
 	vector<double> v = SecondProblem::get_initial_solution();
 
 	// keep trace of how much jumps have been done since the beginning
@@ -108,23 +112,30 @@ vector<double> SimulatedAnnealing::run_search() {
 	// store here new point explored with its score
 	vector<double> new_v(this->K, 1);
 	double new_score;
-	double old_score = 0;
 
 	// random variable that set the threshold for accepting worse solutions
 	uniform_real_distribution<double> acceptance_threshold(0,1);
+
+	individual new_individual;
+
+	individual old_individual = approximate_objective_function(v);
+	double old_score = old_individual.obj_function;
 
 	while(current_iteration <= this->max_iterations) {
 		// round of search for current temperature
 		for(int i = 0; i < temperature_steps(); i++) {
 			current_iteration++;
 			// search new candidate, save it to new_x
-			new_v = get_neighbour(v);
-			new_score = approximate_objective_function(v);
+			new_individual = get_neighbour(old_individual);
+
+			new_score = new_individual.obj_function;
+
+			v = new_individual.values;
 
 			double delta = new_score - old_score;
 			// accept or reject according to acceptance probability
 			if( acceptance_probability(delta) >= acceptance_threshold(rng) ) {
-				// subistitute x with new value (note that assignment with vector is
+				// subistitute v with new value (note that assignment with vector is
 				// equivalent to a copy)
 				tmp = v;
 				v = new_v;
@@ -155,6 +166,7 @@ vector<double> SimulatedAnnealing::run_search() {
 			}
 			// keep current score for the next cycle
 			old_score = new_score;
+			old_individual = new_individual;
 		}
 
 		// update temperature for new round

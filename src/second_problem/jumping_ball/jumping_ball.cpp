@@ -21,7 +21,7 @@ JumpingBall::JumpingBall(
 	double cooling_rate,
 	int max_iterations,
 	double steps_coefficient,
-	double acceptance_coefficient
+	double acceptance_coefficient,
 	int max_worsening_steps)
 		: SimulatedAnnealing::SimulatedAnnealing(
 			K,
@@ -37,49 +37,75 @@ JumpingBall::JumpingBall(
 	this->worsening_steps = 0;
 }
 
-vector<double> JumpingBall::get_neighbour(vector<double> v) {
+individual JumpingBall::get_neighbour(individual old_individual) {
 	// copy x to new array before perturbation
-	vector<double> candidate(K, 1);
+	vector<double> candidate = old_individual.values;
+
+	individual new_individual;
+
+	int first_d;
+	int second_d;
 
 	// count number of steps taken that lead to a
 	// solution worse than the current top
 	do {
-		// copy x to candidate
-		candidate = v;
 
 		// setup random variables
-		uniform_real_distribution<double> perturbation(-2*this->temperature, this->temperature);
-		uniform_int_distribution<int> number_of_variations(0, this->K-1);
+
 		uniform_int_distribution<int> index_choice(0, this->K-1);
+
+		uniform_int_distribution<int> number_of_variations(0, this->K-1);
 
 		// if we were are not improving for too long, jump!
 		if (this->worsening_steps > this->max_worsening_steps) {
+			std::cout << "JUMP" << '\n';
 			while (!respect_constraints(candidate)) {
 				for(int i=0; i<number_of_variations(this->rng); i++) {
-					int chosen_d = index_choice(this->rng);
-					candidate[chosen_d] = v[chosen_d] + perturbation(this->rng);
+					do {
+						first_d = index_choice(rng);
+						// start_d must have a non-zero probability
+					} while(candidate[first_d] == 0);
+
+					do {
+						second_d = index_choice(rng);
+						// end_d can't go beyond 1 after move
+					} while(second_d == first_d || candidate[first_d] + candidate[second_d] > 1);
+
+					uniform_real_distribution<double> perturbation(0, min(candidate[first_d], candidate[second_d]));
+
+					double delta = perturbation(this->rng);
+
+					candidate[first_d] += delta;
+					candidate[second_d] -= delta;
 				}
 			}
 			this->worsening_steps = 0;
 		}
 		else {
 			// classic step if counter is too low
-			uniform_real_distribution<double>
-				perturbation(-2*this->temperature, this->temperature);
-			uniform_int_distribution<int> index_choice(0, K-1);
-			int chosen_d = index_choice(rng);
-			candidate[chosen_d] = v[chosen_d] + perturbation(rng);
-		}
-		double norm = 0;
-		for(int j=1; j<=candidate.size(); j++){
-			norm = norm + candidate[j-1];
-		}
-		for(int j=1; j<=candidate.size(); j++){
-			candidate[j-1]=candidate[j-1]/norm;
-		}
-	} while (!respect_constraints(candidate));
+			do {
+				first_d = index_choice(rng);
+				// start_d must have a non-zero probability
+			} while(candidate[first_d] == 0);
 
-	return candidate;
+			do {
+				second_d = index_choice(rng);
+				// end_d can't go beyond 1 after move
+			} while(second_d == first_d || candidate[first_d] + candidate[second_d] > 1);
+
+			uniform_real_distribution<double> perturbation(0, min(candidate[first_d], candidate[second_d]));
+
+			double delta = perturbation(this->rng);
+
+			candidate[first_d] += delta;
+			candidate[second_d] -= delta;
+		}
+
+	} while (!SecondProblem::respect_constraints(candidate));
+
+	new_individual = update_objective_function(old_individual, candidate, first_d, second_d);
+
+	return new_individual;
 }
 
 vector<double> JumpingBall::run_search() {
@@ -102,8 +128,14 @@ vector<double> JumpingBall::run_search() {
 	// random variable that set the threshold for accepting worse solutions
 	uniform_real_distribution<double> acceptance_threshold(0,1);
 
+	individual new_individual;
+
+	individual old_individual = approximate_objective_function(v);
+	double old_score = old_individual.obj_function;
+
 	while(current_iteration <= this->max_iterations) {
 		// round of search for current temperature
+		std::cout << current_iteration << '\n';
 		std::cerr << "=====> "
 			<< current_iteration << "/" << this->max_iterations
 			<< " ==> temperature: " << this->temperature
@@ -115,34 +147,63 @@ vector<double> JumpingBall::run_search() {
 		int worsening_proposals = 0;
 
 		for(int i = 0; i < temperature_steps(); i++) {
-			// search new candidate, save it to new_v
-			new_v = get_neighbour(v);
+
+			current_iteration++;
+
+			new_individual = get_neighbour(old_individual);
+
+			new_score = new_individual.obj_function;
+
+			v = new_individual.values;
+
+			double delta = new_score - old_score;
 
 			// increment mean probability and counter when new_v is worse than v
-			if ( acceptance_probability(v, new_v) != 1 ) {
-				acceptance_mean += acceptance_probability(v, new_v);
+			if ( acceptance_probability(delta) != 1 ) {
+				acceptance_mean += acceptance_probability(delta);
 				worsening_proposals++;
 			}
 
 			// accept or reject according to acceptance probability
-			if ( acceptance_probability(v, new_v) >= acceptance_threshold(rng) ) {
+			if ( acceptance_probability(delta) >= acceptance_threshold(rng) ) {
 				// subistitute v with new value (note that assignment with vector is
 				// equivalent to a copy)
 				tmp = v;
 				v = new_v;
 				new_v = tmp;
 
-				new_score = objective_function(v);
+				Distribution* v_distribution = new Distribution(v, 1);
+				double g2 =
+					v_distribution->expectation() /
+					robust_soliton->expectation();
+
+				cerr << "=====> "
+					<< current_iteration << "/" << this->max_iterations
+					<< " ==> temperature = " << this->temperature
+					<< " ==> score = " << new_score
+					<< " ==> g2 = " << g2 << "\r";
+
 				// update best result (up to now) if needed
-				if (new_score < this->best_score) {
-					this->best_score = new_score;
+				if (new_score < best_score) {
+					best_score = new_score;
 					best_v = v;
+
 					this->worsening_steps = 0;
+
+					cerr << "=====> "
+						<< current_iteration << "/" << this->max_iterations
+						<< " ==> temperature = " << this->temperature
+						<< " ==> score = " << new_score
+						<< " ==> g2 = " << g2 << "\n";
 				}
 				else{
 					this->worsening_steps++;
 				}
 			}
+			// keep current score for the next cycle
+			old_score = new_score;
+			old_individual = new_individual;
+
 		}
 
 		// report mean of acceptance probability up to now
