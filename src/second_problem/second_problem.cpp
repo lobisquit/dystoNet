@@ -88,6 +88,7 @@ individual SecondProblem::update_objective_function(individual old_individual, v
 	double increment;
 	individual new_individual = old_individual;
 	new_individual.values = v;
+	new_individual.obj_function = 0;
 
 	for(int j=1; j<=this->K; j++){
 		old_E += j*old_individual.values[j-1];
@@ -100,14 +101,14 @@ individual SecondProblem::update_objective_function(individual old_individual, v
 		double old_p = 1 - pow((1 - (first_d+1) / (this->N * old_E)), (this->N * old_E / this->K));
 		increment = old_individual.values[first_d] *
 			// compute pdf using difference of subsequent CDF
-			(binomial_CDF(this->K, i-1, old_p) - binomial_CDF(this->K, i, old_p));
+			(binomial_CDF(this->K, i, old_p) - binomial_CDF(this->K, i+1, old_p));
 		if (increment != 0 || first_d <= 2) {
 			new_individual.v_prime[i-1] -= increment;
 		}
 		double new_p = 1 - pow((1 - (first_d+1) / (this->N * E)), (this->N * E / this->K));
 		increment = new_individual.values[first_d] *
 			// compute pdf using difference of subsequent CDF
-			(binomial_CDF(this->K, i-1, new_p) - binomial_CDF(this->K, i, new_p));
+			(binomial_CDF(this->K, i, new_p) - binomial_CDF(this->K, i+1, new_p));
 		if (increment != 0 || first_d <= 2) {
 			new_individual.v_prime[i-1] += increment;
 		}
@@ -116,14 +117,14 @@ individual SecondProblem::update_objective_function(individual old_individual, v
 		old_p = 1 - pow((1 - (second_d+1) / (this->N * old_E)), (this->N * old_E / this->K));
 		increment = old_individual.values[second_d] *
 			// compute pdf using difference of subsequent CDF
-			(binomial_CDF(this->K, i-1, old_p) - binomial_CDF(this->K, i, old_p));
+			(binomial_CDF(this->K, i, old_p) - binomial_CDF(this->K, i+1, old_p));
 		if (increment != 0 || second_d <= 2) {
 			new_individual.v_prime[i-1] -= increment;
 		}
 		new_p = 1 - pow((1 - (second_d+1) / (this->N * E)), (this->N * E / this->K));
 		increment = new_individual.values[second_d] *
 			// compute pdf using difference of subsequent CDF
-			(binomial_CDF(this->K, i-1, new_p) - binomial_CDF(this->K, i, new_p));
+			(binomial_CDF(this->K, i, new_p) - binomial_CDF(this->K, i+1, new_p));
 		if (increment != 0 || second_d <= 2) {
 			new_individual.v_prime[i-1] += increment;
 		}

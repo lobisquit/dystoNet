@@ -36,14 +36,12 @@ vector<individual> GeneticAlgorithm::get_initial_population() {
 		population(this->dim_population);
 	for(int i = 0; i < this->dim_population; i++){
 		vector<double> rnd_solution = SecondProblem::get_initial_solution();
-		cout << "Respect: " << respect_constraints(rnd_solution) << "\n";
 		population[i] = this->approximate_objective_function(rnd_solution);
 		cout
 			<< "Created "
 			<< i+1 << "/" << this->dim_population
 			<< " elements \n";
 	}
-	cout << "\n";
 
 	return population;
 }
@@ -97,8 +95,8 @@ vector<double> GeneticAlgorithm::run_search() {
 					candidate[second_d] += delta;
 				}while(!respect_constraints(candidate));
 
-				population[j*part_size+i] = this->approximate_objective_function(candidate);
-				// population[j*part_size+i] = this->update_objective_function(old_individual, candidate, first_d, second_d);
+				// population[j*part_size+i] = this->approximate_objective_function(candidate);
+				population[j*part_size+i] = this->update_objective_function(old_individual, candidate, first_d, second_d);
 				// cout << "New obj function: " << population[j*part_size+i].obj_function << "\n";
 			}
 		}

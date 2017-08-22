@@ -61,7 +61,7 @@ int main() {
 		/* N */ N,
 		/* robust_soliton */ &rs,
 		/* max_failure_probability */ 0.05,
-		/* num_generations */ 80000,
+		/* num_generations */ 250000,
 		/** ATTENTION!!!! In this version, dim_population has to be integer multiple
 		* of the inverse of the survival_rate */
 		/* dim_population*/ 20,
