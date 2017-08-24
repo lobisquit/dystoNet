@@ -256,6 +256,10 @@ As in the physical process we want to reduce the function energy and the slowly 
 At the beginning \gls{t} is initialized at a sufficient high value and then it is reduced at each algorithm step.
 
 The process starts at a random point that respect problem constraints. Each new point $\vec{x}_{new}$ is found \emph{perturbing} previous vector $\vec{x}$ until one is found that respects problem constraints.
+
+Empirically, we found for the two problems two different perturbation strategies, i.e. \emph{Neighbour} function in pseudocodes.
+For \gls{fp} we add an uniform variable, whose range is proportional to temperature, to a randomly chosen component of the $\vec{x}$ vector, while for \gls{sp} we perturb ``moving'' some probability from one degree to one other, chosen uniformly across the distribution.
+
 Such solution is kept or rejected according to the \gls{ap}, whose expression is the following.
 
  \begin{equation*} \label{accept_prob}
@@ -267,16 +271,14 @@ Such solution is kept or rejected according to the \gls{ap}, whose expression is
   \end{cases}
  \end{equation*}
 
-Empirically, we found that a successful perturbation strategy for this problem is adding an uniform variable, whose range is proportional to temperature, to a randomly chosen component of the $\vec{x}$ vector.
+The best point among all the explored ones is kept across the path and it is returned at the end of the computation.
 
-The best point among all the explored ones is kept at each iteration and it is returned at the end of the computation.
-
-The algorithm is provided here as pseudocode.
+The algorithm is provided here as pseudocode in \autoref{code_sa}.
 
 \begin{algorithm}
 \KwIn{Objective function $f$ and constraints, Initial Temperature,  Steps Coefficient, Acceptance Coefficient}
 \KwOut{Optimal solution}
-\caption{Simulated Annealing}
+\caption{Simulated Annealing} \label{code_sa}
 $T \gets$ Initial Temperature \\
 $x \gets$ Candidate \\
 $x_{best} \gets x$ \\
@@ -306,11 +308,16 @@ $C_A \gets$ Acceptance coefficient \\
 		}
 	}
 	\Return{$x_{best}$}
-\end{algorithm} % \captionof{lstlisting}{Simulated Alleaning} \label{code_sa}
+\end{algorithm}
 
 \subsection{Jumping Ball}
 
-The second technique we implent is called \gls{jb}. \gls{jb} is a variant of \gls{sa} and apparently it follows the same operating model. The difference between \gls{jb} and \gls{sa} is that the searching for the best \gls{x} could make a \textit{jump}. This means that in some circumstances the value of \gls{nc} is not choosen between the neighbours of \gls{x} but between points rather distant from \gls{x}. These \textit{jumps} make the search  varies along the \gls{of} domain widely than what happens in \gls{sa}.
+The second technique we implement is called \gls{jb}.
+
+\gls{jb} is a variant of \gls{sa}: the relevant difference between the two is that
+
+
+the searching for the best \gls{x} could make a \textit{jump}. This means that in some circumstances the value of \gls{nc} is not choosen between the neighbours of \gls{x} but between points rather distant from \gls{x}. These \textit{jumps} make the search  varies along the \gls{of} domain widely than what happens in \gls{sa}.
 
 Let's compare pseudocode of \gls{sa} with pseudocode of \gls{jb}. We note immediately that they have almost the same pattern. As \gls{sa}, \gls{jb} is based on the parameter \gls{t}. Every time that \gls{t} decreases a new step of the algorithm begins. At every new step \gls{jb} uptades the values of \gls{sc}, \gls{ac} and consequently \gls{ap}. As in \gls{sa} the values of these parameters determine how the algorithm moves through the function domain searching for a new \gls{nc}.
 
