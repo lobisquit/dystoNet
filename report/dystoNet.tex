@@ -27,6 +27,7 @@
 %\usepackage{subfig}
 %\usepackage{subcaption}
 \usepackage{amsmath}
+\usepackage{mathtools}
 \usepackage{amsfonts}
 \usepackage{array}
 \usepackage{verbatim}
@@ -62,6 +63,7 @@
 \usepackage[ruled, vlined]{algorithm2e}
 \SetKwRepeat{Do}{do}{while}
 \SetKwBlock{wpPa}{with probability $P_A$}{end}
+\DontPrintSemicolon
 % \usepackage{algorithm}
 % \usepackage[noend]{algpseudocode}
 % \renewcommand\algorithmicthen{}
@@ -85,11 +87,11 @@
 \usepackage{threeparttable}
 %\usepackage[table,xcdraw]{xcolor}
 \usepackage{tabularx}
-   \usepackage{multirow}
-   \usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{booktabs}
 \newcommand{\tabitem}{~~\llap{\textbullet}~~}
-   \usepackage{array, blindtext}
-   \usepackage{wrapfig}
+\usepackage{array, blindtext}
+\usepackage{wrapfig}
 \usepackage{pdfpages}
 \usepackage[acronym]{glossaries}
 
@@ -118,7 +120,7 @@ Email: {\tt\{masonfed,perondav,lovisott\}@dei.unipd.it}\\}}
 \newacronym{wsn}{WSN}{Wireless Sensor Network}
 \newacronym{fp}{FP}{First Problem}
 \newacronym{sp}{SP}{Second Problem}
-\newacronym{of}{$F_O$}{Objective Function}
+\newacronym{of}{$f$}{Objective Function}
 \newacronym{t}{T}{Temperature}
 \newacronym{oc}{$x_o$}{Old Candidate}
 \newacronym{nc}{$x_n$}{New Candidate}
@@ -168,43 +170,49 @@ In literature, a \gls{wsn} often has a central node, a powered sink connected to
 Such special node receives all information collected by the nodes in the network and provides it to the users.
 
 However, in our paper, following what has been done in \cite{Lin2007}, we get rid of this assumption.
-Users then must collect the data stored in the network visiting the geographical region in which system is located.
+Users then must collect the data stored in the network visiting the geographical region where system is located.
 
-In such a scenario, a randomly picked number of the nodes is visited by a user.
-Our reference paper \cite{Lin2007}, guarantees source packets decodability using \emph{Random Fountain Codes}, combining and spreading $K$ source packets across $N$ total nodes such that, using any group of $K+\epsilon$ of them (with $\epsilon$ constant), the original information can be successfully retrieved with high probability.
+In such a scenario, user visits only a certain number $h$ of nodes of the network.
+Our reference paper \cite{Lin2007}, guarantees source packets decodability using \emph{Random Fountain Codes}, combining and spreading $K$ source packets across $N$ total nodes such that, using any group of $K+\epsilon$ of them (with $\epsilon$ constant in $K$), the original information can be successfully retrieved with high probability.
 
 The challenge here is to keep the communication cost at a minimum level, while keeping the failure probability low.
 
-Traditional but expensive two-way packet delivery is then discarded, in favour of one-way \emph{random walks}, where only neighbours knowledge is required locally.
+Traditional but expensive two-way packet delivery is then discarded, in favour of one-way \emph{random walks}.
 Random walks are designed according to \emph{Metropolis algorithm} such that the number of packets reaching each node resembles the Robust Soliton distribution, whose optimal decoding properties are known\cite{Luby}.
 
-In this paper, we are going to find the optimal $x_d$ parameter for \gls{edfc} with three heuristic techniques.
-The optimal configurations are then tested with a network simulator, and further analysis is performed.
-Unfortunately the heuristic techniques uses to extimate $x_d$, don't prove useful to find the optimal $\nu(d)$ parameter for \gls{adfc}.
+In this paper, we are going to find the optimal $x_d$ and $\nu(d)$ parameters for \gls{edfc} and \gls{adfc} respectively, with three different heuristics.
+
+The optimal configurations are then tested with a network simulator, where further analysis is performed.
 
 The article is structured in three sections.
 
 In \autoref{sec:tech_approach} we present in detail the heuristic algorithms employed, first with a general description of the framework and then fucusing on our specific problem.
 
-In \autoref{sec:results} we present the results obtained using the optimal parameter configuration in the simulator we have implemented.
+In \autoref{sec:results} we present the results obtained using the optimal parameter configurations in the network simulator we have implemented.
 
 \section{Technical Approach}
 \label{sec:tech_approach}
 
-The correct working of the algorithms \gls{edfc} and \gls{adfc} requires knowledge of $x_d$ and $\nu(d)$. $x_d$ is a K-dimensional variable of \gls{edfc} called \textit{redundancy coefficent}. Given a node with \textit{code degree} $d$, $x_d \cdot d$ represents the number of packets received by the node itself at the end of packets spread. The best value of $x_d$ is the solution of the following optimization problem.
+\gls{edfc} and \gls{adfc} spreading algorithms require to be tuned, with their parameters $x_d$ and $\nu(d)$.
+
+$x_d$ is a K-dimensional variable of \gls{edfc} called \textit{redundancy coefficent}. Given a node with \textit{code degree} $d$, $x_d \cdot d$ represents the number of packets that should be received by the node itself at the end of packets spread.
+
+The best value of $x_d$ is the solution of the following optimization problem\cite{Lin2007}.
 
 \begin{equation}
 	\label{firstproblem}
 	\begin{split}
-		minimize & \quad \sum_{d=1}^K x_d d \mu (d) \\
-		subject \ to & \quad \begin{cases}
+		minimize & \sum_{d=1}^K x_d d \mu (d) \\
+		subject \ to & \begin{dcases}
 			Pr(Y<d|X=d) \leq \delta_d \\
 			x_d \geq 1 \quad for \quad d = 1,...,K
-		\end{cases}
+		\end{dcases}
 	\end{split}
 \end{equation}
 
-$\nu(d)$ is a variable of \gls{adfc}. It is a \textit{hypothetical} degree distribution of nodes of network such that the \textit{actual} degree distribution of them is close to the \textit{Robust Solition Distribution}. We note that $\nu(d)$ as $x_d$ is a K-dimensional element which means that it has K possibile outcomes. The best value of $\nu(d)$ is the solution of the following optimization problem.
+$\nu$ is instead the degree distribution of network nodes such that, after package spread, the resulting degree distribution $\nu^\prime$ is as close as possible to the \textit{Robust Soliton Distribution}.
+
+The optimal $\nu(d)$ is the solution of the following optimization problem\cite{Lin2007}.
 
 \begin{equation}
 	\label{secondproblem}
@@ -217,67 +225,88 @@ $\nu(d)$ is a variable of \gls{adfc}. It is a \textit{hypothetical} degree distr
 	\end{split}
 \end{equation}
 
-From now we call \eqref{firstproblem} and \eqref{secondproblem} simply \gls{fp} and \gls{sp}. The different parameters that appear in \gls{fp} and in \gls{sp} are specified in details in ~\cite{Lin2007}. We note immediately that \gls{fp} and \gls{sp} have \textit{non-convex objective functions}. So it is impossible to determine the exact solution of both the problems. To overcome this obstacle we choose to design a series of heuristic algorithms.
+given
+\begin{equation*}
+	\begin{split}
+		& v^\prime(i) = \sum_{d=1}^K \nu(d) \binom{K}{i} p(d)^i [1-p(d)]^{K-i} \\
+		& p(d) = 1 - \left(1 -\frac{d}{N E}\right)^{\frac{N E}{K}} \\
+		& E = \text{ expected value of }\nu
+	\end{split}
+\end{equation*}
 
-The heuristic algorithms we implement are not able to compute the exact solutions of \eqref{firstproblem} and \eqref{secondproblem}. Despite that they can theorically reach approximate solutions still optimal for our purposes. In particular our techniques correspond to search algorithms that consider the possibility that a function could have more than one minimum point. Our techniques don't stop at the first local minimum that they localize as in a convex function. They continue to vary the outcome of the \textit{objective function}, hoping to find a better local minimum than the one previously found.
+From now on, we call \eqref{firstproblem} and \eqref{secondproblem} simply \gls{fp} and \gls{sp}.
+
+We see immediately that \gls{fp} and \gls{sp} are not solvable with \emph{convex optimization} tecniques, as they don't minimize convex objective functions over convex sets.
+
+To overcome this issue, we chose the heuristic approach, whose convergence to the optimum is not guaranteed in polynomial time, but whose effectiveness has been proven in many fields \cite{Edelkamp2010} where traditional tools (such as \emph{Simplex}) cannot be applied.
+
+In fact they reach solutions that are often suboptimal but still useful for our purposes.
 
 \subsection{Simulated Annealing}
 
-The first algorithm we implement is a version of the technique known as \gls{sa}. \gls{sa} is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects. In the physicall alleaning a metal is warmed at high temperatures and then slowly cooled. In this way it is possible to achieve the molecolar equilibrium inside the material itself.
+The first algorithm we implement is known as \gls{sa}.
+\gls{sa} is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects.
+In this physical process a piece of metal is warmed at high temperatures and then slowly cooled. In this way it is possible to achieve the molecular equilibrium inside the material itself.
 
-In \gls{sa}, we compare \gls{of} of the optimization problem to the internal energy of a metallic material. As in the physicall process we want to quickly change the function energy and the slowly bring it to a stable value. In other words we want first cross widly the function domain and then concentrate in the points which have more probability to be absolute minimum of \gls{of}.
+In \gls{sa}, we treat \gls{of} as the internal energy of the material.
+As in the physical process we want to reduce the function energy and the slowly bring it to a stable value. In other words we want first cross widely the function domain and then concentrate in the points with higher probability to be the absolute minimum of \gls{of}.
 
-\gls{sa} is based on a parameter called \gls{t}. At the beginning \gls{t} is initialized at a sufficient high value and then it is reduced until it reaches zero. Every new reduction of \gls{t} corresponds to a new step of the algorithm. After that the algorithm choose a random point of the function domain. This point is saved in the parameter \gls{x}, which means that is examined by the algorithms by this time. The same point contained in \gls{x} is saved in the parameter \gls{bestx}. During all the algorithm working \gls{bestx} contains the minimum between all the points crossed by the algorithm untill now. At the end of the \textit{inizialization phase} the algorithm set the values of \gls{sc} and \gls{ac}. Both these parameters depend on \gls{t} and will change their values as the algorithm goes on.
+\gls{sa} behaviour is dependent on a parameter called \gls{t}: relevant for the search are \gls{sc} and \gls{ac}, the number of points to inspect for given \gls{t} and the probability $P_A$ of accepting a point worse than the current, respectively.
 
-Terminated the \textit{inizialization phase}, the first step of the algorithm begins. All algorithm steps have the  same pattern, which is described in what follows. \gls{x} is copied in the parameter \gls{oc} and then is perturbed in an unique direction. This means that one of the components of \gls{x} changes is value. We note that whataver is the problem we consider, \gls{x} is always a K-dimensional element. The new element found is saved in the parameter \gls{nc}. At this point the algorithm verifies if the value of \gls{nc} belongs to the function domain or not. Indeed the algorithm can work correctly only if every new value of \gls{nc} respect the constraints of the problem. If this doesn't happen the algorithm discargs the value of \gls{nc} and makes a new perturbation. We call the process just described the search of a neighbour of \gls{x}. Once an admittable \gls{nc} is found, the algorithm has to establish if it want move to the neighbour of \gls{x} or not. To make this decision \gls{sa} compares the value of \gls{oc} with the value of \gls{nc}. In particular the algorithm verifies which between \gls{oc} and \gls{nc} has better performance.
+At the beginning \gls{t} is initialized at a sufficient high value and then it is reduced at each algorithm step.
 
-We know that the aim of \gls{sa} in find the minimum point of \gls{of}. Consequently if the value of \gls{of} given by \gls{oc} is higher than the value of \gls{of} given by \gls{nc}, the algorithm moves to \gls{nc} for sure and \gls{nc} becomes the new \gls{x}. Instead if \gls{nc} has worse performance than \gls{oc} the algorithm moves to \gls{nc} only with a certain probability called \gls{ap}. we note that \gls{sa} could move to a worse point of the function domain that the previous point. This happens so that the algorithm has always the possibility to move away from a local minimum in search of a new solution. The value of \gls{ap} depends on the difference between the \gls{of} in \gls{nc} and the \gls{of} in \gls{oc}.
+The process starts at a random point that respect problem constraints. Each new point $\vec{x}_{new}$ is found \emph{perturbing} previous vector $\vec{x}$ until one is found that respects problem constraints.
+Such solution is kept or rejected according to the \gls{ap}, whose expression is the following.
 
- \begin{equation}
- 	\label{accept_prob}
-	P_A = \begin{cases}
-		1 & \quad F_O (x_n)-F_O (x_o) < 0 \\
-		e^{ C_A(T)  \cdot(F_O (x_n)-F_O (x_o))/T } & \quad F_O (x_n)-F_O(x_o) \geq 0
-\end{cases}
- \end{equation}
+ \begin{equation*} \label{accept_prob}
+	P_A(T) = \begin{cases}
+		1 & f(\vec{x}_n)-f (\vec{x}_o) < 0 \\
+		\exp{ \left( C_A(T) \frac{
+					\, [f(\vec{x}_n) - f(\vec{x}_o)] }{T} \right) }
+		& f (\vec{x}_n)-f(\vec{x}_o) \geq 0
+  \end{cases}
+ \end{equation*}
 
-If \gls{sa} choose to move to \gls{nc}, it also verifies if \gls{x} is the point with best performance untill now. To do so \gls{sa} compare \gls{x} with \gls{bestx}. If the value of \gls{x} has better performance than \gls{bestx}, \gls{sa} replaces the value of \gls{bestx} with value of \gls{x} The operations previously described are repeated a number of times equal to \gls{sc}. After that the first step of \gls{sa} ends and \gls{t} is uptated.
+Empirically, we found that a successful perturbation strategy for this problem is adding an uniform variable, whose range is proportional to temperature, to a randomly chosen component of the $\vec{x}$ vector.
 
-For every new \gls{t} the algorithm uptades also \gls{sc}, \gls{ac} and \gls{ap}. So a new step begins. At every new step \gls{sa} changes the value of \gls{x} a number of times equals to \gls{sc}. We note that both \gls{sc}, \gls{ac}, \gls{ap} and the perturbation to which the candidates are subjected depend on \gls{t}. In particular all these parameters decrease as the temperature decreases. This means that at the initial steps of \gls{sa} is very easy for \gls{x} to change value widely while at the final steps is more likely that \gls{x} doesn't change value anymore.
+The best point among all the explored ones is kept at each iteration and it is returned at the end of the computation.
 
-When \gls{t} finally reach the zero value \gls{sa} returns the value of \gls{bestx}, which is the point with the best performance between all the points exmined.
+The algorithm is provided here as pseudocode.
 
 \begin{algorithm}
-	\KwIn{Objective function and constraints, \textit{survival rate}, \textit{max generations}, $\norm{population}$}
-	\KwOut{Optimal solution}
-	$T \gets Temperature$\\
-	$x \gets Candidate$\\
-	$x_{best} \gets x$\\
-	$C_S(T) \gets \textit{Step coefficient}$\\
-	$C_A(T) \gets \textit{Acceptance coefficient}$\\
-	$P_A(C_A) \gets \textit{Acceptance probability}$\\
-	\While{$T>0$}{
-		\For{$i = 1$ to $C_S(T)$}{
-			$x_0 \gets x$\\
+\KwIn{Objective function $f$ and constraints, Initial Temperature,  Steps Coefficient, Acceptance Coefficient}
+\KwOut{Optimal solution}
+\caption{Simulated Annealing}
+$T \gets$ Initial Temperature \\
+$x \gets$ Candidate \\
+$x_{best} \gets x$ \\
+$C_S \gets$ Step coefficient \\
+$C_A \gets$ Acceptance coefficient \\
+
+\While{$T>0$}{
+	\For{$i = 1$ to $SC$}{
+		\vspace{1mm}
+		$x_0 \gets x$\\
+		$x_n \gets Neighbour(x)$\\
+		\While{$x_n$ doesn't respect costraints} {
 			$x_n \gets Neighbour(x)$\\
-			\While{$x_n$ doesn't respect costraints}{
-				$x_n \gets Neighbour(x)$\\
-			}
-			\wpPa{
-				$x \gets x_n$\\
-			}
 		}
-		update $T$\\
-		update $C_S(T)$\\
-		update $C_A(T)$\\
-		uptade $P_A(C_A)$\\
-		\If{$F_O(x)<F_O(x_{best})$}{
+		$P_A \gets$ Acceptance probability \\
+		\wpPa {
+			\vspace{1mm}
+			$x \gets x_n$\\
+		}
+	}
+	update $T$\\
+	update $C_S(T)$\\
+	uptade $P_A(C_A)$\\
+	\If{$f(x)<f(x_{best})$}{
+		\vspace{1mm}
 			$x_{best} \gets x$\\
 		}
 	}
 	\Return{$x_{best}$}
-	\caption{Simulated Annealing}\label{algo:SA}
-\end{algorithm}
+\end{algorithm} % \captionof{lstlisting}{Simulated Alleaning} \label{code_sa}
 
 \subsection{Jumping Ball}
 
