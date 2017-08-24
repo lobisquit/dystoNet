@@ -32,8 +32,7 @@ GeneticAlgorithm::GeneticAlgorithm(int K,
 }
 
 vector<individual> GeneticAlgorithm::get_initial_population() {
-	vector<individual>
-		population(this->dim_population);
+	vector<individual> population(this->dim_population);
 	for(int i = 0; i < this->dim_population; i++){
 		vector<double> rnd_solution = SecondProblem::get_initial_solution();
 		population[i] = this->approximate_objective_function(rnd_solution);
@@ -60,13 +59,14 @@ vector<double> GeneticAlgorithm::run_search() {
 	while(generation < this->num_generations){
 		/** Sorting of the population */
 		std::sort(population.begin(), population.end(), by_obj_function());
-		cout << "Obj function: " << population[0].obj_function << "\n";
-		Distribution* v_distribution = new Distribution(population[0].values, 1);
-			cerr << "=====> "
-				<< generation << "/" << this->num_generations
-				<< " ==> g2 = "
-				/** Best score for this generation, since vectors are sorted */
-				<< v_distribution->expectation() / E << "\n";
+
+		Distribution v_distribution = Distribution(population[0].values, 1);
+		cerr << "=====> "
+			<< generation << "/" << this->num_generations
+			<< " ==> f = " << population[0].obj_function
+			<< " ==> g2 = "
+			/** Best score for this generation, since vectors are sorted */
+			<< v_distribution.expectation() / E << "\n";
 
 		/** Copy of the best individuals in the whole population, and then perturbe it, checking you are respecting
 		* constraints.
@@ -75,10 +75,9 @@ vector<double> GeneticAlgorithm::run_search() {
 		for(int j = 1; j < round(1/this->survival_rate); j++){
 			for(int i = 0; i<part_size; i++){
 				individual old_individual = population[i];
-				// cout << "Old obj function: " << old_individual.obj_function << ",\t i = "<< i << "\t";
 				/** Mutation of */
 				vector<double> candidate;
-				do{
+				do {
 					candidate = population[i].values;
 					do {
 						first_d = index_choice(rng);
@@ -93,7 +92,7 @@ vector<double> GeneticAlgorithm::run_search() {
 					double delta = mutation(rng);
 					candidate[first_d] -= delta;
 					candidate[second_d] += delta;
-				}while(!respect_constraints(candidate));
+				} while(!respect_constraints(candidate));
 
 				// population[j*part_size+i] = this->approximate_objective_function(candidate);
 				population[j*part_size+i] = this->update_objective_function(old_individual, candidate, first_d, second_d);
