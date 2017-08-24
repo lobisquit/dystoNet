@@ -39,8 +39,9 @@ vector<individual> GeneticAlgorithm::get_initial_population() {
 		cout
 			<< "Created "
 			<< i+1 << "/" << this->dim_population
-			<< " elements \n";
+			<< " elements \r";
 	}
+	cout << "\n";
 
 	return population;
 }
@@ -61,7 +62,7 @@ vector<double> GeneticAlgorithm::run_search() {
 		std::sort(population.begin(), population.end(), by_obj_function());
 
 		Distribution v_distribution = Distribution(population[0].values, 1);
-		cerr << "=====> "
+		cout << "=====> "
 			<< generation << "/" << this->num_generations
 			<< " ==> f = " << population[0].obj_function
 			<< " ==> g2 = "

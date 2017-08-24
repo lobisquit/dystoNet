@@ -28,6 +28,7 @@
 #include <ctime>
 #include "soliton.h"
 #include "genetic_algorithm.h"
+#include "functionCSV.h"
 
 using namespace std;
 /**
@@ -54,14 +55,15 @@ int main() {
 	RobustSoliton rs = RobustSoliton(
 		/* c     */ 0.01,
 		/* delta */ 0.05,
-		            K, 1);
+		            K,
+		            2);
 
 	GeneticAlgorithm GA = GeneticAlgorithm(
 		/* K */ K,
 		/* N */ N,
 		/* robust_soliton */ &rs,
 		/* max_failure_probability */ 0.05,
-		/* num_generations */ 250000,
+		/* num_generations */ 2.5e5,
 		/** ATTENTION!!!! In this version, dim_population has to be integer multiple
 		* of the inverse of the survival_rate */
 		/* dim_population*/ 20,
@@ -72,4 +74,6 @@ int main() {
 
 	vector<double> best_redundancy = GA.run_search();
 
+	// save result to CSV
+	writeCSV(best_redundancy, "results/GA-second.csv");
 }
