@@ -38,17 +38,15 @@ JumpingBall::JumpingBall(
 }
 
 vector<double> JumpingBall::get_neighbour(vector<double> x) {
-	// copy x to new array before perturbation
 	vector<double> candidate(K, 1);
 
-	// count number of steps taken that lead to a
-	// solution worse than the current top
 	do {
-		// copy x to candidate
+		// copy x to new array before perturbation
 		candidate = x;
 
 		// setup random variables
-		uniform_real_distribution<double> perturbation(-2*this->temperature, this->temperature);
+		uniform_real_distribution<double>
+			perturbation(-2*this->temperature, this->temperature);
 		uniform_int_distribution<int> number_of_variations(0, this->K-1);
 		uniform_int_distribution<int> index_choice(0, this->K-1);
 
