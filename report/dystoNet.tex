@@ -61,6 +61,7 @@
 
 % Pseudocode
 \usepackage[ruled, vlined]{algorithm2e}
+
 \SetKwRepeat{Do}{do}{while}
 \SetKwBlock{wpPa}{with probability $P_A$}{end}
 \DontPrintSemicolon
@@ -69,7 +70,6 @@
 % \renewcommand\algorithmicthen{}
 % \renewcommand\algorithmicdo{}
 \usepackage{lscape}
-\usepackage{setspace}
 
 \addto\captionsenglish{\renewcommand{\figurename}{Fig.}}
 
@@ -273,102 +273,80 @@ Such solution is kept or rejected according to the \gls{ap}, whose expression is
 
 The best point among all the explored ones is kept across the path and it is returned at the end of the computation.
 
-The algorithm is provided here as pseudocode in \autoref{code_sa}.
+The algorithm is provided here as pseudocode in \autoref{algo:SA}.
 
 \begin{algorithm}
-\KwIn{Objective function $f$ and constraints, Initial Temperature,  Steps Coefficient, Acceptance Coefficient}
+\KwIn{Objective function $f$ and constraints, Initial Temperature,  Maximum number of steps, Steps Coefficient, Acceptance Coefficient}
 \KwOut{Optimal solution}
-\caption{Simulated Annealing} \label{code_sa}
-$T \gets$ Initial Temperature \\
-$x \gets$ Candidate \\
-$x_{best} \gets x$ \\
-$C_S \gets$ Step coefficient \\
-$C_A \gets$ Acceptance coefficient \\
+\caption{Simulated Annealing} \label{algo:SA}
 
-\While{$T>0$}{
-	\For{$i = 1$ to $SC$}{
-		\vspace{1mm}
-		$x_0 \gets x$\\
-		$x_n \gets Neighbour(x)$\\
-		\While{$x_n$ doesn't respect costraints} {
-			$x_n \gets Neighbour(x)$\\
-		}
-		$P_A \gets$ Acceptance probability \\
+$T \gets$ Initial Temperature \\
+$x \gets$ Random valid point() \\
+$x_{best} \gets x$ \\
+$C_A \gets$ Acceptance coefficient \\
+$N_S \gets 0$ \\
+$N_S^{MAX} \gets $ Maximum number of steps \\
+
+\While{$N_S < N_S^{MAX}$} {
+	$C_S \gets$ Steps coefficient ($T$) \\
+	\For{$i = 1$ to $C_S$} {
+		$\vec{x}_{new} \gets$ Neighbour$(\vec{x})$\\
+		$P_A \gets$ Acceptance probability($\vec{x}$, $\vec{x}_{new}$, $C_A$) \\
 		\wpPa {
-			\vspace{1mm}
-			$x \gets x_n$\\
+			$\vec{x} \gets \vec{x}_{new}$\\
 		}
-	}
-	update $T$\\
-	update $C_S(T)$\\
-	uptade $P_A(C_A)$\\
-	\If{$f(x)<f(x_{best})$}{
-		\vspace{1mm}
+		\If{$f(x)<f(x_{best})$}{
 			$x_{best} \gets x$\\
 		}
+		Increment $N_S$
 	}
-	\Return{$x_{best}$}
+	update $T$\\
+	update $C_S$\\
+}
+\Return{$x_{best}$}
 \end{algorithm}
 
 \subsection{Jumping Ball}
 
-The second technique we implement is called \gls{jb}.
+Our second search algorithm is a variation of \gls{sa}, designed, implemented by our group and called \gls{jb}.
 
-\gls{jb} is a variant of \gls{sa}: the relevant difference between the two is that
+Its approach rose from the observation that if the cooling phase of \gls{sa} takes to a sub-optimal region of the solution space there is no way to leave it for a better one.
 
+So, we develop the heuristic of \emph{jumps}, whose aim is to overcome this issue. If the best solution available is not improved for a certain number $N_{WS}^{MAX}$ of small perturbation, as done in \gls{sa}, a big shock, called \emph{jump}, is introduced in $\vec{x}$ components.
 
-the searching for the best \gls{x} could make a \textit{jump}. This means that in some circumstances the value of \gls{nc} is not choosen between the neighbours of \gls{x} but between points rather distant from \gls{x}. These \textit{jumps} make the search  varies along the \gls{of} domain widely than what happens in \gls{sa}.
+This parameter has to be initialized properly: a value too low would lead the algorithm to jump indefinitely without ever stabilizing in a single area, but a value too high would make jumps impossible, making pointless this heuristic and leading to \gls{sa} algorithm.
 
-Let's compare pseudocode of \gls{sa} with pseudocode of \gls{jb}. We note immediately that they have almost the same pattern. As \gls{sa}, \gls{jb} is based on the parameter \gls{t}. Every time that \gls{t} decreases a new step of the algorithm begins. At every new step \gls{jb} uptades the values of \gls{sc}, \gls{ac} and consequently \gls{ap}. As in \gls{sa} the values of these parameters determine how the algorithm moves through the function domain searching for a new \gls{nc}.
+A proper value of $N_{WS}^{MAX}$ enhances the exploration space of the \gls{sa} algorithm, leading to better results in our variant \gls{jb}.
 
-Looking more carefully at pseudocode of \gls{jb}, we note that this algorithm uses two parameters that \gls{sa} doesn't. These parameters are called \gls{ws} and \gls{wsmax}. During the \textit{inizialization phase}  \gls{ws} and \gls{wsmax} are respectively set to zero and to a positive value. While \gls{wsmax} is fixed, \gls{ws} changes value as the algorithm goes on. To understand the working of \gls{ws} and \gls{wsmax} we suppone that \gls{jb} moves to \gls{nc}. If \gls{nc} has better performance than \gls{oc} ($P_A=1$) the value of \gls{ws} is immediately set to zero again. Instead if \gls{nc} has worse performance than \gls{oc} ($P_A<1$) the value of \gls{ws} is increased of one. We conclude that \gls{ws} increases as the algorithm moves to points with worse performance than the points already crossed.
+The pseudocode for \gls{jb} is the same as \gls{sa}, the different \emph{Neighbour} function is described in \autoref{algo:JB_neigh}.
 
-Putting ourself in a very unlucky scenario we suppone that for several times consecutively the new value of \gls{x} is worse than the previous one. In this case the value of \gls{ws} increases al lot, untill it becomes close to \gls{wsmax}. When \gls{ws} exceeds \gls{wsmax} the \textit{jump} takes place. This mean that for a single time the searching for \gls{nc} change its working. In particular the perturbation which \gls{x} is subjected is much bigger. In addiction to have more intensity the perturbation doesn't envolve only one component of \gls{x} but a random number of them. Then \gls{nc} is not a neighbour of \gls{x} anymore but is a point very far from it in the functon domain. After the \textit{jump} the value of \gls{ws} is set to zero and the algorithm goes on as nothing happens. In a simply way we can say that at evry \textit{jump} the algorithm changes the starting point of its searching.
-
-We note that in \gls{jb} is fundamental inizialize accurately the value of \gls{wsmax}. If we choose a value to low, the algorithm will make a huge series of consecutives jump without ever stabilizing in a single area. Conversely if we choose a value too high, the algorithm will never find itself in a condition in which it has to \textit{jump}. We can admit that if we let \gls{wsmax} goes to infinity, \gls{jb} becomes identical to \gls{sa}.
-
-In \gls{sa} we risk that the algorithm focus the search in a bad area, without being able to improve the solution already found. In \gls{jb} this unlucky case is always avoid thanks to \textit{jumps}.
-
-
-\pagebreak
 \begin{algorithm}
-	\KwIn{Objective function and constraints, \textit{survival rate}, \textit{max generations}, $\norm{population}$}
-	\KwOut{Optimal solution}
-	$T \gets Temperature$\\
-	$x \gets Candidate$\\
-	$x_{best} \gets x$\\
-	$C_S(T) \gets \textit{Step coefficient}$\\
-	$C_A(T) \gets \textit{Acceptance coefficient}$\\
-	$P_A(C_A) \gets \textit{Acceptance probability}$\\
-	$N_{WS} \gets 0$\\
-	\While{$T>0$}{
-		\For{$i = 1$ to $SC$}{
-			$x_0 \gets x$\\
-			$x_n \gets Neighbour(x)$\\
-			\While{$x_n$ doesn't respect costraints}{
-				\textit{$N_{WS}++$}\\
-				\If{$N_{WS}<N_{WS}^{MAX}$}{
-					$x_n \gets Neighbour(x)$\\
-				}
-				\Else{
-					$x_n \gets Jump(x)$\\
-					$N_{WS} \gets 0$
-				}
+	\caption{Jumping Ball \emph{Neighbour}}\label{algo:JB_neigh}
+	\KwIn{Problem constraints and objective function $f$, $\vec{x}$, $N_{WS}^{MAX}$, current number of worsening steps $N_{WS}$}
+	\KwOut{$\vec{x}_{new}$}
+	\Repeat{$\vec{x}_{new}$ respects constraints} {
+
+		$\vec{x}_{new} \gets \vec{x}$ \\
+
+		\If { $N_{WS} > N_{WS}^{MAX}$ } {
+
+			\Repeat{$\vec{x}_{new}$ respects constraints} {
+
+				Perturb an random number of components of $\vec{x}_{new}$
+
 			}
-			\wpPa{
-				$x \gets x_n$\\
-			}
+			$N_{WS}$ = 0
 		}
-		update $T$\\
-		update $C_S(T)$\\
-		update $C_A(T)$\\
-		uptade $P_A(C_A)$\\
-		\If{$F_O(x)<F_O(x_{best})$}{
-			$x_{best} \gets x$\\
+		\Else {
+			Perturb just one component of $\vec{x}_{new}$ in $[1, K]$
 		}
 	}
-	\Return{$x_{best}$}
-	\caption{Jumping Ball}\label{algo:JB}
+
+	\If { $f(\vec{x}_{new}) > f(\vec{x}_{best})$  } {
+
+		Increment $N_{WS}$
+	}
+	\Return $\vec{x}_{new}$
 \end{algorithm}
 
 \subsection{Genetic Algorithm}
