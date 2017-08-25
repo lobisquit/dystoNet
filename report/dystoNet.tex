@@ -180,9 +180,7 @@ The challenge here is to keep the communication cost at a minimum level, while k
 Traditional but expensive two-way packet delivery is then discarded, in favour of one-way \emph{random walks}.
 Random walks are designed according to \emph{Metropolis algorithm} such that the number of packets reaching each node resembles the Robust Soliton distribution, whose optimal decoding properties are known\cite{Luby}.
 
-In this paper, we are going to find the optimal $x_d$ and $\nu(d)$ parameters for \gls{edfc} and \gls{adfc} respectively, with three different heuristics.
-
-The optimal configurations are then tested with a network simulator, where further analysis is performed.
+In this paper, we are going to find the optimal $x_d$ and $\nu(d)$ parameters for \gls{edfc} and \gls{adfc} respectively, with three different heuristics, and then test them with a network simulator, where further analysis is performed.
 
 The article is structured in three sections.
 
@@ -193,26 +191,26 @@ In \autoref{sec:results} we present the results obtained using the optimal param
 \section{Technical Approach}
 \label{sec:tech_approach}
 
-\gls{edfc} and \gls{adfc} spreading algorithms require to be tuned, with their parameters $x_d$ and $\nu(d)$.
+\gls{edfc} and \gls{adfc} spreading algorithms require their parameters $\vec{x}$ and $\nu$ to be tuned before executing them.
 
-$x_d$ is a K-dimensional variable of \gls{edfc} called \textit{redundancy coefficent}. Given a node with \textit{code degree} $d$, $x_d \cdot d$ represents the number of packets that should be received by the node itself at the end of packets spread.
+$\vec{x}$ is a K-dimensional variable of \gls{edfc} called \emph{redundancy coefficient}. Given a node with \emph{code degree} $d$, $x_d \cdot d$ represents the number of packets that should be received by the node itself at the end of packets spread.
 
-The best value of $x_d$ is the solution of the following optimization problem\cite{Lin2007}.
+The best value of $\vec{x}$ is the solution of the following optimization problem\cite{Lin2007}.
 
 \begin{equation}
 	\label{firstproblem}
 	\begin{split}
-		minimize & \sum_{d=1}^K x_d d \mu (d) \\
-		subject \ to & \begin{dcases}
+		minimize & \quad \sum_{d=1}^K x_d d \mu (d) \\
+		subject \ to & \quad \begin{dcases}
 			Pr(Y<d|X=d) \leq \delta_d \\
-			x_d \geq 1 \quad for \quad d = 1,...,K
+			x_d \geq 1 \text{ ~for~ } d = 1,...,K
 		\end{dcases}
 	\end{split}
 \end{equation}
 
-$\nu$ is instead the degree distribution of network nodes such that, after package spread, the resulting degree distribution $\nu^\prime$ is as close as possible to the \textit{Robust Soliton Distribution}.
+$\nu$ is instead the degree distribution of network nodes such that, after package spread, the resulting degree distribution $\nu^\prime$ is as close as possible to the \emph{Robust Soliton Distribution}.
 
-The optimal $\nu(d)$ is the solution of the following optimization problem\cite{Lin2007}.
+The optimal $\nu$ is the solution of the following optimization problem\cite{Lin2007}.
 
 \begin{equation}
 	\label{secondproblem}
@@ -240,7 +238,7 @@ We see immediately that \gls{fp} and \gls{sp} are not solvable with \emph{convex
 
 To overcome this issue, we chose the heuristic approach, whose convergence to the optimum is not guaranteed in polynomial time, but whose effectiveness has been proven in many fields \cite{Edelkamp2010} where traditional tools (such as \emph{Simplex}) cannot be applied.
 
-In fact they reach solutions that are often suboptimal but still useful for our purposes.
+In fact the solutions obtained, despite not optimal, are still useful from a pragmatic point of view.
 
 \subsection{Simulated Annealing}
 
@@ -249,13 +247,13 @@ The first algorithm we implement is known as \gls{sa}.
 In this physical process a piece of metal is warmed at high temperatures and then slowly cooled. In this way it is possible to achieve the molecular equilibrium inside the material itself.
 
 In \gls{sa}, we treat \gls{of} as the internal energy of the material.
-As in the physical process we want to reduce the function energy and the slowly bring it to a stable value. In other words we want first cross widely the function domain and then concentrate in the points with higher probability to be the absolute minimum of \gls{of}.
+As in the physical process we want to reduce the function energy and slowly bring it to a stable value. In other words we want first to cross widely the function domain and then to concentrate in the points with higher probability to be the absolute minimum of \gls{of}.
 
 \gls{sa} behaviour is dependent on a parameter called \gls{t}: relevant for the search are \gls{sc} and \gls{ac}, the number of points to inspect for given \gls{t} and the probability $P_A$ of accepting a point worse than the current, respectively.
 
 At the beginning \gls{t} is initialized at a sufficient high value and then it is reduced at each algorithm step.
 
-The process starts at a random point that respect problem constraints. Each new point $\vec{x}_{new}$ is found \emph{perturbing} previous vector $\vec{x}$ until one is found that respects problem constraints.
+The process starts at a random point respecting problem constraints. Each new point $\vec{x}_{new}$ is found \emph{perturbing} previous vector $\vec{x}$ until a new valid one is found.
 
 Empirically, we found for the two problems two different perturbation strategies, i.e. \emph{Neighbour} function in pseudocodes.
 For \gls{fp} we add an uniform variable, whose range is proportional to temperature, to a randomly chosen component of the $\vec{x}$ vector, while for \gls{sp} we perturb ``moving'' some probability from one degree to one other, chosen uniformly across the distribution.
@@ -308,15 +306,15 @@ $N_S^{MAX} \gets $ Maximum number of steps \\
 
 \subsection{Jumping Ball}
 
-Our second search algorithm is a variation of \gls{sa}, designed, implemented by our group and called \gls{jb}.
+Our second search algorithm is a variation of \gls{sa}, called \gls{jb}, designed and implemented by our group.
 
 Its approach rose from the observation that if the cooling phase of \gls{sa} takes to a sub-optimal region of the solution space there is no way to leave it for a better one.
 
-So, we develop the heuristic of \emph{jumps}, whose aim is to overcome this issue. If the best solution available is not improved for a certain number $N_{WS}^{MAX}$ of small perturbation, as done in \gls{sa}, a big shock, called \emph{jump}, is introduced in $\vec{x}$ components.
+So, we develop the heuristic of \emph{jumps}, whose aim is to overcome this issue. If the best solution available is not improved for a certain number $N_{WS}^{MAX}$ of small steps, as done in \gls{sa}, a \emph{jump} is performed perturbating lots of components all at once of a big extent.
 
-This parameter has to be initialized properly: a value too low would lead the algorithm to jump indefinitely without ever stabilizing in a single area, but a value too high would make jumps impossible, making pointless this heuristic and leading to \gls{sa} algorithm.
+$N_{WS}^{MAX}$ has to be initialized properly: a value too low would lead the algorithm to jump indefinitely without ever stabilizing in a single area, but a value too high would make jumps impossible, making pointless this variation.
 
-A proper value of $N_{WS}^{MAX}$ enhances the exploration space of the \gls{sa} algorithm, leading to better results in our variant \gls{jb}.
+A proper value instead enhances the exploration space of the \gls{sa} algorithm, leading to hopefully better results in our variant \gls{jb}.
 
 The pseudocode for \gls{jb} is the same as \gls{sa}, the different \emph{Neighbour} function is described in \autoref{algo:JB_neigh}.
 
@@ -325,15 +323,10 @@ The pseudocode for \gls{jb} is the same as \gls{sa}, the different \emph{Neighbo
 	\KwIn{Problem constraints and objective function $f$, $\vec{x}$, $N_{WS}^{MAX}$, current number of worsening steps $N_{WS}$}
 	\KwOut{$\vec{x}_{new}$}
 	\Repeat{$\vec{x}_{new}$ respects constraints} {
-
 		$\vec{x}_{new} \gets \vec{x}$ \\
-
 		\If { $N_{WS} > N_{WS}^{MAX}$ } {
-
 			\Repeat{$\vec{x}_{new}$ respects constraints} {
-
 				Perturb an random number of components of $\vec{x}_{new}$
-
 			}
 			$N_{WS}$ = 0
 		}
@@ -341,62 +334,61 @@ The pseudocode for \gls{jb} is the same as \gls{sa}, the different \emph{Neighbo
 			Perturb just one component of $\vec{x}_{new}$ in $[1, K]$
 		}
 	}
-
 	\If { $f(\vec{x}_{new}) > f(\vec{x}_{best})$  } {
-
 		Increment $N_{WS}$
 	}
 	\Return $\vec{x}_{new}$
 \end{algorithm}
 
 \subsection{Genetic Algorithm}
-The third technique is called Genetic Algorithm.
-The algorithm takes randomly an initial set of solution for the problem, called \textit{population}, and tries to evolve it toward better solutions.
-Each candidate solution is called \textit{individual}, that is usually a multi-dimensional array. In biological applications, each component of the individual is a \textit{chromosome} or a \textit{genotype}, in our case it is simply an entry for the array.
 
-\gls{ga} is an iterative process, in each iteration, the population is evolved in a new \textit{generation}.
-In each generation, the objective function of each individual is evaluated. The best individuals (in terms of objective function) are selected and mutated to create the next generation.
+Our third technique is an implementation of \gls{ga}, framework that takes randomly an initial set of solutions for the problem and tries to evolve this \emph{population} of points toward better values.
 
-The way in which an individual is mutated can be arbitrarily chosen.
-Usually one or more components are perturbated randomly, or parts of different solutions are joined togheter, to maintain the properties of the old solutions trying to improve it.
-In this work we have decided to perturbe each individual up to 3 times, the number of perturbation will be the one that leads to a better objective function.
+According to the biological interpretation, each candidate solution, in our case a multi-dimensional vector, is an \emph{individual}.
+Then each of its components is called \emph{chromosome} or \emph{genotype} and the subsequent iterations to explore the solution space \emph{generations}.
+
+In each step of the algorithm the worst performing individuals of the current population are discarded and replaced by \emph{mutations} of the best individuals, which survives to the next round.
+
+In this work we have decided to keep the 25\% best individuals of the current generation for the next one and obtain the remaining three quarters perturbing one, two and three components of the previous ones respectively.
+
+Perturbations are performed as described earlier in \gls{sa} section.
 
 \begin{algorithm}
-\KwIn{Objective function and constraints, \textit{survival rate}, \textit{max generations}, $\norm{population}$}
-\KwOut{Optimal solution}
-$generation \gets 0$\\
-$\textit{best part size} \gets \norm{population} \cdot \textit{survival rate}$\\
-$population \gets \textit{initial population}$\\
-\While{$generation < \textit{max generations}$}{
-  sort(\textit{population})\\
-  \For{$j=1$ to round($1/\textit{survival rate}$)}{
-    \For{$i=1$ to \textit{best part size}}{
-      $population(j \cdot \textit{best part size} + i) \gets population(i)$\\
-      \Do{! respect Constraints}{
-        $individual \gets population(j \cdot \textit{best part size} + i)$\\
-        $candidates(0) \gets individual + perturbation$\\
-        $candidates(1) \gets candidate(0) + perturbation$\\
-        $candidates(2) \gets candidate(1) + perturbation$\\
-        sort(\textit{candidates})\\
-        $individual \gets candidates(0)$
-      }
-      $population(j \cdot \textit{best part size} + i) \gets individual$
-    }
-  }
-  \textit{generation++}
-}
-\Return{$population(0)$}\;
-\caption{Genetic Algorithm}\label{algo:GA}
+	\KwIn{Objective function and constraints, survival rate, max generations, population size}
+	\KwOut{Optimal solution}
+	generation $\gets 0$\\
+	best part size $\gets$ population size $\cdot$ survival rate\\
+	population $\gets$ get initial population\\
+	\While{\emph{generation} $<$ \emph{max generations}}{
+		sort(population)\\
+		\For{$j=1$ to \emph{round(1/survival rate)}}{
+			\For{$i=1$ to \emph{best part size}} {
+				population(j $\cdot$ best part size + i) $\gets$ population(i)\\
+				\Repeat{\emph{individual} respect constraints}{
+					individual $\gets$ population(j $\cdot$ best part size + i)\\
+					candidates(0) $\gets$ individual + perturbation\\
+					candidates(1) $\gets$ candidate(0) + perturbation\\
+					candidates(2) $\gets$ candidate(1) + perturbation\\
+					sort(candidates)\\
+					individual $\gets$ candidates(0)
+				}
+				population(j $\cdot$ best part size + i) \\
+			}
+		}
+		generation++ \\
+	}
+	\Return{population(0)}
+	\caption{Genetic Algorithm}\label{algo:GA}
 \end{algorithm}
 
-The parameters that can be tuned in order to achieve the best result are:
+Our \gls{ga} can be tuned with the following parameters.
 \begin{description}
 	\item[\textbf{Survival Rate}] \hfill \\
-	The fraction of population that is used to create the next generation;
+	The fraction of population that is used to create the next generation. A survival rate too high forces the algorihm to discard worse, but potentially interesting paths in favour of the current best, while a value too low reduces the progress across generations.
 	\item[\textbf{Max Generations}] \hfill \\
-	Number of generations created, this is actually the number of iteration of the algorithm. The duration of the computation is linearly dependent on this parameter.
-	\item[$\norm{population}$] \hfill \\
-	Number of individual in a population. This parameter affects the computational complexity of the algorithm. The larger the population, the more time will pass from one generation to another, since in each generation the objective function for each individual is computed.
+	Number of generations, the iterations of the algorithm. Note that exploration time is linear in this parameter.
+	\item[\textbf{Population size}] \hfill \\
+	Number of individual in a population. Increasing this parameter enhances performances but increase slightly the memory load and to a greater extent computation time.
 \end{description}
 
 \section{Results}
