@@ -273,7 +273,6 @@ Such solution is kept or rejected according to the \gls{ap}, whose expression is
 	\end{split}
 \end{equation*}
 
-
 The best point among all the explored ones is kept across the path and it is returned at the end of the computation.
 
 The algorithm is provided here as pseudocode in \autoref{algo:SA}.
@@ -377,7 +376,7 @@ Perturbations are performed as described earlier in \gls{sa} section.
 					sort(candidates)\\
 					individual $\gets$ candidates(0)
 				}
-				population(j $\cdot$ best part size + i) \\
+				population(j $\cdot$ best part size + i) $\gets$ individual \\
 			}
 		}
 		generation++ \\
@@ -399,10 +398,10 @@ Our \gls{ga} can be tuned with the following parameters.
 \section{Results}
 \label{sec:results}
 \begin{figure}
-  \centering
-	    \includegraphics[width=0.9\columnwidth]{ratiovsprob.eps}
-  \caption{Successfull decoding probability $P_s$ for different values of $N$, $K$ and decoding ratio $\nu$.}
-  \label{fig:ratiovsprob}
+	\centering
+	\includegraphics[width=0.9\columnwidth]{ratiovsprob.eps}
+	\caption{Successfull decoding probability $P_s$ for different values of $N$, $K$ and decoding ratio $\nu$.}
+	\label{fig:ratiovsprob}
 \end{figure}
 
 \section{Conclusions And Future Work}
