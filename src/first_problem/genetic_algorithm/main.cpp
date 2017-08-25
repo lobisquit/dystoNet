@@ -45,5 +45,5 @@ int main() {
 	cout << "]\n";
 
 	// save result to CSV
-	writeCSV(best_redundancy, "results/GA.csv");
+	writeCSV(best_redundancy, "results/EDFC/GA.csv");
 }

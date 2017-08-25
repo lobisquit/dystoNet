@@ -91,6 +91,8 @@ int main() {
 				JB.objective_function(no_redundancy)
 			) << "\n";
 
+	writeCSV(best_redundancy, "results/ADFC/JB-second.csv");
+
 	// std::cout << GA << "\n";
 	// GA.run_search(x);
 

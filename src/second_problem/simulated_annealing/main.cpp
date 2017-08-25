@@ -82,4 +82,6 @@ int main() {
 	std::cout << SA << "\n";
 
 	vector<double> best_redundancy = SA.run_search();
+
+	writeCSV(best_redundancy, "results/ADFC/SA-second.csv");
 }

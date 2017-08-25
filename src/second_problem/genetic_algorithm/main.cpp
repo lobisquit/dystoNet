@@ -75,5 +75,5 @@ int main() {
 	vector<double> best_redundancy = GA.run_search();
 
 	// save result to CSV
-	writeCSV(best_redundancy, "results/GA-second.csv");
+	writeCSV(best_redundancy, "results/ADFC/GA-second.csv");
 }

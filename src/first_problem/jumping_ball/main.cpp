@@ -42,5 +42,5 @@ int main() {
 								) << "\n";
 
 	// save result to CSV
-	writeCSV(best_redundancy, "results/JB.csv");
+	writeCSV(best_redundancy, "results/EDFC/JB.csv");
 }
