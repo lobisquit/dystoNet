@@ -162,7 +162,7 @@ Distributed Storage Networks, sensors, heuristic optimization
 \end{IEEEkeywords}
 
 \glsresetall
-\label{sec:introduction}
+\section{Introduction} \label{sec:introduction}
 We consider a \gls{wsn} whose nodes are distributed over a known region.
 Some of them, called \textit{sensing nodes}, collect and deploy data from the environment (temperature, pressure, motion data, \ldots) while the others, called \textit{caching nodes}, simply store data coming from \textit{sensing nodes}.
 
@@ -240,6 +240,8 @@ To overcome this issue, we chose the heuristic approach, whose convergence to th
 
 In fact the solutions obtained, despite not optimal, are still useful from a pragmatic point of view.
 
+%TODO put here primitives of heuristic search? (now in SA chapter)
+
 \subsection{Simulated Annealing}
 
 The first algorithm we implement is known as \gls{sa}.
@@ -260,14 +262,17 @@ For \gls{fp} we add an uniform variable, whose range is proportional to temperat
 
 Such solution is kept or rejected according to the \gls{ap}, whose expression is the following.
 
- \begin{equation*} \label{accept_prob}
-	P_A(T) = \begin{cases}
-		1 & f(\vec{x}_n)-f (\vec{x}_o) < 0 \\
-		\exp{ \left( C_A(T) \frac{
-					\, [f(\vec{x}_n) - f(\vec{x}_o)] }{T} \right) }
-		& f (\vec{x}_n)-f(\vec{x}_o) \geq 0
-  \end{cases}
- \end{equation*}
+\begin{equation*} \label{accept_prob}
+	\begin{split}
+	P_A(T) &= \begin{cases}
+		1 & \Delta < 0 \\
+		\exp{ \left( - C_A ~ \Delta / T \right) }
+		& \Delta \geq 0
+	\end{cases} \\
+	\text{where } \Delta &= f(\vec{x}_{new})-f (\vec{x})
+	\end{split}
+\end{equation*}
+
 
 The best point among all the explored ones is kept across the path and it is returned at the end of the computation.
 
