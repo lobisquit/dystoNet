@@ -79,15 +79,12 @@ vector<double> GeneticAlgorithm::run_search() {
 		*/
 		for(int j = 1; j < round(1/this->survival_rate); j++){
 			for(int i = 0; i < part_size; i++){
-
-
 				population[j * part_size + i] = population[i];
 
 				vector<double> candidate;
 
 				/** Mutation of  */
 				do {
-
 					candidate = population[j * part_size + i];
 
 					int chosen_d_1 = index_choice(rng);
