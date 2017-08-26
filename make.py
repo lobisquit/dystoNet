@@ -2,10 +2,12 @@
 from __future__ import print_function
 
 import argparse
+import configparser
 import os
 import subprocess
 import sys
 import webbrowser
+from collections import OrderedDict
 from pathlib import Path
 
 SRC_DIR = Path('src')
@@ -95,7 +97,7 @@ def build(package, dependencies):
 
 	return merge_compile(output_dir=Path('build') / package)
 
-def run(project):
+def run(project, config=[]):
 	'''
 		Execute a program compiled with build
 
@@ -103,12 +105,11 @@ def run(project):
 		----------
 		project : Path
 			path to the directory containing cpp files whose build has to be run
+		config: list (default [])
+			list containing fields required by script, in the right order and number
 	'''
-	# return exec_command('{path} > {output}'.format(
-	# 	path = Path('build') / project / PROGRAM_FILE,
-	# 	output = 'output.txt'
-	# ))
-	return exec_command(Path('build') / project / PROGRAM_FILE)
+	command = str(Path('build') / project / PROGRAM_FILE)
+	return exec_command(command + " " + " ".join(config))
 
 def docs():
 	''' Create doxygen output '''
@@ -135,6 +136,12 @@ if __name__ == '__main__':
 		nargs='*',
 		help='Packets that are needed to compile wanted package')
 
+	parser.add_argument('--configs',
+		dest='configs',
+		default=['configurations.ini'],
+		nargs='+',
+		help='Files containing parameter configurations to run')
+
 	cmd_args = parser.parse_args()
 
 	# act accordingly to selected mode parameter
@@ -160,10 +167,25 @@ if __name__ == '__main__':
 			sys.exit(build_result)
 
 		# run only if build was successfull
-		if build_result == 0 and cmd_args.mode in ['run', 'test']:
+		if build_result == 0 and cmd_args.mode in ['test']:
 			run_result = run(package)
 			if run_result != 0:
 				sys.exit(run_result)
+
+		if build_result == 0 and cmd_args.mode in ['run']:
+			# read config files given in configs argument
+			for config_file in cmd_args.configs:
+				config = configparser.ConfigParser(dict_type=OrderedDict)
+				config.read(config_file)
+
+				# loop through all section of file
+				for section in config.sections():
+					print('------> Running section "{}" of "{}"'.format(section, config_file))
+
+					# note that parameters MUST be in the right order in the ini file
+					run_result = run(package, config[section].values())
+					if run_result != 0:
+						sys.exit(run_result)
 
 	if cmd_args.mode == 'docs':
 		docs_result = docs()

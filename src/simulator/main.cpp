@@ -4,22 +4,24 @@
 #include <iostream>
 
 int main() {
-	int N = 100;
-	int K = 20;
+	int N = 2000;
+	int K = 1000;
 	double len_x = 10;
 	double len_y = 10;
-	double neighThresh = 15;
-	double c = 0.1;
-	double delta = 0.5;
+	double neighThresh = 5;
+	// double c = 0.01;
+	// double delta = 0.05;
 	int seed = 3;
 
 	/** Overhead coefficients */
-	vector<double> x = readCSV("results/GA.csv");
+	vector<double> x = readCSV("results/GAbest-g2=0.361393.csv");
 	for (double a: x) {
 		cout << a << "\n";
 	}
+
 	// vector<double> x(K, 1);
-	Distribution* d = new OverheadRobustSoliton(x, c, delta, K, seed);
+	// Distribution* d = new OverheadRobustSoliton(x, c, delta, K, seed);
+	Distribution* d = new Distribution(x, seed);
 
 	Network net = Network(N, K, len_x, len_y, neighThresh, d);
 
@@ -36,10 +38,10 @@ int main() {
 
 	cout << "N = " << N << ", K = " << K << ", Ps = [";
 	/** Number of times in which I pick randomly h nodes */
-	int m = 1000;
+	int m = 10;
 	/** Number of times I repeat the random process, to ensure the convergence,
 	* take the mean of the set of taken measures */
-	int t = 20;
+	int t = 10;
 	int ms, h, steps = 16;
 	/** Compute delta to build the linspace */
 	double delta_step = (2.5 - 1)/(steps - 1);

@@ -8,14 +8,35 @@
 #include "jumping_ball.h"
 #include "functionCSV.h"
 
-int main() {
-	int K = 1000;
-	int N = 2000;
+int main(int argc, char* argv[]) {
+	// note that first argv is the program executable itself
+	if (argc - 1 != 5) {
+		cerr << "Usage: algorithm needs five parameters to run, while " << argc << " are given\n";
+		return 1;
+	}
 
-	RobustSoliton rs = RobustSoliton(
-		/* c     */ 0.01,
-		/* delta */ 0.05,
-		            K, 1);
+	int K;
+	int N;
+	double c;
+	double delta;
+	int seed;
+
+	istringstream sK(argv[1]);
+	if (!(sK >> K)) { cerr << "Invalid K " << argv[1] << '\n'; }
+
+	istringstream sN(argv[2]);
+	if (!(sN >> N)) { cerr << "Invalid N " << argv[2] << '\n'; }
+
+	istringstream sc(argv[3]);
+	if (!(sc >> c)) { cerr << "Invalid c " << argv[3] << '\n'; }
+
+	istringstream sdelta(argv[4]);
+	if (!(sdelta >> delta)) { cerr << "Invalid delta " << argv[4] << '\n'; }
+
+	istringstream sseed(argv[5]);
+	if (!(sseed >> seed)) { cerr << "Invalid seed " << argv[5] << '\n'; }
+
+	RobustSoliton rs = RobustSoliton(c, delta, K, seed);
 
 	JumpingBall JB = JumpingBall(
 		/* K */ K,
@@ -41,6 +62,14 @@ int main() {
 								JB.objective_function(no_redundancy)
 								) << "\n";
 
-	// save result to CSV
-	writeCSV(best_redundancy, "results/EDFC/JB.csv");
+	ostringstream file_name_stream;
+	file_name_stream << "results/EDFC/JB"
+									 << "-K=" << K
+									 << "-N=" << N
+									 << "-c=" << c
+									 << "-delta=" << delta
+									 << "-seed=" << seed
+									 << ".csv";
+
+	writeCSV(best_redundancy, file_name_stream.str());
 }
