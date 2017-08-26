@@ -31,16 +31,19 @@ GeneticAlgorithm::GeneticAlgorithm(int K,
 	this->survival_rate = survival_rate;
 }
 
-vector<vector<double>> GeneticAlgorithm::get_initial_population() {
-	vector<vector<double>>
-		population(this->dim_population, vector<double>(this->K));
+vector<individual> GeneticAlgorithm::get_initial_population() {
+	vector<individual> population(this->dim_population);
+	// vector<vector<double>>
+	// 	population(this->dim_population, vector<double>(this->K));
 	for(int i = 0; i < this->dim_population; i++){
-		population[i] = FirstProblem::get_initial_solution();
-		cerr
+		population[i].values = FirstProblem::get_initial_solution();
+		population[i].obj_function = this->objective_function(population[i].values);
+		cout
 			<< "Created "
 			<< i+1 << "/" << this->dim_population
 			<< " elements \r";
 	}
+	cout << "\n";
 
 	return population;
 }
@@ -48,7 +51,7 @@ vector<vector<double>> GeneticAlgorithm::get_initial_population() {
 vector<double> GeneticAlgorithm::run_search() {
 	int generation = 0;
 
-	vector<vector<double>> population = get_initial_population();
+	vector<individual> population = get_initial_population();
 	/** Selection */
 	/** fraction of individuals picked for the next generation */
 	int part_size = ceil(this->dim_population * this->survival_rate);
@@ -56,23 +59,14 @@ vector<double> GeneticAlgorithm::run_search() {
 	uniform_real_distribution<double> mutation(-20, 20);
 	uniform_int_distribution<int> index_choice(0, K - 1);
 
-	vector<double> no_redundancy(this->K, 1);
-
-	double b0 = objective_function(no_redundancy);
-
 	while(generation < this->num_generations){
 		cout << generation << "/" << this->num_generations << "\n";
 		/** Sorting of the population */
-		std::sort(population.begin(), population.end(),
-			[this](vector<double> s1, vector<double> s2) -> bool {
-				return this->objective_function(s1) < this->objective_function(s2);
-			});
-
-		// cerr << "=====> "
-		// 	<< generation << "/" << this->num_generations
-		// 	<< " ==> g1 = "
-		// 	/** Best score for this generation, since vectors are sorted */
-		// 	<< this->objective_function(population[0]) / b0 << "\n";
+		// std::sort(population.begin(), population.end(),
+		// 	[this](vector<double> s1, vector<double> s2) -> bool {
+		// 		return this->objective_function(s1) < this->objective_function(s2);
+		// 	});
+		std::sort(population.begin(), population.end(), by_obj_function());
 
 		/** Copy the best individuals in the population, and then
 		* perturbe them checking constraints are still met.
@@ -81,7 +75,7 @@ vector<double> GeneticAlgorithm::run_search() {
 			for(int i = 0; i < part_size; i++){
 				population[j * part_size + i] = population[i];
 
-				vector<double> candidate;
+				individual candidate;
 
 				/** Mutation of  */
 				do {
@@ -91,34 +85,34 @@ vector<double> GeneticAlgorithm::run_search() {
 					int chosen_d_2 = index_choice(rng);
 					int chosen_d_3 = index_choice(rng);
 
-					candidate[chosen_d_1] = population[j * part_size + i][chosen_d_1] + mutation(rng);
-					vector<double> candidate_1 = candidate;
-					candidate[chosen_d_2] = population[j * part_size + i][chosen_d_2] + mutation(rng);
-					vector<double> candidate_2 = candidate;
-					candidate[chosen_d_3] = population[j * part_size + i][chosen_d_3] + mutation(rng);
-					vector<double> candidate_3 = candidate;
+					candidate.values[chosen_d_1] = population[j * part_size + i].values[chosen_d_1] + mutation(rng);
+					candidate.obj_function = this->update_objective_function(candidate.values, population[j * part_size + i]);
+					individual candidate_1 = candidate;
+					candidate.values[chosen_d_2] = population[j * part_size + i].values[chosen_d_2] + mutation(rng);
+					candidate.obj_function = this->update_objective_function(candidate.values, population[j * part_size + i]);
+					individual candidate_2 = candidate;
+					candidate.values[chosen_d_3] = population[j * part_size + i].values[chosen_d_3] + mutation(rng);
+					candidate.obj_function = this->update_objective_function(candidate.values, population[j * part_size + i]);
+					individual candidate_3 = candidate;
 
-					vector<vector<double>> first_selection;
+					vector<individual> first_selection;
 
 					first_selection.push_back(candidate_1);
 					first_selection.push_back(candidate_2);
 					first_selection.push_back(candidate_3);
 
-					std::sort(first_selection.begin(), first_selection.end(),
-						[this](vector<double> f1, vector<double> f2) -> bool {
-							return this->objective_function(f1) < this->objective_function(f2);
-						});
+					std::sort(first_selection.begin(), first_selection.end(), by_obj_function());
 
 					candidate=first_selection[0];
 
-				} while(!respect_constraints(candidate));
+				} while(!update_respect_constraints(candidate,  population[j * part_size + i]));
 
 				population[j * part_size + i] = candidate;
 			}
 		}
 		generation++;
 	}
-	return population[0];
+	return population[0].values;
 }
 
 vector<double> get_neighbour(vector<double> x) {

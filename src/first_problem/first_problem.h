@@ -12,6 +12,11 @@
 #ifndef _FIRST_PROBLEM_H_
 #define _FIRST_PROBLEM_H_
 
+struct individual{
+	vector<double> values;
+	double obj_function = 0;
+};
+
 class FirstProblem : public HeuristicSearch {
 	public:
 		/** Random numbers generator */
@@ -49,8 +54,10 @@ class FirstProblem : public HeuristicSearch {
 		}
 
 		double objective_function(vector<double> x);
+		double update_objective_function(vector<double> x, individual old_x);
 		vector<double> get_initial_solution();
 		bool respect_constraints(vector<double> candidate_x);
+		bool update_respect_constraints(individual candidate_x, individual old_x);
 
 		// functions to implement in lower classes
 		vector<double> get_neighbour(vector<double> x);
