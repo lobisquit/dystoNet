@@ -12,12 +12,6 @@ using namespace std;
 
 
 int main(int argc, char* argv[]) {
-	// note that first argv is the program executable itself
-	if (argc - 1 != 5) {
-		cerr << "Usage: algorithm needs five parameters to run, while " << argc << " are given\n";
-		return 1;
-	}
-
 	int K;
 	int N;
 	double c;
