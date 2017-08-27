@@ -2,7 +2,7 @@
 from __future__ import print_function
 
 import argparse
-import configparser
+import json
 import os
 import subprocess
 import sys
@@ -60,6 +60,44 @@ def merge_compile(output_dir):
 		" ".join(object_files),
 		output_dir / PROGRAM_FILE))
 
+def iter_options(l):
+	'''
+		Loop through options of parameters
+
+		Parameters
+		----------
+		l: list
+			l contains parameters (as simple values) or
+			variants of current parameter (as list or tuple)
+			ex. [1, 2, ['a', 'b']]
+
+			No further nesting is intended for this function
+	'''
+	# no variations for empty list
+	if len(l) == 0:
+		return [[]]
+
+	combinations = []
+
+	if isinstance(l[0], (list, tuple)):
+		head = []
+
+		# current element has variants
+		for variant in l[0]:
+			head.append(variant)
+	else:
+		# only a single variant in current head
+		head = [ l[0] ]
+
+	tail_combinations = iter_options(l[1:])
+
+	# loop through each head-tail combination and save it
+	for version in head:
+		for tail in tail_combinations:
+			combinations.append([version] + tail)
+
+	return combinations
+
 def clean():
 	''' Remove all build artifacts from BUILD_DIR '''
 
@@ -109,7 +147,7 @@ def run(project, config=[]):
 			list containing fields required by script, in the right order and number
 	'''
 	command = str(Path('build') / project / PROGRAM_FILE)
-	return exec_command(command + " " + " ".join(config))
+	return exec_command(command + " " + " ".join([str(arg) for arg in config]))
 
 def docs():
 	''' Create doxygen output '''
@@ -121,7 +159,7 @@ if __name__ == '__main__':
 
 	parser.add_argument('--mode',
 		dest='mode',
-		choices=['build', 'run', 'docs', 'test'],
+		choices=['build', 'run', 'docs', 'test', 'dry-run'],
 		default='run',
 		help='Select operation mode (voices of this Makefile)')
 
@@ -138,21 +176,20 @@ if __name__ == '__main__':
 
 	parser.add_argument('--configs',
 		dest='configs',
-		default=['configurations.ini'],
+		default=['configs.json'],
 		nargs='+',
-		help='Files containing parameter configurations to run')
+		help='JSON files containing parameter configurations to run')
 
 	cmd_args = parser.parse_args()
 
 	# act accordingly to selected mode parameter
-	if cmd_args.mode in ['build', 'run', 'test']:
+	if cmd_args.mode in ['build', 'run', 'test', 'dry-run']:
 		# always clean the environment in these cases
 		clean()
 
 		# create paths for dependencies in SRC_DIR
 		dep_paths = [SRC_DIR / dep for dep in cmd_args.deps]
-
-		if cmd_args.mode in ['build', 'run']:
+		if cmd_args.mode in ['build', 'run', 'dry-run']:
 			# in build mode, package is expected to be in SRC_DIR
 			package = SRC_DIR / cmd_args.package
 
@@ -172,20 +209,31 @@ if __name__ == '__main__':
 			if run_result != 0:
 				sys.exit(run_result)
 
-		if build_result == 0 and cmd_args.mode in ['run']:
+		if build_result == 0 and cmd_args.mode in ['run', 'dry-run']:
 			# read config files given in configs argument
 			for config_file in cmd_args.configs:
-				config = configparser.ConfigParser(dict_type=OrderedDict)
-				config.read(config_file)
+				with open(config_file) as data_file:
+					data = json.load(data_file, object_pairs_hook=OrderedDict)
 
-				# loop through all section of file
-				for section in config.sections():
-					print('------> Running section "{}" of "{}"'.format(section, config_file))
+					for section in data:
+						# read parameters of current section
+						params = list(data[section]['problem'].values())
 
-					# note that parameters MUST be in the right order in the ini file
-					run_result = run(package, config[section].values())
-					if run_result != 0:
-						sys.exit(run_result)
+						# load additional parameters if running simulator
+						if package == SRC_DIR / Path("simulator"):
+							params.extend(data[section]['simulator'].values())
+
+						# loop through all variants of parameters
+						configurations = iter_options(params)
+						for index, configuration in enumerate(configurations):
+							print('------> Running {} of section {} of {}: {}/{}'.format(
+								configuration, section, config_file, index+1, len(configurations)))
+
+							if cmd_args.mode != 'dry-run':
+								# run current configuration
+								run_result = run(package, configuration)
+								if run_result != 0:
+									sys.exit(run_result)
 
 	if cmd_args.mode == 'docs':
 		docs_result = docs()
