@@ -1,0 +1,138 @@
+{
+    "Lin2007": {
+        "problem": {
+            "K": 1000,
+            "N": 2000,
+            "c": 0.01,
+            "delta": 0.05,
+            "seed": 1
+        },
+
+        "simulator" : {
+            "len_x": 10,
+            "len_y": 10,
+            "neigh_treshold": 5,
+            "problem": ["EDFC", "ADFC"],
+            "solutor": ["GA", "SA", "JB"]
+        }
+    },
+    "Aly2008 small network 1": {
+        "problem": {
+            "K": 10,
+            "N": 100,
+            "c": 0.01,
+            "delta": 0.05,
+            "seed": 1
+        },
+
+        "simulator" : {
+            "len_x": 10,
+            "len_y": 10,
+            "neigh_treshold": 5,
+            "problem": ["EDFC", "ADFC"],
+            "solutor": ["GA", "SA", "JB"]
+        }
+    },
+    "Aly2008 small network 2": {
+        "problem": {
+            "K": 20,
+            "N": 100,
+            "c": 0.01,
+            "delta": 0.05,
+            "seed": 1
+        },
+
+        "simulator" : {
+            "len_x": 10,
+            "len_y": 10,
+            "neigh_treshold": 5,
+            "problem": ["EDFC", "ADFC"],
+            "solutor": ["GA", "SA", "JB"]
+        }
+    },
+    "Aly2008 small network 3": {
+        "problem": {
+            "K": 20,
+            "N": 200,
+            "c": 0.01,
+            "delta": 0.05,
+            "seed": 1
+        },
+
+        "simulator" : {
+            "len_x": 10,
+            "len_y": 10,
+            "neigh_treshold": 5,
+            "problem": ["EDFC", "ADFC"],
+            "solutor": ["GA", "SA", "JB"]
+        }
+    },
+    "Aly2008 small network 3": {
+        "problem": {
+            "K": 20,
+            "N": 200,
+            "c": 0.01,
+            "delta": 0.05,
+            "seed": 1
+        },
+
+        "simulator" : {
+            "len_x": 10,
+            "len_y": 10,
+            "neigh_treshold": 5,
+            "problem": ["EDFC", "ADFC"],
+            "solutor": ["GA", "SA", "JB"]
+        }
+    },
+    "Aly2008 small network 4": {
+        "problem": {
+            "K": 40,
+            "N": 200,
+            "c": 0.01,
+            "delta": 0.05,
+            "seed": 1
+        },
+
+        "simulator" : {
+            "len_x": 10,
+            "len_y": 10,
+            "neigh_treshold": 5,
+            "problem": ["EDFC", "ADFC"],
+            "solutor": ["GA", "SA", "JB"]
+        }
+    },
+    "Aly2008 medium network 1": {
+        "problem": {
+            "K": 50,
+            "N": 500,
+            "c": 0.01,
+            "delta": 0.05,
+            "seed": 1
+        },
+
+        "simulator" : {
+            "len_x": 10,
+            "len_y": 10,
+            "neigh_treshold": 5,
+            "problem": ["EDFC", "ADFC"],
+            "solutor": ["GA", "SA", "JB"]
+        }
+    },
+    "Aly2008 medium network 2": {
+        "problem": {
+            "K": 100,
+            "N": 1000,
+            "c": 0.01,
+            "delta": 0.05,
+            "seed": 1
+        },
+
+        "simulator" : {
+            "len_x": 10,
+            "len_y": 10,
+            "neigh_treshold": 5,
+            "problem": ["EDFC", "ADFC"],
+            "solutor": ["GA", "SA", "JB"]
+        }
+    }
+}

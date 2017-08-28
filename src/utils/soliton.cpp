@@ -11,7 +11,18 @@ Distribution::Distribution(int seed) {
 }
 
 Distribution::Distribution(vector<double> probabilities, int seed) {
-	// TODO check probabilities
+	// check distribution is a proper one
+	double sum = 0;
+	for (double p: probabilities) {
+		if (p < 0 || p > 1) {
+			throw invalid_argument("Distribution: probability value is out of range [0, 1]");
+		}
+		sum += p;
+	}
+	if (sum - 1.0 > 1e-12) {
+		throw invalid_argument("Distribution: probabilities don't sum to 1");
+	}
+
 	this->probabilities = probabilities;
 
 	// set random number generator
@@ -127,7 +138,7 @@ double RobustSoliton::get_tau(int degree, double R) {
 	if (degree >= 1 && degree <= K/R - 1) {
 		return R / (degree * K);
 	}
-	if (degree == K/R) {
+	if (degree == (int) K/R) {
 		return R * log(R / delta) / K;
 	}
 	return 0;
