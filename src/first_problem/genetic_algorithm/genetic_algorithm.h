@@ -14,12 +14,6 @@
 
 using namespace std;
 
-struct by_obj_function {
-	bool operator()(individual const &a, individual const &b) {
-		return a.obj_function < b.obj_function;
-	}
-};
-
 class GeneticAlgorithm : public FirstProblem {
 	public:
 		/** Percentage of population that survives the next turn */
@@ -67,7 +61,7 @@ class GeneticAlgorithm : public FirstProblem {
 		* Create the first generation, with random values within the range of
 		* the possible solution.
 		*/
-		vector<individual> get_initial_population();
+		vector<vector<double>> get_initial_population();
 };
 
 #endif
