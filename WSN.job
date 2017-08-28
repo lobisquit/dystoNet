@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Genera output ed errori nella cartella corrente.
+# Se non specificato diversamente output ed errori
+# vengono rediretti rispettivamente nei 2 file
+# convert.job.oJOBID e convert.job.eJOBID
+#
+#$ -cwd
+
+cd /home/lovisott/dystoNet/
+
+# example of execution
+date
+python3 make.py --deps second_problem utils --package second_problem/genetic_algorithm --mode run --configs test.json
+date
