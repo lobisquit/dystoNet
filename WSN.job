@@ -7,9 +7,9 @@
 #
 #$ -cwd
 
-cd /home/lovisott/dystoNet/
+cd ~/dystoNet/
 
 # example of execution
 date
-python3 make.py --deps second_problem utils --package second_problem/genetic_algorithm --mode run --configs test.json
+python3 make.py --deps first_problem utils --package first_problem/genetic_algorithm --mode run --configs sample.json
 date
