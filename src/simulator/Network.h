@@ -65,5 +65,6 @@ class Network {
 
 		/** Visit to the network */
 		vector<vector<int>> collector(int h);
-		bool message_passing(int h, vector<vector<int>> en_matrix);
 };
+
+bool message_passing(int h, vector<vector<int>> en_matrix);

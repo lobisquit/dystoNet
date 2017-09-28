@@ -155,56 +155,45 @@ vector<vector<int>> Network::collector(int h) {
 	return en_matrix;
 }
 
-bool Network::message_passing(int h, vector<vector<int>> en_matrix){
+bool message_passing(int h, vector<vector<int>> en_matrix) {
 	vector<int> degrees(h);
 	bool decoded, fail = false;
 
-	while(fail == false){
+	while (fail == false) {
 		decoded = true;
 		/** Compute degree of each packet in the matrix */
 		for (int i=0; i<h; i++) {
-			vector<int> row = en_matrix[i];
+			vector<int>* row = &en_matrix[i];
 			int degree = 0;
-			for (int j: row) {
+			for (int j: *row) {
 				degree += j;
 			}
-			if(degree > 0){
+			if (degree > 1) {
 				decoded = false;
 			}
 			degrees.at(i) = degree;
 		}
-		if(decoded == true){
+		if (decoded == true) {
 			return true;
 		}
 		/** Simplify one-degree nodes */
 		fail = true;
-		for(int i=0;i<h;i++){
-			if(degrees.at(i)==1){
+		for (int i=0; i<h; i++){
+			if (degrees.at(i) == 1){
 				// cout << "\n One-degree at row " << i;
 				fail = false;
 				/** Simplify the packet of the one-degree node */
-				vector<int> one_degree = en_matrix[i];
-				for(unsigned int j=0;j<one_degree.size();j++){
-					if(one_degree.at(j) == 1){
+				vector<int>* one_degree = &en_matrix[i];
+				for (unsigned int j = 0; j < one_degree->size(); j++) {
+					if (one_degree->at(j) == 1){
 						// cout << " and column " << j;
-						for(unsigned int row = 0; row < en_matrix.size(); row++){
+						for (unsigned int row = 0; row < en_matrix.size(); row++) {
 								en_matrix[row][j] = 0;
 						}
 					}
 				}
 			}
 		}
-		// cout << "\n Encoding Matrix: \n";
-		// for (vector<int> row: en_matrix) {
-		// 	int degree = 0;
-		// 	for (int i: row) {
-		// 		degree += i;
-		// 		cout << i << ", ";
-		// 	}
-		// 	cout << "\n";
-		// 	cout << "degree = " << degree;
-		// 	cout << "\n";
-		// }
 	}
 	return false;
 }

@@ -96,7 +96,7 @@ int main(int argc, char* argv[]) {
 			ms = 0;
 			for(int i = 0; i < m; i++){
 				en_matrix = net.collector(h);
-				ms += net.message_passing(h, en_matrix);
+				ms += message_passing(h, en_matrix);
 			}
 			mean += (double)ms/m;
 		}
