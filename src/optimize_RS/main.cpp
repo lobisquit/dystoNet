@@ -79,7 +79,7 @@ int main(int argc, char* argv[]) {
 
 			double mean_dec_probability = 0;
 			for (int trial = 0; trial < number_of_trials; trial++) {
-				cout << "trial " << trial << "\r";
+				// cout << "trial " << trial << "\r";
 
 				RobustSoliton rs = RobustSoliton(c, delta, K, seed);
 
