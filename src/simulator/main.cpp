@@ -2,6 +2,7 @@
 #include "Node.h"
 #include "functionCSV.h"
 #include <iostream>
+#include "FC.h"
 
 int main(int argc, char* argv[]) {
 	int K;

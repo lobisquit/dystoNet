@@ -1,7 +1,8 @@
-#include "Network.h"
 #include <iostream>
 #include "soliton.h"
 #include <algorithm>
+#include "functionCSV.h"
+#include "FC.h"
 
 using namespace std;
 
@@ -65,13 +66,12 @@ int main(int argc, char* argv[]) {
 		indeces.push_back(i);
 	}
 
-	// store successful decoding probability of each (c, eta) couple
-	vector<vector<double>> dec_probabilities
-		(number_of_cs, vector<double>(number_of_decoding_ratios, 0));
-
 	for (unsigned int c_index = 0; c_index < cs.size(); c_index++) {
 		double c = cs[c_index];
 		cout << "c index = " << c_index << "/" << cs.size() << "\n";
+
+		// store successful decoding probability of each (c, eta) couple
+		vector<double> dec_probabilities(number_of_decoding_ratios, 0);
 
 		for (unsigned int eta_index = 0; eta_index < etas.size(); eta_index++) {
 			cout << "eta index = " << eta_index << "/" << etas.size() << "\n";
@@ -100,14 +100,17 @@ int main(int argc, char* argv[]) {
 			}
 			mean_dec_probability /= number_of_trials;
 
-			dec_probabilities[c_index][eta_index] = mean_dec_probability;
+			dec_probabilities[eta_index] = mean_dec_probability;
 		}
-	}
 
-	for (vector<double> row: dec_probabilities) {
-		for (double p: row) {
-			cout << p << ", ";
-		}
-		cout << "\n";
+		// for every c, output results
+		ostringstream file_name_stream;
+		file_name_stream << "results/optimize_c/trials"
+										 << "-K=" << K
+										 << "-N=" << N
+										 << "-etas=(" << etas.front() << ", " << etas.back() << ", " << etas.size() << ")"
+										 << "-delta=" << delta
+										 << ".csv";
+		writeCSV(dec_probabilities, file_name_stream.str());
 	}
 }
