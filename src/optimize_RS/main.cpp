@@ -81,7 +81,7 @@ int main(int argc, char* argv[]) {
 			for (int trial = 0; trial < number_of_trials; trial++) {
 				// cout << "trial " << trial << "\r";
 
-				RobustSoliton rs = RobustSoliton(c, delta, K, seed);
+				RobustSoliton rs = RobustSoliton(c, delta, K, trial);
 
 				// populate coding matrix
 				vector<vector<int>> coding_matrix(max_rows, vector<int>(K, 0));
