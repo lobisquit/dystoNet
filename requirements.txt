@@ -1,0 +1,13 @@
+cairocffi==0.8.0
+cffi==1.11.0
+cycler==0.10.0
+gobject==0.1.0
+matplotlib==2.0.2
+numpy==1.13.3
+pandas==0.20.3
+pathlib==1.0.1
+pycparser==2.18
+pyparsing==2.2.0
+python-dateutil==2.6.1
+pytz==2017.2
+six==1.11.0
