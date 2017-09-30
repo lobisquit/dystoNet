@@ -12,6 +12,6 @@ cd ~/dystoNet/
 # example of execution
 date
 source venv/bin/activate
-python make.py --package optimize_RS --deps simulator utils --configs configs.json
+python make.py --package optimize_RS --deps utils --configs configs.json
 # python3 make.py --deps first_problem utils --package first_problem/genetic_algorithm --mode run --configs sample.json
 date
