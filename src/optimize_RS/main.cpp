@@ -108,7 +108,10 @@ int main(int argc, char* argv[]) {
 		file_name_stream << "results/optimize_c/trials"
 										 << "-K=" << K
 										 << "-N=" << N
-										 << "-etas=(" << etas.front() << ", " << etas.back() << ", " << etas.size() << ")"
+										 << "-c=" << c
+										 << "-etas=" << etas.front()
+										 << "," << etas.back()
+										 << "," << etas.size()
 										 << "-delta=" << delta
 										 << ".csv";
 		writeCSV(dec_probabilities, file_name_stream.str());
