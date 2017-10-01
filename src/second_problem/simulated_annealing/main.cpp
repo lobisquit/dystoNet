@@ -6,6 +6,7 @@
 #include <ctime>
 #include "soliton.h"
 #include "simulated_annealing.h"
+#include "functionCSV.h"
 
 int main(int argc, char* argv[]) {
 	int K;

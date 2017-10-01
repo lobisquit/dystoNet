@@ -43,13 +43,12 @@ individual JumpingBall::get_neighbour(individual old_individual) {
 
 	individual new_individual;
 
-	int first_d;
-	int second_d;
+	int first_d = 0;
+	int second_d = 0;
 
 	// count number of steps taken that lead to a
 	// solution worse than the current top
 	do {
-
 		// setup random variables
 
 		uniform_int_distribution<int> index_choice(0, this->K-1);

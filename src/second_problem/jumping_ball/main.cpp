@@ -6,6 +6,7 @@
 #include <ctime>
 #include "soliton.h"
 #include "jumping_ball.h"
+#include "functionCSV.h"
 
 int main(int argc, char* argv[]) {
 	int K;
