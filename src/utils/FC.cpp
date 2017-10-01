@@ -100,3 +100,12 @@ void print_vector(vector<int> v) {
 	cout << "\n";
 	cout << "---------------------------\n";
 }
+
+void print_vector(vector<double> v) {
+	cout << "---------------------------\n";
+	for (double element: v) {
+		cout << element << "\t";
+	}
+	cout << "\n";
+	cout << "---------------------------\n";
+}
