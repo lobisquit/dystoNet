@@ -58,22 +58,18 @@ vector<double> GeneticAlgorithm::run_search() {
 
 	vector<double> no_redundancy(this->K, 1);
 
+	// keep memory of best result of last iteration
+	double current_g1 = 0;
+	int worsening_counter = 0;
+
 	while(generation < this->num_generations){
-		cout
-			<< generation << "/" << this->num_generations
-			<< ", f = " << (this->objective_function(population[0]) / this->objective_function(no_redundancy))
-			<< "\n";
+		current_g1 = this->objective_function(population[0]) / this->objective_function(no_redundancy);
+
 		/** Sorting of the population */
 		std::sort(population.begin(), population.end(),
 			[this](vector<double> s1, vector<double> s2) -> bool {
 				return this->objective_function(s1) < this->objective_function(s2);
 			});
-
-		// cerr << "=====> "
-		// 	<< generation << "/" << this->num_generations
-		// 	<< " ==> g1 = "
-		// 	/** Best score for this generation, since vectors are sorted */
-		// 	<< this->objective_function(population[0]) / b0 << "\n";
 
 		/** Copy the best individuals in the population, and then
 		* perturbe them checking constraints are still met.
@@ -117,6 +113,27 @@ vector<double> GeneticAlgorithm::run_search() {
 				population[j * part_size + i] = candidate;
 			}
 		}
+
+		/**
+		 * If improvement is too small for too many iterations, stop.
+		 */
+		double new_g1 = this->objective_function(population[0]) / this->objective_function(no_redundancy);
+		if (new_g1 > current_g1 - 0.00001) {
+			worsening_counter++;
+		}
+		else {
+			worsening_counter = 0;
+		}
+		if (worsening_counter > 100) {
+			break;
+		}
+
+		cerr << "=====> "
+				 << generation << "/" << this->num_generations
+				 << " ==> g1 = " << current_g1
+				 << " ==> new_g1 = " << new_g1
+				 << " ==> worsening_steps = " << worsening_counter << "\n";
+
 		generation++;
 	}
 	return population[0];
