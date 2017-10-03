@@ -59,7 +59,10 @@ vector<double> GeneticAlgorithm::run_search() {
 	vector<double> no_redundancy(this->K, 1);
 
 	while(generation < this->num_generations){
-		cout << generation << "/" << this->num_generations << "\n";
+		cout
+			<< generation << "/" << this->num_generations
+			<< ", f = " << (this->objective_function(population[0]) / this->objective_function(no_redundancy))
+			<< "\n";
 		/** Sorting of the population */
 		std::sort(population.begin(), population.end(),
 			[this](vector<double> s1, vector<double> s2) -> bool {
