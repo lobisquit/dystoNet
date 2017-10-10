@@ -3,6 +3,7 @@
 #include "functionCSV.h"
 #include <iostream>
 #include "FC.h"
+#include "vector_utils.h"
 
 int main(int argc, char* argv[]) {
 	int K;
@@ -40,7 +41,7 @@ int main(int argc, char* argv[]) {
 
 	ostringstream file_name_stream;
 	file_name_stream << "results/"
-									 << argv[9] // problem to solve (EDFC or ADFC)
+									 << argv[9]  // problem to solve (EDFC or ADFC)
 									 << "/"
 									 << argv[10] // solutor employed to solve problem
 									 << "-K=" << K
@@ -49,6 +50,11 @@ int main(int argc, char* argv[]) {
 									 << "-delta=" << delta
 									 << "-seed=" << seed
 									 << ".csv";
+
+	cout
+		<< "... working on "
+		<< file_name_stream.str()
+		<< "\n";
 
 	vector<double> x = readCSV(file_name_stream.str());
 
@@ -63,45 +69,58 @@ int main(int argc, char* argv[]) {
 		cerr << "Invalid problem: " << argv[9] << "\n";
 	}
 
-	Network net = Network(N, K, len_x, len_y, neigh_threshold, d);
+	// avoid very bad solutions, i.e. distribution where the
+	// expected number of packets from each node is too high
 
+	if (d->expectation() > 10 || 1) {
+		cout
+			<< "Solution provided by "
+			<< file_name_stream.str()
+			<< " is suboptimal! E[d] = "
+			<< d->expectation()
+			<< "\n";
+		exit(0);
+	}
+
+	// create Network and perform encoding
+	Network net = Network(N, K, len_x, len_y, neigh_threshold, d);
 	net.spread_packets();
 
-	Node* nodes = net.get_nodes();
-	for (int i=0; i<net.get_nodes_size(); i++) {
-		cout
-			<< nodes[i]
-			<< " -> "
-			<< nodes[i].get_packets().size()
-			<< "\n";
+	int number_of_etas = 10;
+	int number_of_trials = 100;
+
+	vector<double> decoding_probs(number_of_etas, 0);
+
+	// loop through all eta values wanted, e.g. 10
+	for (double eta: linspace(1, 2.5, number_of_etas)) {
+		double decoding_prob = 0;
+
+		vector<vector<int>> en_matrix;
+		unsigned int h = (unsigned int) K * eta;
+
+		// repeat process many times, to compute successful probability
+		for (int i=0; i<number_of_trials; i++) {
+			// collect packets from h nodes randomly across N
+			en_matrix = net.collector(h);
+			decoding_prob += message_passing(h, en_matrix) ? 1 : 0;
+		}
+		decoding_prob /= number_of_trials;
+
+		// add probability to output vector
+		decoding_probs.push_back(decoding_prob);
 	}
 
-	cout << "N = " << N << ", K = " << K << ", Ps = [";
-	/** Number of times in which I pick randomly h nodes */
-	int m = 10;
-	/** Number of times I repeat the random process, to ensure the convergence,
-	* take the mean of the set of taken measures */
-	int t = 10;
-	int ms, h, steps = 16;
-	/** Compute delta to build the linspace */
-	double delta_step = (2.5 - 1)/(steps - 1);
-	for (int j = 0; j<steps; j++) {
-		cout << "j= " << j << "\n";
-		h = round(K * (1+j*delta_step));
-		vector<vector<int>> en_matrix;
-		/** Random number generator used in random_shuffle function */
-		srand(time(0));
-		double mean = 0;
-		for(int z = 0; z < t; z++){
-			cout << "z= " << z << "\r";
-			ms = 0;
-			for(int i = 0; i < m; i++){
-				en_matrix = net.collector(h);
-				ms += message_passing(h, en_matrix);
-			}
-			mean += (double)ms/m;
-		}
-		cout << mean/t << ", ";
-	}
-	cout << "]\n";
+	ostringstream output_file_stream;
+	output_file_stream << "results/simulator/"
+									 << "etas"
+									 << "-problem=" << argv[9]  // problem to solve (EDFC or ADFC)
+									 << "-solutor=" << argv[10] // solutor employed to solve problem
+									 << "-K=" << K
+									 << "-N=" << N
+									 << "-c=" << c
+									 << "-delta=" << delta
+									 << "-seed=" << seed
+									 << ".csv";
+
+	writeCSV(decoding_probs, output_file_stream.str());
 }

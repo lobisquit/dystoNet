@@ -81,9 +81,9 @@ int Network::get_nodes_size() {
 void Network::spread_packets() {
 	// perform a random walk for each packet
 	for (int i = 0; i < this->get_packets_size(); i++) {
-		cout
+		cerr
 			<< "Spreading pkt " << (i + 1)
-			<< "/" << this->get_packets_size() << "\r";
+			<< "/" << this->get_packets_size() << "\n";
 
 		// add packet to sensing (source) node
 		Packet* pkt = &this->packets[i];
@@ -104,7 +104,7 @@ void Network::spread_packets() {
 		// add pkt to the final step of random walk
 		node->add_packet(pkt);
 	}
-	cout << "\n";
+	cerr << "\n";
 
 	// keep only "degree" packets for each node
 	for (int i = 0; i < this->get_nodes_size(); i++) {

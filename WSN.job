@@ -11,13 +11,8 @@ cd ~/dystoNet/
 
 # example of execution
 date
-source venv/bin/activate
-python make.py --package first_problem/simulated_annealing --deps utils first_problem --mode dry-run
-python make.py --package first_problem/jumping_ball --deps utils first_problem first_problem/simulated_annealing --mode dry-run
-python make.py --package first_problem/genetic_algorithm --deps utils first_problem --mode dry-run
 
-python make.py --package second_problem/simulated_annealing --deps utils second_problem --mode dry-run
-python make.py --package second_problem/jumping_ball --deps utils second_problem second_problem/simulated_annealing --mode dry-run
-python make.py --package second_problem/genetic_algorithm --deps utils second_problem --mode dry-run
+source venv/bin/activate
+python make.py --package simulator --deps utils
 
 date
