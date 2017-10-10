@@ -69,19 +69,6 @@ int main(int argc, char* argv[]) {
 		cerr << "Invalid problem: " << argv[9] << "\n";
 	}
 
-	// avoid very bad solutions, i.e. distribution where the
-	// expected number of packets from each node is too high
-
-	if (d->expectation() > 10 || 1) {
-		cout
-			<< "Solution provided by "
-			<< file_name_stream.str()
-			<< " is suboptimal! E[d] = "
-			<< d->expectation()
-			<< "\n";
-		exit(0);
-	}
-
 	// create Network and perform encoding
 	Network net = Network(N, K, len_x, len_y, neigh_threshold, d);
 	net.spread_packets();
