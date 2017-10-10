@@ -89,7 +89,7 @@ int main(int argc, char* argv[]) {
 	int number_of_etas = 10;
 	int number_of_trials = 100;
 
-	vector<double> decoding_probs(number_of_etas, 0);
+	vector<double> decoding_probs;
 
 	// loop through all eta values wanted, e.g. 10
 	for (double eta: linspace(1, 2.5, number_of_etas)) {
