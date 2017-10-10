@@ -3,18 +3,9 @@
 #include <algorithm>
 #include "functionCSV.h"
 #include "FC.h"
+#include "vector_utils.h"
 
 using namespace std;
-
-vector<double> linspace(double start, double stop, int num) {
-	vector<double> out;
-	double step = (stop - start) / (num - 1);
-
-	for (int i = 0; i < num; i++) {
-		out.push_back(start + i*step);
-	}
-	return out;
-}
 
 double max(vector<double> v) {
 	double max_value = -1 * numeric_limits<double>::infinity();
