@@ -11,7 +11,7 @@ Network::Network(
 	double len_y,
 	double max_distance,
 	Distribution* distribution) {
-	cout << "======> Building network\n";
+	cerr << "======> Building network\n";
 
 	// setup random number generation
 	this->rng = distribution->get_rng();
@@ -59,7 +59,7 @@ Network::Network(
 		}
 	}
 
-	cout << "======> Network built \n";
+	cerr << "======> Network built \n";
 }
 
 Node* Network::get_nodes() {
