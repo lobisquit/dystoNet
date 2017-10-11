@@ -13,6 +13,6 @@ cd ~/dystoNet/
 date
 
 source venv/bin/activate
-python make.py --package simulator --deps utils
+python make.py --package simulator --deps utils first_problem second_problem
 
 date

@@ -4,6 +4,9 @@
 #include <iostream>
 #include "FC.h"
 #include "vector_utils.h"
+#include "first_problem.h"
+#include "second_problem.h"
+#include "soliton.h"
 
 int main(int argc, char* argv[]) {
 	int K;
@@ -30,6 +33,19 @@ int main(int argc, char* argv[]) {
 	istringstream sseed(argv[5]);
 	if (!(sseed >> seed)) { cerr << "Invalid seed " << argv[5] << '\n'; }
 
+	// // avoid very bad solutions, i.e. distribution where the
+	// // expected number of packets from each node is too high
+
+	// if (d->expectation() > 10 || 1) {
+	// 	cout
+	// 		<< "Solution provided by "
+	// 		<< file_name_stream.str()
+	// 		<< " is suboptimal! E[d] = "
+	// 		<< d->expectation()
+	// 		<< "\n";
+	// 	exit(0);
+	// } " << argv[5] << '\n'; }
+
 	istringstream slen_x(argv[6]);
 	if (!(slen_x >> len_x)) { cerr << "Invalid len_x " << argv[6] << '\n'; }
 
@@ -54,16 +70,40 @@ int main(int argc, char* argv[]) {
 	cout
 		<< "... working on "
 		<< file_name_stream.str()
-		<< "\n";
+		<< " - ";
 
 	vector<double> x = readCSV(file_name_stream.str());
 
 	Distribution* d = NULL;
 	if (string(argv[9]).compare("EDFC") == 0) {
-	  d = new OverheadRobustSoliton(x, c, delta, K, seed);
+		d = new OverheadRobustSoliton(x, c, delta, K, seed);
+
+		// distribution with no overhead
+		vector<double> no_redundancy(K, 1);
+
+		// print reference objective function
+		FirstProblem problem = FirstProblem(
+																				K,
+																				N,
+																				new RobustSoliton(c, delta, K, seed),
+																				0.05);
+
+			cout
+			<< "g1 = "
+			<< problem.objective_function(x) / problem.objective_function(no_redundancy)
+			<< " - ";
 	}
 	else if (string(argv[9]).compare("ADFC") == 0) {
-	  d = new Distribution(x, seed);
+		// optimal degree distribution
+		d = new Distribution(x, seed);
+
+		// reference degree distribution
+		RobustSoliton* rs = new RobustSoliton(c, delta, K, seed);
+
+		cout
+			<< "g2 = "
+			<< d->expectation() / rs->expectation()
+			<< " - ";
 	}
 	else {
 		cerr << "Invalid problem: " << argv[9] << "\n";
@@ -73,10 +113,15 @@ int main(int argc, char* argv[]) {
 	Network net = Network(N, K, len_x, len_y, neigh_threshold, d);
 	net.spread_packets();
 
+	// add to objective function number of packets spread in the network
+	cout << " packets = " << net.get_packets_size() << "\n";
+
 	int number_of_etas = 10;
 	int number_of_trials = 100;
 
 	vector<double> decoding_probs;
+
+	exit(0);
 
 	// loop through all eta values wanted, e.g. 10
 	for (double eta: linspace(1, 2.5, number_of_etas)) {
@@ -99,15 +144,15 @@ int main(int argc, char* argv[]) {
 
 	ostringstream output_file_stream;
 	output_file_stream << "results/simulator/"
-									 << "etas"
-									 << "-problem=" << argv[9]  // problem to solve (EDFC or ADFC)
-									 << "-solutor=" << argv[10] // solutor employed to solve problem
-									 << "-K=" << K
-									 << "-N=" << N
-									 << "-c=" << c
-									 << "-delta=" << delta
-									 << "-seed=" << seed
-									 << ".csv";
+										 << "etas"
+										 << "-problem=" << argv[9]  // problem to solve (EDFC or ADFC)
+										 << "-solutor=" << argv[10] // solutor employed to solve problem
+										 << "-K=" << K
+										 << "-N=" << N
+										 << "-c=" << c
+										 << "-delta=" << delta
+										 << "-seed=" << seed
+										 << ".csv";
 
 	writeCSV(decoding_probs, output_file_stream.str());
 }
