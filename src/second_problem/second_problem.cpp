@@ -150,13 +150,13 @@ vector<double> SecondProblem::get_initial_solution() {
 		v[j] = generator(this->rng);
 		sum += v[j];
 	}
+
 	for (int j=0; j<this->K; j++) {
 		v[j] /= sum;
 	}
+
 	// constraints are surely met, since components
 	// are > 0 and sum to 1 by construction
-
-
 	return v;
 }
 

@@ -58,15 +58,20 @@ individual SimulatedAnnealing::get_neighbour(individual old_individual) {
 		} while(second_d == first_d || candidate[first_d] + candidate[second_d] > 1);
 
 		// "move" some probability from start to end point
-		uniform_real_distribution<double> perturbation(0, min(candidate[first_d], candidate[second_d]));
+		uniform_real_distribution<double> perturbation(0,
+																									 min(candidate[first_d],
+																											 candidate[second_d]));
 
 		double delta = perturbation(rng);
-		candidate[first_d] -= delta;
-		candidate[second_d]   += delta;
+		candidate[first_d]  -= delta;
+		candidate[second_d] += delta;
 
 	} while (!SecondProblem::respect_constraints(candidate));
 
-	new_individual = update_objective_function(old_individual, candidate, first_d, second_d);
+	new_individual = update_objective_function(old_individual,
+																						 candidate,
+																						 first_d,
+																						 second_d);
 
 	return new_individual;
 }
@@ -125,12 +130,11 @@ vector<double> SimulatedAnnealing::run_search() {
 		// round of search for current temperature
 		for(int i = 0; i < temperature_steps(); i++) {
 			current_iteration++;
+
 			// search new candidate, save it to new_x
 			new_individual = get_neighbour(old_individual);
-
 			new_score = new_individual.obj_function;
-
-			v = new_individual.values;
+			new_v = new_individual.values;
 
 			double delta = new_score - old_score;
 			// accept or reject according to acceptance probability
