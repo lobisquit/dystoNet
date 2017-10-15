@@ -67,6 +67,13 @@ int main(int argc, char* argv[]) {
 									 << "-seed=" << seed
 									 << ".csv";
 
+	// check if file exists
+	ifstream infile(file_name_stream.str());
+	if (!infile.good()) {
+		cerr << "File not accessible!\n";
+		exit(0);
+	}
+
 	cout
 		<< "... working on "
 		<< file_name_stream.str()
