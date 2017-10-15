@@ -57,7 +57,7 @@ individual JumpingBall::get_neighbour(individual old_individual) {
 
 		// if we were are not improving for too long, jump!
 		if (this->worsening_steps > this->max_worsening_steps) {
-			std::cout << "JUMP" << '\n';
+			cerr << "JUMP" << '\n';
 			while (!respect_constraints(candidate)) {
 				for(int i=0; i<number_of_variations(this->rng); i++) {
 					do {
@@ -134,8 +134,8 @@ vector<double> JumpingBall::run_search() {
 
 	while(current_iteration <= this->max_iterations) {
 		// round of search for current temperature
-		std::cout << current_iteration << '\n';
-		std::cerr << "=====> "
+		cerr << current_iteration << '\n';
+		cerr << "=====> "
 			<< current_iteration << "/" << this->max_iterations
 			<< " ==> temperature: " << this->temperature
 			<< " ==> Best score: " << this->best_score << "\n";
@@ -153,7 +153,7 @@ vector<double> JumpingBall::run_search() {
 
 			new_score = new_individual.obj_function;
 
-			v = new_individual.values;
+			new_v = new_individual.values;
 
 			double delta = new_score - old_score;
 

@@ -20,7 +20,12 @@ Distribution::Distribution(vector<double> probabilities, int seed) {
 		sum += p;
 	}
 	if (sum - 1.0 > 1e-12) {
-		throw invalid_argument("Distribution: probabilities don't sum to 1");
+		ostringstream error_stream;
+		error_stream
+			<< "Distribution: probabilities don't sum to 1, but to "
+			<< sum;
+
+		throw invalid_argument(error_stream.str());
 	}
 
 	this->probabilities = probabilities;
