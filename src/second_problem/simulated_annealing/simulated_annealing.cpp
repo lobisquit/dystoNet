@@ -154,7 +154,7 @@ vector<double> SimulatedAnnealing::run_search() {
 					<< current_iteration << "/" << this->max_iterations
 					<< " ==> temperature = " << this->temperature
 					<< " ==> score = " << new_score
-					<< " ==> g2 = " << g2 << "\r";
+					<< " ==> g2 = " << g2 << "\n";
 
 				// update best result (up to now) if needed
 				if (new_score < best_score) {
