@@ -39,17 +39,25 @@ for result_file in RESULT_DIR.glob('etas*.csv'):
 	p = pd.read_csv(result_file, header=None)
 
 	p.columns = ['{}, {}'.format(configs['problem'], configs['solutor'])]
-	# p = p.set_index(np.linspace(1, 2.5, 10))
-	print(len(p))
+	p = p.set_index(np.linspace(1, 2.5, 10))
 
 	# note that double {{}} excapes format
-	tag = 'K={}, N={}, \delta={}'.format(configs["K"], configs["N"], configs["delta"])
+	tag = 'K={}, N={}, \delta={}'.format(
+		configs["K"],
+		configs["N"],
+		configs["delta"])
 
-	# add to probabilities dict or merge with existing one
-	if tag in probs:
-		probs[tag] = pd.concat([probs[tag], p], axis=1)
+	# add to global results only if solution works
+	# (i.e. probability of success is not always 0)
+	if p.values.sum() != 0:
+		# add to probabilities dict or merge with existing one
+		if tag in probs:
+			probs[tag] = pd.concat([probs[tag], p], axis=1)
+		else:
+			probs[tag] = p
 	else:
-		probs[tag] = p
+		print("Success probability was always 0!")
+
 
 # plot decoding probability vs decoding ratio for various c, for each K, N, delta configuration
 for config, scores in probs.items():

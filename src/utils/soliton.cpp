@@ -2,6 +2,7 @@
 #include <random>
 #include "soliton.h"
 #include <iostream>
+#include <iomanip>
 
 using namespace std;
 
@@ -23,6 +24,7 @@ Distribution::Distribution(vector<double> probabilities, int seed) {
 		ostringstream error_stream;
 		error_stream
 			<< "Distribution: probabilities don't sum to 1, but to "
+			<< setprecision(10)
 			<< sum;
 
 		throw invalid_argument(error_stream.str());

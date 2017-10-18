@@ -128,10 +128,9 @@ int main(int argc, char* argv[]) {
 
 	vector<double> decoding_probs;
 
-	exit(0);
-
 	// loop through all eta values wanted, e.g. 10
 	for (double eta: linspace(1, 2.5, number_of_etas)) {
+		cerr << "testing eta = " << eta << "\n";
 		double decoding_prob = 0;
 
 		vector<vector<int>> en_matrix;
@@ -160,6 +159,8 @@ int main(int argc, char* argv[]) {
 										 << "-delta=" << delta
 										 << "-seed=" << seed
 										 << ".csv";
+
+	cout << "written file " << output_file_stream.str() << "\n";
 
 	writeCSV(decoding_probs, output_file_stream.str());
 }
