@@ -101,7 +101,6 @@ double SimulatedAnnealing::temperature_steps() {
 }
 
 vector<double> SimulatedAnnealing::run_search() {
-
 	vector<double> v = SecondProblem::get_initial_solution();
 
 	// keep trace of how much jumps have been done since the beginning
@@ -119,7 +118,7 @@ vector<double> SimulatedAnnealing::run_search() {
 	double new_score;
 
 	// random variable that set the threshold for accepting worse solutions
-	uniform_real_distribution<double> acceptance_threshold(0,1);
+	uniform_real_distribution<double> acceptance_threshold(0, 1);
 
 	individual new_individual;
 
