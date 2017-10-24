@@ -118,7 +118,9 @@ int main(int argc, char* argv[]) {
 
 	// create Network and perform encoding
 	Network net = Network(N, K, len_x, len_y, neigh_threshold, d);
-	net.spread_packets();
+
+	double random_walk_length = net.spread_packets();
+	cout << " rw_length = " << random_walk_length << " - ";
 
 	// add to objective function number of packets spread in the network
 	cout << " packets = " << net.get_packets_size() << "\n";
@@ -127,8 +129,6 @@ int main(int argc, char* argv[]) {
 	int number_of_trials = 100;
 
 	vector<double> decoding_probs;
-
-	exit(0);
 
 	// loop through all eta values wanted, e.g. 10
 	for (double eta: linspace(1, 2.5, number_of_etas)) {

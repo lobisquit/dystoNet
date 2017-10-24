@@ -78,7 +78,10 @@ int Network::get_nodes_size() {
 	return this->N;
 }
 
-void Network::spread_packets() {
+double Network::spread_packets() {
+	// save here average length of random walks
+	double walks_length = 0;
+
 	// perform a random walk for each packet
 	for (int i = 0; i < this->get_packets_size(); i++) {
 		cerr
@@ -99,6 +102,9 @@ void Network::spread_packets() {
 
 			// set random neighbour as next node in the trip
 			node = neighbours[next(this->rng)];
+
+			// increment walks length
+			walks_length++;
 		}
 
 		// add pkt to the final step of random walk
@@ -109,9 +115,11 @@ void Network::spread_packets() {
 	// keep only "degree" packets for each node
 	for (int i = 0; i < this->get_nodes_size(); i++) {
 		Node* node = &this->nodes[i];
-
 		node->filter_packets();
 	}
+
+	// return average length of random walk of each packet
+	return walks_length / this->get_packets_size();
 }
 
 vector<vector<int>> Network::collector(int h) {

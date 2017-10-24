@@ -61,7 +61,7 @@ class Network {
 		Node* get_nodes();
 		Packet* get_packets();
 
-		void spread_packets();
+		double spread_packets();
 
 		/** Visit to the network */
 		vector<vector<int>> collector(int h);
