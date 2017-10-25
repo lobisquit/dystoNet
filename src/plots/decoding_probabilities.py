@@ -6,11 +6,12 @@ import numpy as np
 import pandas as pd
 from matplotlib import rc, rcParams
 
-# rcParams['font.family'] = 'serif'
-# rcParams['font.serif'] = ['Charter']
+# plt.rcParams['savefig.facecolor']='red'
+rcParams['font.family'] = 'serif'
+rcParams['grid.linestyle'] = ':'
 rc('text', usetex=True)
 
-RESULT_DIR = Path('../../results/simulator')
+RESULT_DIR = Path('results/simulator')
 
 def parse_result_file(result_file):
 	# remove file name and split using hyphens
@@ -40,11 +41,11 @@ for result_file in RESULT_DIR.glob('etas*.csv'):
 	# decoding probability varying eta for given configuration
 	p = pd.read_csv(result_file, header=None)
 
-	p.columns = ['{}, {}'.format(configs['problem'], configs['solutor'])]
+	p.columns = ['{} - {}'.format(configs['problem'], configs['solutor'])]
 	p = p.set_index(np.linspace(1, 2.5, 10))
 
 	# note that double {{}} excapes format
-	tag = 'K={}, N={}, $\delta$={}'.format(
+	tag = 'K={}, N={}, $\\delta={}$'.format(
 		configs["K"],
 		configs["N"],
 		configs["delta"])
@@ -65,19 +66,43 @@ problem_solutors = np.unique(np.concatenate(
 
 colors = dict(zip(
 	problem_solutors,
-	plt.cm.Greys(np.linspace(0, 1, len(problem_solutors))))
-)
+	plt.cm.viridis(np.linspace(0, 1, len(problem_solutors)))))
 
 # plot decoding probability vs decoding ratio for various c, for each K, N, delta configuration
+
+lines = []
+labels = []
+figure_size = (3, 2.2)
 for config, scores in probs.items():
-	fig = plt.figure(config, figsize=(6, 4))
+	fig = plt.figure(config, figsize=figure_size)
 	ax = fig.gca()
 
 	for column in sorted(scores.columns):
-		ax.plot(scores.index, scores[column], color=colors[column], label=column)
+		line, = ax.plot(scores.index, scores[column], color=colors[column], label=column)
+		if len(lines) < len(scores.columns):
+			lines.append(line)
+			labels.append(column)
 
-	# current_ax = scores.plot(title=config, ax=fig.gca(), colors = colors)
-	ax.legend()
-	ax.set_xlabel("\\eta")
+	# ax.set_title(config)
+	ax.set_xlabel("Decoding ratio $\\eta$")
 	ax.set_ylabel("Decoding probability")
-	plt.show()
+	ax.grid(True)
+
+	plt.tight_layout()
+
+	fig.savefig(
+		"report/figures/eta_vs_prob/plot-" +
+		config.replace(" ", "")
+		      .replace(".", "")
+		      .replace("$", "")
+		      .replace(",", "-")
+		      .replace("\\", "") +
+		".eps", format='eps', transparent=True)
+	# plt.show()
+
+# show legend by itself
+figlegend = plt.figure(figsize=figure_size)
+figlegend.legend(lines, labels, 'center')
+
+figlegend.savefig("report/figures/eta_vs_prob/legend.eps", format='eps')
+# plt.show()
