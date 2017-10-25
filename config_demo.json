@@ -1,0 +1,19 @@
+{
+    "Lin2007": {
+        "problem": {
+            "K": 1000,
+            "N": 2000,
+            "c": 0.01,
+            "delta": 0.05,
+            "seed": 1
+        },
+
+        "simulator" : {
+            "len_x": 10,
+            "len_y": 10,
+            "neigh_treshold": 5,
+            "problem": ["EDFC", "ADFC"],
+            "solutor": ["GA", "SA", "JB"]
+        }
+    }
+}

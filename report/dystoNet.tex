@@ -397,6 +397,16 @@ Our \gls{ga} can be tuned with the following parameters.
 
 \section{Results} \label{sec:results}
 
+In the follows, are reported the results of the simulations made to calculate the overhead ratio for \gls{edfc} and \gls{adfc}.
+Simulations have been made following the same parameters used in \cite{Lin2007}, for different size of N and K and using all the algorithms proposed in \autoref{sec:tech_approach}.
+In every case, our results are worst than the one obtained in \cite{Lin2007}.
+
+In the first optimization problem, all the algorithms take to similar results, but in general, \gls{ga} achieves the lower overhead ratio.
+Using \gls{adfc}, \gls{sa} and \gls{jb} don't converge, and the overhead ratio remains always high. Only \gls{ga} give an acceptable result, for this reason \gls{ga} is the only algorithm we took in consideration for this problem.
+
+All the simulation's results are reported in \autoref{tab:results}.
+Note that in Equation 13 of \cite{Lin2007}, to compute the violation probability, has been used a Robust Soliton distribution with the terms from $K/R$ to $K$ forced to zero, since they suppose that in a real Robust Soliton, these terms are negligible. We chose to not force these terms to zero to take in consideration a real Robust Soliton Distribution.
+
 TODO:
 
 - compute $g_1$ and $g_2$ for Lin's paper configuration: make comparison. Note that we did \emph{not} force parameter to zero after K/R
@@ -453,11 +463,16 @@ TODO:
 		&&&& &ADFC & GA &  & 0.906249 & 93.3731 & 260 & $2.43 \times 10^4$ \\  \bottomrule
 	\end{tabular}
 	\caption{Complete results for all network configurations considered, marked with letters.}
+	\label{tab:results}
 \end{table}
 
 
-\section{Conclusions And Future Work}
-\label{sec:conclusions}
+\section{Conclusions And Future Work}\label{sec:conclusions}
+In this work, we ran a meta-heuristic optimization over two minimization problems, using two well-known algorithms (\gls{ga} and \gls{sa}) and a modified version of \gls{sa}.
+We used the results of the optimization to built a sensor network simulator that take in account only the network layer of the ISO-OSI architecture.
+We tried to built the simulator in a structured and intuitive manner and generating a exaustive documentation.
+We chose C++ Object-Oriented as programming language since it has a great variety of library and is more powerful than other tools like Matlab in terms of execution speed, documentation generation and adaptability.
+
 \bibliographystyle{IEEEtran}
 \bibliography{bibliography}
 
