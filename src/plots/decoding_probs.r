@@ -1,7 +1,7 @@
 library(reshape2)
 library(ggplot2)
 library(scales)
-library(svglite)
+library(extrafont)
 
 path="results/simulator/"
 get_config = function(name) {
@@ -85,8 +85,7 @@ final_p = ggplot(data=eta_probs, aes(x=eta,
   facet_wrap(~ marked_config, ncol = 2) +
   theme(
     ## set everything to serif, we are good people after all
-    ## text = element_text("Charter"),
-    text = element_text("Times"),
+    text = element_text("Charter"),
 
     ## axis title size
     axis.title.x = element_text(size = 12, margin = margin(t = 15)),
@@ -115,6 +114,10 @@ final_p = ggplot(data=eta_probs, aes(x=eta,
   scale_x_continuous(breaks = etas,
                      labels = function(x) format(round(x, 2), nsmall = 2)) +
   scale_colour_brewer(palette="Set1")
+
+
+## plot also on window
+final_p
 
 ## load all extrafonts
 loadfonts()
