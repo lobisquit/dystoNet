@@ -70,19 +70,23 @@ letters = c("a", "b", "c", "d", "e", "f", "g", "h")
 for (index in 1:length(correct_order_configs)) {
   correct_config = correct_order_configs[index]
 
+  ## put proper letter in front of network configuration
+  ## put spaces aroung equals
   eta_probs$marked_config[eta_probs$config == correct_config] <-
-    paste(letters[index], correct_config, sep=") ")
+    gsub("=", " = ",
+         paste(letters[index], correct_config, sep=") "))
 }
 
-ggplot(data=eta_probs, aes(x=eta,
-                           y=prob,
-                           group=problem_solver,
-                           color=factor(problem_solver))) +
+final_p = ggplot(data=eta_probs, aes(x=eta,
+                                     y=prob,
+                                     group=problem_solver,
+                                     color=factor(problem_solver))) +
   geom_line() +
   facet_wrap(~ marked_config, ncol = 2) +
   theme(
     ## set everything to serif, we are good people after all
-    text = element_text("Serif"),
+    ## text = element_text("Charter"),
+    text = element_text("Times"),
 
     ## axis title size
     axis.title.x = element_text(size = 12, margin = margin(t = 15)),
@@ -112,4 +116,11 @@ ggplot(data=eta_probs, aes(x=eta,
                      labels = function(x) format(round(x, 2), nsmall = 2)) +
   scale_colour_brewer(palette="Set1")
 
-ggsave("report/figures/eta_vs_prob.png", width=6, height=8)
+## load all extrafonts
+loadfonts()
+ggsave(plot=final_p,
+       filename="report/figures/eta_vs_prob.pdf",
+       width=15.5,
+       height=20,
+       unit="cm",
+       device="pdf")
