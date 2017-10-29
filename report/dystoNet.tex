@@ -15,7 +15,6 @@
 
 \usepackage{listings}
 \usepackage{multirow}
-
 %\usepackage[utf8x]{inputenc}
 \usepackage[english]{babel}
 \selectlanguage{english}
@@ -23,6 +22,7 @@
 %\usepackage{caption}
 \usepackage{cite}
 \usepackage[pdftex]{graphicx}
+
 % \usepackage{subfig}
 \usepackage{subcaption}
 \usepackage{amsmath}
@@ -421,36 +421,29 @@ TODO:
 
 - \emph{Decoding ratio} vs \emph{Successful decoding probability} for different K and N (like in Aly)
 
-\begin{table}[h]
+\begin{table}[htp]
 	\centering
 	\input{result-table.tex}
 	\caption{Complete results for all network configurations considered, marked with letters.}
 	\label{tab:results}
 \end{table}
 
-\newcommand{\myplot}[2]{
-	\begin{subfigure}{.5\textwidth}
-		\ifthenelse{\equal{#1}{}} {
-		}{
-			\caption{#1}
-			\vspace{-1.1cm}
-		}
-		\vspace{0.5cm}
-		\centering
-		\includegraphics[]{#2}
-	\end{subfigure}
-}
+% \newcommand{\myplot}[2]{
+% 	\begin{subfigure}{.5\textwidth}
+% 		\ifthenelse{\equal{#1}{}} {
+% 		}{
+% 			\caption{#1}
+% 			\vspace{-1.1cm}
+% 		}
+% 		\vspace{0.5cm}
+% 		\centering
+% 		\includegraphics[]{#2}
+% 	\end{subfigure}
+% }
 
 \begin{figure}[htp]
-	\myplot{K=1000, N=2000}{figures/eta_vs_prob/plot-K=1000-N=2000-delta=005.eps}
-	\myplot{K=10, N=100}{figures/eta_vs_prob/plot-K=10-N=100-delta=05.eps}
-	\myplot{K=20, N=100}{figures/eta_vs_prob/plot-K=20-N=100-delta=05.eps}
-	\myplot{K=20, N=200}{figures/eta_vs_prob/plot-K=20-N=200-delta=05.eps}
-	\myplot{K=40, N=200}{figures/eta_vs_prob/plot-K=40-N=200-delta=05.eps}
-	\myplot{K=50, N=500}{figures/eta_vs_prob/plot-K=50-N=500-delta=005.eps}
-	\myplot{K=100, N=1000}{figures/eta_vs_prob/plot-K=100-N=1000-delta=005.eps}
-	\myplot{}{figures/eta_vs_prob/legend.eps}
-\caption{For each configuration in \autoref{tab:results}, successful deconding probability has been computed varying decoding ratio $\eta$.}
+	\includegraphics[]{figures/eta_vs_prob.png}
+	\caption{For each configuration in \autoref{tab:results}, successful deconding probability has been computed varying decoding ratio $\eta$.}
 \end{figure}
 
 \section{Conclusions And Future Work}\label{sec:conclusions}

@@ -112,4 +112,4 @@ ggplot(data=eta_probs, aes(x=eta,
                      labels = function(x) format(round(x, 2), nsmall = 2)) +
   scale_colour_brewer(palette="Set1")
 
-ggsave("report/figures/eta_vs_prob.svg", width=6, height=8)
+ggsave("report/figures/eta_vs_prob.png", width=6, height=8)
