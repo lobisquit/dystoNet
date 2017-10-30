@@ -40,7 +40,7 @@ for (csv_file in result_files) {
                           ## paste("delta", config["delta"], sep="="),
                           sep=", ")
 
-    problem_solver = paste(config["problem"], config["solutor"], sep=" - ")
+    problem_solver = paste(config["problem"], config["solutor"], sep=", ")
 
     current_eta_probs = data.frame(config = configuration,
                                    problem_solver = problem_solver,

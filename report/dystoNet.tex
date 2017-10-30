@@ -5,7 +5,11 @@
 
 \usepackage{etex}
 
-%Fixing IEEEtran.cls bug with [english]{babel}
+% change default font to charter
+\usepackage{charter}
+\usepackage[bitstream-charter]{mathdesign}
+
+% Fixing IEEEtran.cls bug with [english]{babel}
 \makeatletter
 \def\markboth#1#2{\def\leftmark{\@IEEEcompsoconly{\sffamily}\MakeUppercase{\protect#1}}%
 \def\rightmark{\@IEEEcompsoconly{\sffamily}\MakeUppercase{\protect#2}}}
