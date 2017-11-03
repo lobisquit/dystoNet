@@ -4,23 +4,9 @@ library(ggplot2)
 library(scales)
 library(extrafont)
 
-source("src/plots/plot_theme.r")
+source("src/plots/utils.r")
 
 path="results/simulator/"
-get_config = function(name) {
-  tokens = strsplit(name, "\\.csv|-")
-  # remove first element from returned list
-  tokens = tokens[[1]][-1]
-
-  info = list()
-  for (element in tokens) {
-    name <- strsplit(element, "=")[[1]][1]
-    value <- strsplit(element, "=")[[1]][2]
-    info[name] = value
-  }
-  info
-}
-
 etas = seq(1, 2.5, length=10)
 
 ## read all simulator results

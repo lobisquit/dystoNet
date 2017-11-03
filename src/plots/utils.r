@@ -3,6 +3,20 @@ library(ggplot2)
 library(scales)
 library(extrafont)
 
+get_config = function(name, path="results/simulator/") {
+  tokens = strsplit(name, "\\.csv|-")
+  # remove first element from returned list
+  tokens = tokens[[1]][-1]
+
+  info = list()
+  for (element in tokens) {
+    name <- strsplit(element, "=")[[1]][1]
+    value <- strsplit(element, "=")[[1]][2]
+    info[name] = value
+  }
+  info
+}
+
 my_theme = function() {
   theme(
     ## set everything to serif, we are good people after all
