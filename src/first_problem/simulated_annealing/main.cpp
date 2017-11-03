@@ -7,6 +7,9 @@
 #include "soliton.h"
 #include "simulated_annealing.h"
 #include "functionCSV.h"
+#include <chrono>
+
+using namespace std::chrono;
 
 int main(int argc, char* argv[]) {
 	int K;
@@ -48,7 +51,16 @@ int main(int argc, char* argv[]) {
 
 	std::cout << SA << "\n";
 
+	milliseconds begin
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
 	vector<double> best_redundancy = SA.run_search();
+
+	milliseconds end
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	std::cout << "Time spent for EDFC SA = " << (end - begin).count() << "ms \n";
+
 	std::cout << "Arriving to   score "
 		<< (
 			SA.objective_function(best_redundancy) / SA.objective_function(no_redundancy)

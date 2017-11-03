@@ -7,6 +7,9 @@
 #include "soliton.h"
 #include "jumping_ball.h"
 #include "functionCSV.h"
+#include <chrono>
+
+using namespace std::chrono;
 
 int main(int argc, char* argv[]) {
 	int K;
@@ -49,7 +52,16 @@ int main(int argc, char* argv[]) {
 
 	std::cout << JB << "\n";
 
+	milliseconds begin
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
 	vector<double> best_redundancy = JB.run_search();
+
+	milliseconds end
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	std::cout << "Time spent for EDFC JB = " << (end - begin).count() << "ms \n";
+
 	std::cout << "g1 = "
 						<< (
 								JB.objective_function(best_redundancy) /

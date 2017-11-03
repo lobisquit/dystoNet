@@ -7,9 +7,10 @@
 #include "soliton.h"
 #include "genetic_algorithm.h"
 #include "functionCSV.h"
+#include <chrono>
 
+using namespace std::chrono;
 using namespace std;
-
 
 int main(int argc, char* argv[]) {
 	int K;
@@ -49,7 +50,15 @@ int main(int argc, char* argv[]) {
 
 	std::cout << GA << "\n";
 
+	milliseconds begin
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
 	vector<double> best_redundancy = GA.run_search();
+
+	milliseconds end
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	std::cout << "Time spent for EDFC GA = " << (end - begin).count() << "ms \n";
 
 	ostringstream file_name_stream;
 	file_name_stream << "results/ADFC/GA"
