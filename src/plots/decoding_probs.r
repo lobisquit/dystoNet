@@ -1,7 +1,10 @@
+
 library(reshape2)
 library(ggplot2)
 library(scales)
 library(extrafont)
+
+source("src/plots/plot_theme.r")
 
 path="results/simulator/"
 get_config = function(name) {
@@ -20,6 +23,7 @@ get_config = function(name) {
 
 etas = seq(1, 2.5, length=10)
 
+## read all simulator results
 eta_probs <- data.frame()
 result_files <- list.files(path="results/simulator/", pattern="etas.*.csv")
 for (csv_file in result_files) {
@@ -34,87 +38,74 @@ for (csv_file in result_files) {
 
   # add row for each probability value
   for (index in 1:dim(probs)[1]) {
-    configuration = paste(paste("K", config["K"], sep="="),
-                          paste("N", config["N"], sep="="),
-                          ## paste("c", config["c"], sep="="),
-                          ## paste("delta", config["delta"], sep="="),
-                          sep=", ")
-
     problem_solver = paste(config["problem"], config["solutor"], sep=", ")
 
-    current_eta_probs = data.frame(config = configuration,
-                                   problem_solver = problem_solver,
+    current_eta_probs = data.frame(K = config["K"],
+                                   N = config["N"],
+                                   problem = config["problem"],
+                                   solutor = config["solutor"],
                                    eta = etas[index],
-                                   prob = probs[[1]][index]
-                                   )
+                                   prob = probs[[1]][index])
 
     eta_probs = rbind(current_eta_probs, eta_probs)
   }
 }
 
 ## manipulate the dataframe to make plots of correct order
-correct_order_configs = c(
-  "K=1000, N=2000",
-  "K=10, N=100",
-  "K=20, N=100",
-  "K=20, N=200",
-  "K=40, N=200",
-  "K=50, N=500",
-  "K=100, N=1000"
-)
-eta_probs = within(eta_probs,
-                   config <- factor(config, levels=correct_order_configs))
+correct_order_configs = list(
+  list(letter="a", K=1000, N=2000),
+  list(letter="b", K=10, N=100),
+  list(letter="c", K=20, N=100),
+  list(letter="d", K=20, N=200),
+  list(letter="e", K=40, N=200),
+  list(letter="f", K=50, N=500),
+  list(letter="g", K=100, N=1000))
 
-## put letters before configurations, in order
-letters = c("a", "b", "c", "d", "e", "f", "g", "h")
-for (index in 1:length(correct_order_configs)) {
-  correct_config = correct_order_configs[index]
-
-  ## put proper letter in front of network configuration
-  ## put spaces aroung equals
-  eta_probs$marked_config[eta_probs$config == correct_config] <-
-    gsub("=", " = ",
-         paste(letters[index], correct_config, sep=") "))
-}
+## map each couple N, K to the corresponding letter
+eta_probs$letter = apply (eta_probs[,c("K", "N")], 1, function(row) {
+  K = row[1]
+  N = row[2]
+  for (config in correct_order_configs) {
+    if (config$K == K && config$N == N) {
+      return(config$letter)
+    }
+  }
+})
 
 final_p = ggplot(data=eta_probs, aes(x=eta,
                                      y=prob,
-                                     group=problem_solver,
-                                     color=factor(problem_solver))) +
+                                     group=interaction(problem, solutor),
+                                     color=interaction(problem, solutor, sep=", "),
+                                     )) +
   geom_line() +
-  facet_wrap(~ marked_config, ncol = 2) +
+  facet_wrap(~ letter, ncol = 2, labeller = function(letters) {
+    ## look up information about given configuration
+    ## and build a proper title
+    lapply(letters, function(letter) {
+      for (config in correct_order_configs) {
+        if (config$letter == letter) {
+          return(sprintf("%s) K = %s, N = %s",
+                    config$letter,
+                    config$K,
+                    config$N))
+        }
+      }
+    })
+  }) +
+  my_theme() +
   theme(
-    ## set everything to serif, we are good people after all
-    text = element_text("Charter"),
-
-    ## axis title size
-    axis.title.x = element_text(size = 12, margin = margin(t = 15)),
-    axis.title.y = element_text(size = 12, margin = margin(r = 15)),
-
     ## rotate x ticks lables
     axis.text.x = element_text(angle = 45, hjust = 1),
 
-    ## set subtitles preferences
-    strip.background = element_rect(fill="white"),
-    strip.text = element_text(size = 10),
-
-    ## plot area setting
-    panel.background = element_rect(fill = "white"),
-    panel.grid.major = element_line(colour = "#666666",
-                                    linetype = "dotted",
-                                    size = 0.3),
-
     ## legend settings: position, lines background, title
     legend.position = c(0.75, 0.1),
-    legend.key = element_blank(),
-    legend.title = element_blank(),
-    legend.text = element_text(size = 10),
+
+    panel.grid.major = element_line(linetype = "dotted"),
   ) +
   labs(x = "Decoding ratio", y = "Decoding probability") +
   scale_x_continuous(breaks = etas,
                      labels = function(x) format(round(x, 2), nsmall = 2)) +
   scale_colour_brewer(palette="Set1")
-
 
 ## plot also on window
 final_p

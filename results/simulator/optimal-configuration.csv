@@ -1,4 +1,4 @@
-Problem, Mode, $K$, $N$, $c$, $\delta$, $g_1$, $g_2$, "Random walk length", "Number of packets"
+Problem, Mode, K, N, c, delta, g_1, g_2, "Random walk length", "Number of packets"
 EDFC, GA, 1000, 2000, 0.01, 0.05, 1.67265, , 3475.53, 25000
 EDFC, SA, 1000, 2000, 0.01, 0.05, 1.89216, , 3940.11, 28000
 EDFC, JB, 1000, 2000, 0.01, 0.05, 1.89966, , 3956.04, 28000
