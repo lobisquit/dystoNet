@@ -61,7 +61,7 @@ class HeuristicSearch {
 		* Try to find the valid solution that minimizes objective function
 		* @param best_x array to fill with best point found by the algorithm
 		*/
-		vector<double> run_search();
+		vector<double> run_search(string progress_file_name);
 };
 
 #endif

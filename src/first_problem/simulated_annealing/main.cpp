@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <ctime>
+
 #include "soliton.h"
 #include "simulated_annealing.h"
 #include "functionCSV.h"
@@ -48,7 +49,17 @@ int main(int argc, char* argv[]) {
 
 	std::cout << SA << "\n";
 
-	vector<double> best_redundancy = SA.run_search();
+	ostringstream progress_name_stream;
+	progress_name_stream << "results/EDFC-progress/SA"
+											 << "-K=" << K
+											 << "-N=" << N
+											 << "-c=" << c
+											 << "-delta=" << delta
+											 << "-seed=" << seed
+											 << ".csv";
+
+	vector<double> best_redundancy = SA.run_search(progress_name_stream.str());
+
 	std::cout << "Arriving to   score "
 		<< (
 			SA.objective_function(best_redundancy) / SA.objective_function(no_redundancy)
