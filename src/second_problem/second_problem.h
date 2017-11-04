@@ -68,7 +68,7 @@ class SecondProblem : public HeuristicSearch {
 		// functions to implement in lower classes
 		vector<double> get_neighbour(vector<double> v);
 		double acceptance_probability(vector<double> old_v, vector<double> new_v);
-		vector<double> run_search();
+		vector<double> run_search(string progress_file_name);
 };
 
 #endif

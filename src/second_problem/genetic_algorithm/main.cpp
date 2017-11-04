@@ -10,7 +10,6 @@
 
 using namespace std;
 
-
 int main(int argc, char* argv[]) {
 	int K;
 	int N;
@@ -49,7 +48,16 @@ int main(int argc, char* argv[]) {
 
 	std::cout << GA << "\n";
 
-	vector<double> best_redundancy = GA.run_search();
+	ostringstream progress_name_stream;
+	progress_name_stream << "results/ADFC-progress/GA"
+											 << "-K=" << K
+											 << "-N=" << N
+											 << "-c=" << c
+											 << "-delta=" << delta
+											 << "-seed=" << seed
+											 << ".csv";
+
+	vector<double> best_redundancy = GA.run_search(progress_name_stream.str());
 
 	ostringstream file_name_stream;
 	file_name_stream << "results/ADFC/GA"

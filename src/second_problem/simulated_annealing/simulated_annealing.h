@@ -78,7 +78,7 @@ class SimulatedAnnealing : public SecondProblem {
 
 		double acceptance_probability(double delta);
 
-		vector<double> run_search();
+		vector<double> run_search(string progress_file_name);
 
 		/**
 		* Compute temperature for next round of search

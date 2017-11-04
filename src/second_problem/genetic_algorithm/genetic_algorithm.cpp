@@ -5,6 +5,10 @@
 #include <stdexcept>
 #include <random>
 #include <algorithm>
+#include <chrono>
+#include <fstream>
+
+using namespace std::chrono;
 
 #include "soliton.h"
 #include "genetic_algorithm.h"
@@ -46,8 +50,19 @@ vector<individual> GeneticAlgorithm::get_initial_population() {
 	return population;
 }
 
-vector<double> GeneticAlgorithm::run_search() {
+vector<double> GeneticAlgorithm::run_search(string progress_file_name) {
 	int generation = 0;
+
+	// prepare stream for output timing file
+	ofstream progress_file;
+	progress_file.open(progress_file_name);
+	progress_file << "Time,score" << "\n";
+
+	milliseconds begin_time
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	// remember how long the obj function has not improved significantly
+	int worsening_counter = 0;
 
 	vector<individual> population = get_initial_population();
 
@@ -58,16 +73,19 @@ vector<double> GeneticAlgorithm::run_search() {
 	uniform_int_distribution<int> index_choice(0, this->K-1);
 	double E = robust_soliton->expectation();
 	while(generation < this->num_generations){
+		double old_obj_function = population[0].obj_function;
+
 		/** Sorting of the population */
 		std::sort(population.begin(), population.end(), by_obj_function());
 
 		Distribution v_distribution = Distribution(population[0].values, 1);
+		double current_obj_function = population[0].obj_function;
 		cout << "=====> "
-			<< generation << "/" << this->num_generations
-			<< " ==> f = " << population[0].obj_function
-			<< " ==> g2 = "
+				 << generation << "/" << this->num_generations
+				 << " ==> f = " << current_obj_function
+				 << " ==> g2 = "
 			/** Best score for this generation, since vectors are sorted */
-			<< v_distribution.expectation() / E << "\n";
+				 << v_distribution.expectation() / E << "\n";
 
 		/** Copy of the best individuals in the whole population, and then perturbe it, checking you are respecting
 		* constraints.
@@ -100,8 +118,27 @@ vector<double> GeneticAlgorithm::run_search() {
 				// cout << "New obj function: " << population[j*part_size+i].obj_function << "\n";
 			}
 		}
+
+		if (current_obj_function > old_obj_function - 0.00001) {
+			worsening_counter++;
+		}
+		else {
+			worsening_counter = 0;
+		}
+		if (worsening_counter > 1000) {
+			break;
+		}
+
+		// save current best score in output file
+		milliseconds current_time
+			= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+		progress_file << (current_time - begin_time).count() << ","
+									<< population[0].obj_function << "\n";
+
 		generation++;
 	}
+	progress_file.close();
+
 	return population[0].values;
 }
 

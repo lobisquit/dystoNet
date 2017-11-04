@@ -46,7 +46,16 @@ int main(int argc, char* argv[]) {
 
 	std::cout << SA << "\n";
 
-	vector<double> best_redundancy = SA.run_search();
+	ostringstream progress_name_stream;
+	progress_name_stream << "results/ADFC-progress/SA"
+											 << "-K=" << K
+											 << "-N=" << N
+											 << "-c=" << c
+											 << "-delta=" << delta
+											 << "-seed=" << seed
+											 << ".csv";
+
+	vector<double> best_redundancy = SA.run_search(progress_name_stream.str());
 
 	ostringstream file_name_stream;
 	file_name_stream << "results/ADFC/SA"

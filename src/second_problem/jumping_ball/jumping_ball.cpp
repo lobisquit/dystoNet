@@ -4,6 +4,11 @@
 #include <limits>
 #include <stdexcept>
 #include <random>
+#include <chrono>
+#include <fstream>
+
+using namespace std::chrono;
+using namespace std;
 
 #include "soliton.h"
 #include "binomial.h"
@@ -107,8 +112,20 @@ individual JumpingBall::get_neighbour(individual old_individual) {
 	return new_individual;
 }
 
-vector<double> JumpingBall::run_search() {
+vector<double> JumpingBall::run_search(string progress_file_name) {
 	vector<double> v = SecondProblem::get_initial_solution();
+
+	// prepare stream for output timing file
+	ofstream progress_file;
+	progress_file.open(progress_file_name);
+	progress_file << "Time,score" << "\n";
+
+	milliseconds begin_time
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	// compute normalization factor for score
+	vector<double> no_redundancy(K, 1);
+	double norm_obj_function = this->objective_function(no_redundancy);
 
 	// keep trace of how much jumps have been done since the beginning
 	int current_iteration = 0;
@@ -132,13 +149,10 @@ vector<double> JumpingBall::run_search() {
 	individual old_individual = approximate_objective_function(v);
 	double old_score = old_individual.obj_function;
 
+	int worsening_counter = 0;
+
 	while(current_iteration <= this->max_iterations) {
 		// round of search for current temperature
-		cerr << current_iteration << '\n';
-		cerr << "=====> "
-			<< current_iteration << "/" << this->max_iterations
-			<< " ==> temperature: " << this->temperature
-			<< " ==> Best score: " << this->best_score << "\n";
 
 		// keep trace of mean value of acceptance_probability
 		// when new point is worse (for better points it is 1)
@@ -146,13 +160,10 @@ vector<double> JumpingBall::run_search() {
 		int worsening_proposals = 0;
 
 		for(int i = 0; i < temperature_steps(); i++) {
-
 			current_iteration++;
 
 			new_individual = get_neighbour(old_individual);
-
 			new_score = new_individual.obj_function;
-
 			new_v = new_individual.values;
 
 			double delta = new_score - old_score;
@@ -176,42 +187,63 @@ vector<double> JumpingBall::run_search() {
 					v_distribution->expectation() /
 					robust_soliton->expectation();
 
-				cerr << "=====> "
-					<< current_iteration << "/" << this->max_iterations
-					<< " ==> temperature = " << this->temperature
-					<< " ==> score = " << new_score
-					<< " ==> g2 = " << g2 << "\n";
-
 				// update best result (up to now) if needed
 				if (new_score < best_score) {
 					best_score = new_score;
 					best_v = v;
 
 					this->worsening_steps = 0;
-
-					cerr << "=====> "
-						<< current_iteration << "/" << this->max_iterations
-						<< " ==> temperature = " << this->temperature
-						<< " ==> score = " << new_score
-						<< " ==> g2 = " << g2 << "\n";
 				}
-				else{
+				else {
 					this->worsening_steps++;
 				}
+
+				// plan to stop if improvement (new best score) is lower than a threshold
+			  if (new_score > best_score + 0.00001) {
+					worsening_counter++;
+				}
+				else {
+					worsening_counter = 0;
+				}
+
+				cerr << "=====> "
+						 << current_iteration << "/" << this->max_iterations
+						 << " ==> temp = " << this->temperature
+						 << " ==> best_score = " << best_score
+						 << " ==> score = " << new_score
+						 << " ==> g2 = " << g2
+						 << " ==> worse_counter " << worsening_counter
+						 << "\n";
 			}
+
+			// stop at given temperature if improvements are negligible
+			if (worsening_counter > 1000) {
+				break;
+			}
+
 			// keep current score for the next cycle
 			old_score = new_score;
 			old_individual = new_individual;
-
 		}
+
+		// stop whole process if no improvement is found for all temperatures
+		// in a long time
+		if (worsening_counter > 10000) {
+			break;
+		}
+
+		// save current best score in output file
+		milliseconds current_time
+			= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	  progress_file << (current_time - begin_time).count() << ","
+									<< (best_score / norm_obj_function) << "\n";
 
 		// report mean of acceptance probability up to now
 		acceptance_mean = acceptance_mean / worsening_proposals;
-		//cout << "mean of acceptance_probability = " << acceptance_mean << '\n';
 
 		// update temperature for new round
 		this->temperature = new_temperature();
 	}
-
+	progress_file.close();
 	return best_v;
 }

@@ -15,8 +15,6 @@ using namespace std;
 #include "genetic_algorithm.h"
 #include "first_problem.h"
 
-using namespace std;
-
 GeneticAlgorithm::GeneticAlgorithm(int K,
 									int N,
 									RobustSoliton* robust_soliton,
@@ -155,6 +153,8 @@ vector<double> GeneticAlgorithm::run_search(string progress_file_name) {
 
 		generation++;
 	}
+	progress_file.close();
+
 	return population[0];
 }
 
