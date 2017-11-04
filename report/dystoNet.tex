@@ -219,7 +219,7 @@ The optimal $\nu$ is the solution of the following optimization problem\cite{Lin
 \begin{equation}
 	\label{secondproblem}
 	\begin{split}
-		minimize & \quad \sum_{i=1}^{K/R}(\nu'(i)-\mu(i))^2 \\
+		minimize & \quad \sum_{i=1}^{K}(\nu'(i)-\mu(i))^2 \\
 		subject \ to & \quad \begin{cases}
 			\sum_{i=1}^K \nu(i) = 1 \\
 			\nu(i) \geq 0 \quad for \quad i=1,...,K
@@ -400,69 +400,56 @@ Our \gls{ga} can be tuned with the following parameters.
 \end{description}
 
 \section{Results} \label{sec:results}
-In this section we will compare the two spreading algorithms, \gls{edfc} and \gls{adfc}, in different network configurations.
-Those settings span from smaller neworks of hundreds of elements to bigger ones with thousands of nodes: we followed our reference papers \cite{Lin2007} \cite{Aly2008} with respect to degree distribution parameters, as well as system fault tolerance.
+In this section we will compare the proposed spreading algorithms, \gls{edfc} and \gls{adfc}, in different scenarios, spanning from smaller neworks of hundreds of elements to bigger ones with thousands of nodes.
+We followed our reference papers \cite{Lin2007} \cite{Aly2008} with respect to degree distribution parameters, as well as system fault tolerance, to obtain consistent results.
 
 First of all, we tried to solve the relevant optimization problems, equations \eqref{firstproblem} and \eqref{secondproblem}, for the various parameter settings using the three heuristics described in \autoref{sec:tech_approach}: this lead various degree distributions for each network.
 
 Those probability mass distributions were then fed into a network simulator.
 We supposed a fully reliable channel, developing then a network layer simulator: this was done to assess the viability of the coding scheme in a general context, regardless of physical and medium access protocol peculiarities.
 
-As customary in literature, wireless sensors were modeled as a set of points uniformly spread in a reference area and each one could communicate only with all near nodes, according to a distance parameter.
+As customary in literature, wireless sensors were modeled as a set of points uniformly spread in a reference area where each one could communicate only with all near nodes, according to a distance parameter.
 
 \bigbreak
 
 We collected relevant simulation results in \autoref{tab:results}.
-Along with network parameters, we provide the normalized value of the objective functions $g_1$ and $g_2$, of problem \eqref{firstproblem} and \eqref{secondproblem} respectively.
+Along with network parameters, we provide the normalized value of the objective functions $g_1$ and $g_2$ of problem \eqref{firstproblem} and \eqref{secondproblem} respectively.
 
-The results of \gls{sa} and \gls{jb} were highly suboptimal in the \gls{adfc} framework: we suppose their perturbation tecnique was not able to perform significat steps in the direction of the minimum, staying always close the starting point, whereas \gls{ga} that employs a different one was rather performant.
+Results of \gls{sa} and \gls{jb} on \gls{adfc} problem are not shown in our result table, because the solutions found were highly suboptimal: we suppose their perturbation tecnique was not able to perform significat steps in the direction of the minimum, staying always close the starting point, whereas \gls{ga} heuristic was more suitable for this complex solution space.
 
-We report spreading parameters too, obtained with our simulation: $L_{rw}$, average length of random walks taken by each packet, $n_{pkt}$ number of packets spread across the network and number of total packet transmissions $n_{tx}$.
+We report spreading parameters too, obtained with our simulation: $L_{rw}$, average length of random walks taken by each packet, $n_{pkt}$ number of packets spread across the network and total number of packet transmissions $n_{tx}$.
 
 We chose to focus on these few parameters to highlight the total cost of each algorithm with the solution provided by our heuristics.
 
 Transmission cost, however, is only one side of the coin: in order to be effective, packets have to be recovered in reasonable time by the user.
 
-For the various network configurations labeled in \autoref{tab:results}, we then tested how average successful deconding probability changes with different deconding ratio $\eta$, defined as the fraction of packets collected by the user among $K$.
+For the various network configurations labeled in \autoref{tab:results}, we then tested how average successful deconding probability changes with different deconding ratios $\eta$, defined as the fraction of packets collected by the user among $K$.
 Our results are summarized in \autoref{fig:eta_vs_prob}.
 
 \bigbreak
-With respect to \gls{edfc} solutions, we noticed that our three heuristics finds similar points, except in network a), where \gls{ga} is clearly the best one.
+With respect to \gls{edfc} solutions, we noticed that our three heuristics finds similar points, except in network a), where \gls{ga} is the best one by a significant margin.
 
 Regarding to computation time, \gls{jb} was faster to reach convergence than \gls{sa}, thanks to our jumping heuristic that allowed to a more aggressive strategy at the beginning, in highly suboptimal regions of solutions space.
-However, \gls{ga} turned out to be the quickest way to reach the final solution: thanks to its genetic heuristic, it could explore and evaluate different paths of solution space at the same time.
+However, \gls{ga} turned out to be the quickest way to reach the final solution: thanks to its genetic heuristic, it could explore and evaluate different paths of solution space at the same time. % plot of computation times vs network parameters
 
-The second problem, \gls{adfc} has been much more difficult
+%% move to technical approach?
+The second problem, \gls{adfc} has been much more difficult to deal with, because of the computational complexity of its objective function: while in \gls{edfc} the scalar product in $\mathbb{R}^K$ requires time $O(K)$, the double sum to compute $g_2$ requires time $O(K^2)$.
 
- its genetic heuristic has proven successful in new promising points, even in the hard to explore setting of \gls{adfc}
+This was unfeasible for big network configurations, where heuristic search took too long to obtain a solution in reasonable time, so we decided to speed up the process at the cost of an approximated value for the objective function.
 
+In paper\cite{Lin2007}, the proposal was to drop the contribute of coefficients after index $K/R$, since reference Robust Soliton distribution probability is considered irrelevant in that region.
 
-
-
-
-
-
-
+We discard this hypothesis, proposing an adaptive strategy, ...
+%%
 
 Our best scores on configuration a) are very close to the ones obtained in \cite{Lin2007}.
-As shown in that paper, \gls{adfc} is confirmed to achieve much lower network overhead than \gls{edfc}, in general at the cost of a lower successful deconding probability for small values of $\eta$.
+As shown in that paper, \gls{adfc} is confirmed to achieve much lower network overhead than \gls{edfc}, in general at the cost of a lower successful decoding probability for small values of $\eta$.
 
-We proved this statement also for smaller and medium networks, where \gls{adfc} performs really well, except for configurations e) and g), albeit reducing packet deliveries up to three order of magnitudes.
-
+We proved this statement also for smaller and medium networks where \gls{adfc} performs really well, except for configurations e) and g), albeit reducing packet deliveries up to three order of magnitudes.
 Setting f) is a prime example of this observation, a similar success probability is obtained, with a fraction of the transmission cost.
 
 
-This way we could find for each confi
-
-In the first optimization problem, all the algorithms take to similar results, but in general, \gls{ga} achieves the lower overhead ratio.
-Using \gls{adfc}, \gls{sa} and \gls{jb} don't converge, and the overhead ratio remains always high. Only \gls{ga} give an acceptable result, for this reason \gls{ga} is the only algorithm we took in consideration for this problem.
-
-
-Note that in Equation 13 of \cite{Lin2007}, to compute the violation probability, has been used a Robust Soliton distribution with the terms from $K/R$ to $K$ forced to zero, since they suppose that in a real Robust Soliton, these terms are negligible. We chose to not force these terms to zero to take in consideration a real Robust Soliton Distribution.
-
 TODO:
-
-- compute $g_1$ and $g_2$ for Lin's paper configuration: make comparison. Note that we did \emph{not} force parameter to zero after K/R
 
 - \emph{Decoding ratio} vs \emph{Successful decoding probability} for different K and N (like in Aly)
 
