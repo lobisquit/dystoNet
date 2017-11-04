@@ -5,6 +5,11 @@
 #include <stdexcept>
 #include <random>
 #include <algorithm>
+#include <chrono>
+#include <fstream>
+
+using namespace std::chrono;
+using namespace std;
 
 #include "soliton.h"
 #include "genetic_algorithm.h"
@@ -45,8 +50,16 @@ vector<vector<double>> GeneticAlgorithm::get_initial_population() {
 	return population;
 }
 
-vector<double> GeneticAlgorithm::run_search() {
+vector<double> GeneticAlgorithm::run_search(string progress_file_name) {
 	int generation = 0;
+
+	// prepare stream for output timing file
+	ofstream progress_file;
+	progress_file.open(progress_file_name);
+	progress_file << "Time,score" << "\n";
+
+	milliseconds begin_time
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
 	vector<vector<double>> population = get_initial_population();
 	/** Selection */
@@ -133,6 +146,12 @@ vector<double> GeneticAlgorithm::run_search() {
 				 << " ==> g1 = " << current_g1
 				 << " ==> new_g1 = " << new_g1
 				 << " ==> worsening_steps = " << worsening_counter << "\n";
+
+		// save current best score in output file
+		milliseconds current_time
+			= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+		progress_file << (current_time - begin_time).count() << ","
+									<< new_g1 << "\n";
 
 		generation++;
 	}

@@ -56,7 +56,7 @@ class GeneticAlgorithm : public FirstProblem {
 
 		double acceptance_probability(vector<double> old_x, vector<double> new_x);
 
-		vector<double> run_search();
+		vector<double> run_search(string progress_file_name);
 		/**
 		* Create the first generation, with random values within the range of
 		* the possible solution.

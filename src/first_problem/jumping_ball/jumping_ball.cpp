@@ -4,6 +4,10 @@
 #include <limits>
 #include <stdexcept>
 #include <random>
+#include <chrono>
+#include <fstream>
+
+using namespace std::chrono;
 
 #include "soliton.h"
 #include "binomial.h"
@@ -76,8 +80,20 @@ vector<double> JumpingBall::get_neighbour(vector<double> x) {
 	return candidate;
 }
 
-vector<double> JumpingBall::run_search() {
+vector<double> JumpingBall::run_search(string progress_file_name) {
 	vector<double> x = FirstProblem::get_initial_solution();
+
+	// prepare stream for output timing file
+	ofstream progress_file;
+	progress_file.open(progress_file_name);
+	progress_file << "Time,score" << "\n";
+
+	milliseconds begin_time
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	// compute normalization factor for score
+	vector<double> no_redundancy(K, 1);
+	double norm_obj_function = this->objective_function(no_redundancy);
 
 	// keep trace of how much jumps have been done since the beginning
 	int current_iteration = 0;
@@ -144,6 +160,12 @@ vector<double> JumpingBall::run_search() {
 			}
 		}
 
+		// save current best score in output file
+		milliseconds current_time
+			= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	  progress_file << (current_time - begin_time).count() << ","
+									<< (best_score / norm_obj_function) << "\n";
+
 		// report mean of acceptance probability up to now
 		acceptance_mean = acceptance_mean / worsening_proposals;
 		//cout << "mean of acceptance_probability = " << acceptance_mean << '\n';
@@ -151,6 +173,8 @@ vector<double> JumpingBall::run_search() {
 		// update temperature for new round
 		this->temperature = new_temperature();
 	}
+
+	progress_file.close();
 
 	return best_x;
 }

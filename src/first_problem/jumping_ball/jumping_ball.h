@@ -53,7 +53,7 @@ class JumpingBall : public SimulatedAnnealing {
 		using FirstProblem::get_initial_solution;
 		using SimulatedAnnealing::acceptance_probability;
 
-		vector<double> run_search();
+		vector<double> run_search(string progress_file_name);
 		vector<double> get_neighbour(vector<double> x);
 
 		/**

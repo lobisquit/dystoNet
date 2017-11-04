@@ -101,6 +101,10 @@ vector<double> SimulatedAnnealing::run_search(string progress_file_name) {
 	progress_file.open(progress_file_name);
   progress_file << "Time,score" << "\n";
 
+	// compute normalization factor for score
+	vector<double> no_redundancy(K, 1);
+	double norm_obj_function = this->objective_function(no_redundancy);
+
 	milliseconds begin_time
 		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
@@ -166,7 +170,7 @@ vector<double> SimulatedAnnealing::run_search(string progress_file_name) {
 		milliseconds current_time
 			= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	  progress_file << (current_time - begin_time).count() << ","
-									<< best_score << "\n";
+									<< (best_score / norm_obj_function) << "\n";
 
 		// report mean of acceptance probability up to now
 		acceptance_mean = acceptance_mean / worsening_proposals;
