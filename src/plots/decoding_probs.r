@@ -39,13 +39,13 @@ for (csv_file in result_files) {
 
 ## manipulate the dataframe to make plots of correct order
 correct_order_configs = list(
-  list(letter="a", K=1000, N=2000),
-  list(letter="b", K=10, N=100),
-  list(letter="c", K=20, N=100),
-  list(letter="d", K=20, N=200),
-  list(letter="e", K=40, N=200),
-  list(letter="f", K=50, N=500),
-  list(letter="g", K=100, N=1000))
+  list(letter="a", K="1000", N="2000"),
+  list(letter="b", K="10", N="100"),
+  list(letter="c", K="20", N="100"),
+  list(letter="d", K="20", N="200"),
+  list(letter="e", K="40", N="200"),
+  list(letter="f", K="50", N="500"),
+  list(letter="g", K="100", N="1000"))
 
 ## map each couple N, K to the corresponding letter
 eta_probs$letter = apply (eta_probs[,c("K", "N")], 1, function(row) {
@@ -58,26 +58,30 @@ eta_probs$letter = apply (eta_probs[,c("K", "N")], 1, function(row) {
   }
 })
 
+format_names <- function(letters) {
+  lapply(letters, function(letter) {
+    for (config in correct_order_configs) {
+      if (config$letter == letter) {
+        return(
+          sprintf("%s) K = %s, N = %s",
+                  config$letter,
+                  config$K,
+                  config$N
+                  )
+        )
+        ## return("prova")
+      }
+    }
+  })
+}
+
 final_p = ggplot(data=eta_probs, aes(x=eta,
                                      y=prob,
                                      group=interaction(problem, solutor),
                                      color=interaction(problem, solutor, sep=", "),
                                      )) +
   geom_line() +
-  facet_wrap(~ letter, ncol = 2, labeller = function(letters) {
-    ## look up information about given configuration
-    ## and build a proper title
-    lapply(letters, function(letter) {
-      for (config in correct_order_configs) {
-        if (config$letter == letter) {
-          return(sprintf("%s) K = %s, N = %s",
-                    config$letter,
-                    config$K,
-                    config$N))
-        }
-      }
-    })
-  }) +
+  facet_wrap(~ letter, ncol = 2, labeller = as_labeller(format_names)) +
   my_theme() +
   theme(
     ## rotate x ticks lables
