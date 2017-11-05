@@ -236,7 +236,7 @@ vector<double> JumpingBall::run_search(string progress_file_name) {
 		milliseconds current_time
 			= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	  progress_file << (current_time - begin_time).count() << ","
-									<< (best_score / norm_obj_function) << "\n";
+									<< best_score << "\n";
 
 		// report mean of acceptance probability up to now
 		acceptance_mean = acceptance_mean / worsening_proposals;
