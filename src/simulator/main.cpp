@@ -1,7 +1,9 @@
+#include <iostream>
+#include <fstream>
+
+#include "functionCSV.h"
 #include "Network.h"
 #include "Node.h"
-#include "functionCSV.h"
-#include <iostream>
 #include "FC.h"
 #include "vector_utils.h"
 #include "first_problem.h"
@@ -33,19 +35,6 @@ int main(int argc, char* argv[]) {
 	istringstream sseed(argv[5]);
 	if (!(sseed >> seed)) { cerr << "Invalid seed " << argv[5] << '\n'; }
 
-	// // avoid very bad solutions, i.e. distribution where the
-	// // expected number of packets from each node is too high
-
-	// if (d->expectation() > 10 || 1) {
-	// 	cout
-	// 		<< "Solution provided by "
-	// 		<< file_name_stream.str()
-	// 		<< " is suboptimal! E[d] = "
-	// 		<< d->expectation()
-	// 		<< "\n";
-	// 	exit(0);
-	// } " << argv[5] << '\n'; }
-
 	istringstream slen_x(argv[6]);
 	if (!(slen_x >> len_x)) { cerr << "Invalid len_x " << argv[6] << '\n'; }
 
@@ -55,11 +44,14 @@ int main(int argc, char* argv[]) {
 	istringstream sneigh_threshold(argv[8]);
 	if (!(sneigh_threshold >> neigh_threshold)) { cerr << "Invalid neigh_treshold " << argv[8] << '\n'; }
 
+	char* problem = argv[9]; // problem to solve (EDFC or ADFC)
+	char* solver = argv[10]; // solver employed to solve problem
+
 	ostringstream file_name_stream;
 	file_name_stream << "results/"
-									 << argv[9]  // problem to solve (EDFC or ADFC)
+									 << problem
 									 << "/"
-									 << argv[10] // solutor employed to solve problem
+									 << solver
 									 << "-K=" << K
 									 << "-N=" << N
 									 << "-c=" << c
@@ -73,6 +65,37 @@ int main(int argc, char* argv[]) {
 		cerr << "File not accessible!\n";
 		exit(0);
 	}
+
+	// save to CSV file the setting for current run of simulator
+	string summary_file_name = "results/simulator-configurations.csv";
+
+	// check wheather file already exists or not
+	ifstream summary_inspect(summary_file_name);
+	bool file_exists = summary_inspect.good();
+	summary_inspect.close();
+
+	// actually open it in writing mode
+	ofstream summary_file;
+	if (file_exists) {
+		cout << "____> append mode!\n";
+		summary_file.open(summary_file_name, ofstream::app);
+	}
+	else {
+		cout << "____> out mode!\n";
+		summary_file.open(summary_file_name, ofstream::out);
+
+		// if file was not already there, put titles
+		summary_file
+			<< "Problem, Solver, K, N, c, delta, g_1, g_2,"
+			<< "\"Random walk length\", \"Number of packets\"\n";
+	}
+
+	summary_file << problem << ","
+							 << solver << ","
+							 << K << ","
+							 << N << ","
+							 << c << ","
+							 << delta << ",";
 
 	cout
 		<< "... working on "
@@ -95,10 +118,18 @@ int main(int argc, char* argv[]) {
 																				new RobustSoliton(c, delta, K, seed),
 																				0.05);
 
-			cout
-			<< "g1 = "
-			<< problem.objective_function(x) / problem.objective_function(no_redundancy)
-			<< " - ";
+		double g1 = problem.objective_function(x) / problem.objective_function(no_redundancy);
+
+		summary_file << g1 << ",,";
+
+		if (g1 > 10) {
+			cout << "Score too bad, exiting! \n";
+
+			// add empty columns for L_rw and n_pkt
+			summary_file << ",\n";
+			summary_file.close();
+			exit(0);
+		}
 	}
 	else if (string(argv[9]).compare("ADFC") == 0) {
 		// optimal degree distribution
@@ -107,10 +138,17 @@ int main(int argc, char* argv[]) {
 		// reference degree distribution
 		RobustSoliton* rs = new RobustSoliton(c, delta, K, seed);
 
-		cout
-			<< "g2 = "
-			<< d->expectation() / rs->expectation()
-			<< " - ";
+		double g2 = d->expectation() / rs->expectation();
+		summary_file << "," << g2 << ",";
+
+		if (g2 > 10) {
+			cout << "Score too bad, exiting! \n";
+
+			// add empty columns for L_rw and n_pkt
+			summary_file << ",\n";
+			summary_file.close();
+			exit(0);
+		}
 	}
 	else {
 		cerr << "Invalid problem: " << argv[9] << "\n";
@@ -120,10 +158,10 @@ int main(int argc, char* argv[]) {
 	Network net = Network(N, K, len_x, len_y, neigh_threshold, d);
 
 	double random_walk_length = net.spread_packets();
-	cout << " rw_length = " << random_walk_length << " - ";
+	summary_file << random_walk_length << ",";
 
 	// add to objective function number of packets spread in the network
-	cout << " packets = " << net.get_packets_size() << "\n";
+	summary_file << net.get_packets_size();
 
 	int number_of_etas = 10;
 	int number_of_trials = 100;
@@ -154,7 +192,7 @@ int main(int argc, char* argv[]) {
 	output_file_stream << "results/simulator/"
 										 << "etas"
 										 << "-problem=" << argv[9]  // problem to solve (EDFC or ADFC)
-										 << "-solutor=" << argv[10] // solutor employed to solve problem
+										 << "-solver=" << argv[10] // solver employed for the problem
 										 << "-K=" << K
 										 << "-N=" << N
 										 << "-c=" << c
@@ -165,4 +203,7 @@ int main(int argc, char* argv[]) {
 	cout << "written file " << output_file_stream.str() << "\n";
 
 	writeCSV(decoding_probs, output_file_stream.str());
+
+	summary_file << "\n";
+	summary_file.close();
 }
