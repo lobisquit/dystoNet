@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 		// if file was not already there, put titles
 		summary_file
 			<< "Problem, Solver, K, N, c, delta, g_1, g_2,"
-			<< "\"Random walk length\", \"Number of packets\"\n";
+			<< "Lrw, npkt, ntx\n";
 	}
 
 	summary_file << problem << ","
@@ -126,7 +126,7 @@ int main(int argc, char* argv[]) {
 			cout << "Score too bad, exiting! \n";
 
 			// add empty columns for L_rw and n_pkt
-			summary_file << ",\n";
+			summary_file << ",,\n";
 			summary_file.close();
 			exit(0);
 		}
@@ -145,7 +145,7 @@ int main(int argc, char* argv[]) {
 			cout << "Score too bad, exiting! \n";
 
 			// add empty columns for L_rw and n_pkt
-			summary_file << ",\n";
+			summary_file << ",,\n";
 			summary_file.close();
 			exit(0);
 		}
@@ -160,8 +160,10 @@ int main(int argc, char* argv[]) {
 	double random_walk_length = net.spread_packets();
 	summary_file << random_walk_length << ",";
 
-	// add to objective function number of packets spread in the network
-	summary_file << net.get_packets_size();
+	// add to report number of packets spread in the network
+	// and total transmission
+	summary_file << net.get_packets_size() << ",";
+	summary_file << random_walk_length * net.get_packets_size();
 
 	int number_of_etas = 10;
 	int number_of_trials = 100;
