@@ -424,7 +424,7 @@ We chose to focus on these few parameters to highlight the total cost of each al
 Transmission cost, however, is only one side of the coin: in order to be effective, packets have to be recovered in reasonable time by the user.
 
 For the various network configurations labeled in \autoref{tab:results}, we then tested how average successful deconding probability changes with different deconding ratios $\eta$, defined as the fraction of packets collected by the user among $K$.
-Our results are summarized in \autoref{fig:eta_vs_prob}.
+Our results are summarized in \autoref{fig:reliable_ones}.
 
 \bigbreak
 With respect to \gls{edfc} solutions, we noticed that our three heuristics finds similar points, except in network a), where \gls{ga} is the best one by a significant margin.
@@ -461,8 +461,14 @@ TODO:
 \end{table}
 
 \begin{figure}[htp]
-	\label{fig:eta_vs_prob}
-	\includegraphics[]{figures/eta_vs_prob.pdf}
+	\label{fig:eta_vs_prob_adfc_only}
+	\includegraphics[]{figures/eta_vs_prob_adfc_only.pdf}
+	\caption{For each configuration in \autoref{tab:results}, successful deconding probability has been computed varying decoding ratio $\eta$.}
+\end{figure}
+
+\begin{figure}[htp]
+	\label{fig:eta_vs_prob_reliable_ones}
+	\includegraphics[]{figures/eta_vs_prob_reliable_ones.pdf}
 	\caption{For each configuration in \autoref{tab:results}, successful deconding probability has been computed varying decoding ratio $\eta$.}
 \end{figure}
 

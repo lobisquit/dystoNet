@@ -1,4 +1,3 @@
-
 library(reshape2)
 library(ggplot2)
 library(scales)
@@ -22,14 +21,14 @@ for (csv_file in result_files) {
     next
   }
 
+  print(config)
+
   # add row for each probability value
   for (index in 1:dim(probs)[1]) {
-    problem_solver = paste(config["problem"], config["solutor"], sep=", ")
-
     current_eta_probs = data.frame(K = config["K"],
                                    N = config["N"],
                                    problem = config["problem"],
-                                   solutor = config["solutor"],
+                                   solver = config["solver"],
                                    eta = etas[index],
                                    prob = probs[[1]][index])
 
@@ -40,36 +39,47 @@ for (csv_file in result_files) {
 ## map each couple N, K to the corresponding letter
 eta_probs$letter = apply(eta_probs[,c("K", "N")], 1, get_letter)
 
-final_p = ggplot(data=eta_probs, aes(x=eta,
-                                     y=prob,
-                                     group=interaction(problem, solutor),
-                                     color=interaction(problem, solutor, sep=", "),
-                                     )) +
-  geom_line() +
-  facet_wrap(~ letter, ncol = 2, labeller = as_labeller(format_configs)) +
-  my_theme() +
-  theme(
-    ## rotate x ticks lables
-    axis.text.x = element_text(angle = 45, hjust = 1),
+## make two distinct plots: one for ADFC only, to show only GA is reliable
+## and one with all EDFC and the best ADFC, GA
 
-    ## legend settings: position, lines background, title
-    legend.position = c(0.75, 0.1),
+portions = list(
+  "eta_vs_prob_adfc_only" = eta_probs[eta_probs$problem == "ADFC",],
+  "eta_vs_prob_reliable_ones" = eta_probs[eta_probs$problem == "EDFC" | eta_probs$solver == "GA",]
+)
 
-    panel.grid.major = element_line(linetype = "dotted"),
-  ) +
+plots = list()
+for (portion in names(portions)) {
+  plot = ggplot(data=portions[portion][[1]],
+                aes(x=eta,
+                    y=prob,
+                    group=interaction(problem, solver),
+                    color=interaction(problem, solver, sep=", "),
+                    )) +
+    geom_line() +
+    facet_wrap(~ letter, ncol = 2, labeller = as_labeller(format_configs)) +
+    my_theme() +
+    theme(
+      ## rotate x ticks lables
+      axis.text.x = element_text(angle = 45, hjust = 1),
+
+      ## legend settings: position, lines background, title
+      legend.position = c(0.75, 0.1),
+
+      panel.grid.major = element_line(linetype = "dotted"),
+      ) +
   labs(x = "Decoding ratio", y = "Decoding probability") +
   scale_x_continuous(breaks = etas,
                      labels = function(x) format(round(x, 2), nsmall = 2)) +
-  scale_colour_brewer(palette="Set1")
+  scale_colour_brewer(palette="Set1") +
+  guides(col = guide_legend(ncol = 1))
 
-## plot also on window
-final_p
-
-## load all extrafonts
-loadfonts()
-ggsave(plot=final_p,
-       filename="report/figures/eta_vs_prob.pdf",
-       width=15.5,
-       height=20,
-       unit="cm",
-       device="pdf")
+  ## show and save plot
+  plot
+  loadfonts()
+  ggsave(plot=plot,
+         filename=sprintf("report/figures/%s.pdf", portion),
+         width=15.5,
+         height=20,
+         unit="cm",
+         device="pdf")
+}
