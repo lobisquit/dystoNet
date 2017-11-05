@@ -41,3 +41,40 @@ my_theme = function() {
     legend.text = element_text(size = 10),
     )
   }
+
+## manipulate the dataframe to make plots of correct order, as in table
+correct_order_configs <- list(
+  list(letter="a", K="1000", N="2000"),
+  list(letter="b", K="10", N="100"),
+  list(letter="c", K="20", N="100"),
+  list(letter="d", K="20", N="200"),
+  list(letter="e", K="40", N="200"),
+  list(letter="f", K="50", N="500"),
+  list(letter="g", K="100", N="1000"))
+
+get_letter <- function(row) {
+  K = row[1]
+  N = row[2]
+  for (config in correct_order_configs) {
+    if (config$K == K && config$N == N) {
+      return(config$letter)
+    }
+  }
+}
+
+format_configs <- function(letters) {
+  lapply(letters, function(letter) {
+    for (config in correct_order_configs) {
+      if (config$letter == letter) {
+        return(
+          sprintf("%s) K = %s, N = %s",
+                  config$letter,
+                  config$K,
+                  config$N
+                  )
+        )
+        ## return("prova")
+      }
+    }
+  })
+}
