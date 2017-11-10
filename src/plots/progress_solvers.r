@@ -48,9 +48,9 @@ for (letter in unique(progress_solvers$letter)) {
   }
 }
 
-for (problem in c("EDFC", "ADFC")) {
-  current_plot <- ggplot(
-    data=progress_solvers[progress_solvers$problem == problem, ],
+progress_plot <- function(name, dataset) {
+  plot <- ggplot(
+    data=dataset,
     aes(x = Time,
         y = value,
         group = interaction(problem, solver),
@@ -74,12 +74,15 @@ for (problem in c("EDFC", "ADFC")) {
       panel.grid.major = element_line(linetype = "dotted"),
       )
 
-  ggsave(plot=current_plot,
-         filename=sprintf("report/figures/progress/%s.png", problem),
+  ggsave(plot=plot,
+         filename=sprintf("report/figures/progress-%s.png", name),
          width=15.5,
          height=20,
          unit="cm",
          device="png")
-  ## x11()
-  ## print(current_plot)
+
+  plot
 }
+
+progress_plot("adfc", progress_solvers[progress_solvers$problem == "ADFC", ])
+progress_plot("edfc", progress_solvers[progress_solvers$problem == "EDFC", ])
