@@ -8,6 +8,7 @@
 % change default font to charter
 \usepackage{charter}
 \usepackage[bitstream-charter]{mathdesign}
+\usepackage{XCharter}
 
 % Fixing IEEEtran.cls bug with [english]{babel}
 \makeatletter
@@ -30,7 +31,11 @@
 % \usepackage{subfig}
 \usepackage{subcaption}
 \usepackage{amsmath}
+
 \usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+
 \usepackage{amsfonts}
 \usepackage{array}
 \usepackage{verbatim}
@@ -108,7 +113,7 @@
 \title{Heuristic optimization of Distributed Storage Network techniques}
 \author{\IEEEauthorblockN{Federico Mason, Davide Peron, Enrico Lovisotto}\\
 \small{{Department of Information Engineering, University of Padova -- Via Gradenigo, 6/b, 35131 Padova, Italy\\
-Email: {\tt\{masonfed,perondav,lovisott\}@dei.unipd.it}\\}}
+Email: {\tt\{masonfed, perondav, lovisott\}@dei.unipd.it}\\}}
 }
 
 % Reduce the space below figs.
