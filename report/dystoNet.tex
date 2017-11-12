@@ -1,9 +1,24 @@
 % \documentclass[journal]{IEEEtran}
 \documentclass[12pt,journal,draftclsnofoot,onecolumn]{IEEEtran}
-% \documentclass[conference]{IEEEtran}
 \IEEEoverridecommandlockouts
 
-\usepackage{etex}
+% remove colon after subsubsection, use spacing instead
+\makeatletter
+\renewcommand{\@IEEEsectpunct}{\quad}
+\makeatother
+
+\makeatletter
+% add a small spacing *before* subsections
+\let\origsubsubsection\subsubsection
+\renewcommand\subsubsection{\@ifstar{\starsubsubsection}{\nostarsubsubsection}}
+
+\newcommand\nostarsubsubsection[1]
+{\subsubsectionprelude\origsubsubsection{#1}}
+
+\newcommand\subsubsectionprelude{%
+  \vspace{6pt}
+}
+\makeatother
 
 % change default font to charter
 \usepackage{charter}
