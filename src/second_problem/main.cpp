@@ -7,6 +7,7 @@
 #include "soliton.h"
 #include "second_problem.h"
 #include <chrono>
+#include "functionCSV.h"
 
 using namespace std::chrono;
 

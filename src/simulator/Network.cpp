@@ -11,7 +11,7 @@ Network::Network(
 	double len_y,
 	double max_distance,
 	Distribution* distribution) {
-	cout << "======> Building network\n";
+	cerr << "======> Building network\n";
 
 	// setup random number generation
 	this->rng = distribution->get_rng();
@@ -59,7 +59,7 @@ Network::Network(
 		}
 	}
 
-	cout << "======> Network built \n";
+	cerr << "======> Network built \n";
 }
 
 Node* Network::get_nodes() {
@@ -78,12 +78,15 @@ int Network::get_nodes_size() {
 	return this->N;
 }
 
-void Network::spread_packets() {
+double Network::spread_packets() {
+	// save here average length of random walks
+	double walks_length = 0;
+
 	// perform a random walk for each packet
 	for (int i = 0; i < this->get_packets_size(); i++) {
-		cout
+		cerr
 			<< "Spreading pkt " << (i + 1)
-			<< "/" << this->get_packets_size() << "\r";
+			<< "/" << this->get_packets_size() << "\n";
 
 		// add packet to sensing (source) node
 		Packet* pkt = &this->packets[i];
@@ -99,19 +102,24 @@ void Network::spread_packets() {
 
 			// set random neighbour as next node in the trip
 			node = neighbours[next(this->rng)];
+
+			// increment walks length
+			walks_length++;
 		}
 
 		// add pkt to the final step of random walk
 		node->add_packet(pkt);
 	}
-	cout << "\n";
+	cerr << "\n";
 
 	// keep only "degree" packets for each node
 	for (int i = 0; i < this->get_nodes_size(); i++) {
 		Node* node = &this->nodes[i];
-
 		node->filter_packets();
 	}
+
+	// return average length of random walk of each packet
+	return walks_length / this->get_packets_size();
 }
 
 vector<vector<int>> Network::collector(int h) {
@@ -153,47 +161,4 @@ vector<vector<int>> Network::collector(int h) {
 		}
 	}
 	return en_matrix;
-}
-
-bool message_passing(int h, vector<vector<int>> en_matrix) {
-	vector<int> degrees(h);
-	bool decoded, fail = false;
-
-	while (fail == false) {
-		decoded = true;
-		/** Compute degree of each packet in the matrix */
-		for (int i=0; i<h; i++) {
-			vector<int>* row = &en_matrix[i];
-			int degree = 0;
-			for (int j: *row) {
-				degree += j;
-			}
-			if (degree > 1) {
-				decoded = false;
-			}
-			degrees.at(i) = degree;
-		}
-		if (decoded == true) {
-			return true;
-		}
-		/** Simplify one-degree nodes */
-		fail = true;
-		for (int i=0; i<h; i++){
-			if (degrees.at(i) == 1){
-				// cout << "\n One-degree at row " << i;
-				fail = false;
-				/** Simplify the packet of the one-degree node */
-				vector<int>* one_degree = &en_matrix[i];
-				for (unsigned int j = 0; j < one_degree->size(); j++) {
-					if (one_degree->at(j) == 1){
-						// cout << " and column " << j;
-						for (unsigned int row = 0; row < en_matrix.size(); row++) {
-								en_matrix[row][j] = 0;
-						}
-					}
-				}
-			}
-		}
-	}
-	return false;
 }

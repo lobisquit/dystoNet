@@ -4,6 +4,10 @@
 #include <limits>
 #include <stdexcept>
 #include <random>
+#include <chrono>
+#include <fstream>
+
+using namespace std::chrono;
 
 #include "soliton.h"
 #include "binomial.h"
@@ -58,15 +62,20 @@ individual SimulatedAnnealing::get_neighbour(individual old_individual) {
 		} while(second_d == first_d || candidate[first_d] + candidate[second_d] > 1);
 
 		// "move" some probability from start to end point
-		uniform_real_distribution<double> perturbation(0, min(candidate[first_d], candidate[second_d]));
+		uniform_real_distribution<double> perturbation(0,
+																									 min(candidate[first_d],
+																											 candidate[second_d]));
 
 		double delta = perturbation(rng);
-		candidate[first_d] -= delta;
-		candidate[second_d]   += delta;
+		candidate[first_d]  -= delta;
+		candidate[second_d] += delta;
 
 	} while (!SecondProblem::respect_constraints(candidate));
 
-	new_individual = update_objective_function(old_individual, candidate, first_d, second_d);
+	new_individual = update_objective_function(old_individual,
+																						 candidate,
+																						 first_d,
+																						 second_d);
 
 	return new_individual;
 }
@@ -95,9 +104,20 @@ double SimulatedAnnealing::temperature_steps() {
 	return this->steps_coefficient / this->temperature;
 }
 
-vector<double> SimulatedAnnealing::run_search() {
-
+vector<double> SimulatedAnnealing::run_search(string progress_file_name) {
 	vector<double> v = SecondProblem::get_initial_solution();
+
+	// prepare stream for output timing file
+	ofstream progress_file;
+	progress_file.open(progress_file_name);
+	progress_file << "Time,score" << "\n";
+
+	milliseconds begin_time
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+	// compute normalization factor for score
+	vector<double> no_redundancy(K, 1);
+	double norm_obj_function = this->objective_function(no_redundancy);
 
 	// keep trace of how much jumps have been done since the beginning
 	int current_iteration = 0;
@@ -113,8 +133,10 @@ vector<double> SimulatedAnnealing::run_search() {
 	vector<double> new_v(this->K, 1);
 	double new_score;
 
+	int worsening_counter = 0;
+
 	// random variable that set the threshold for accepting worse solutions
-	uniform_real_distribution<double> acceptance_threshold(0,1);
+	uniform_real_distribution<double> acceptance_threshold(0, 1);
 
 	individual new_individual;
 
@@ -125,12 +147,11 @@ vector<double> SimulatedAnnealing::run_search() {
 		// round of search for current temperature
 		for(int i = 0; i < temperature_steps(); i++) {
 			current_iteration++;
+
 			// search new candidate, save it to new_x
 			new_individual = get_neighbour(old_individual);
-
 			new_score = new_individual.obj_function;
-
-			v = new_individual.values;
+			new_v = new_individual.values;
 
 			double delta = new_score - old_score;
 			// accept or reject according to acceptance probability
@@ -141,37 +162,60 @@ vector<double> SimulatedAnnealing::run_search() {
 				v = new_v;
 				new_v = tmp;
 
-				Distribution* v_distribution = new Distribution(v, 1);
+				Distribution v_distribution = Distribution(v, 1);
 				double g2 =
-					v_distribution->expectation() /
+					v_distribution.expectation() /
 					robust_soliton->expectation();
 
 				cerr << "=====> "
-					<< current_iteration << "/" << this->max_iterations
-					<< " ==> temperature = " << this->temperature
-					<< " ==> score = " << new_score
-					<< " ==> g2 = " << g2 << "\r";
+						 << current_iteration << "/" << this->max_iterations
+						 << " ==> temp = " << this->temperature
+						 << " ==> best_score = " << best_score
+						 << " ==> score = " << new_score
+						 << " ==> g2 = " << g2
+						 << " ==> worse_count = " << worsening_counter
+						 << "\n";
 
 				// update best result (up to now) if needed
-				if (new_score < best_score) {
+				if (delta < 0) {
 					best_score = new_score;
 					best_v = v;
+				}
 
-					cerr << "=====> "
-						<< current_iteration << "/" << this->max_iterations
-						<< " ==> temperature = " << this->temperature
-						<< " ==> score = " << new_score
-						<< " ==> g2 = " << g2 << "\n";
+				// plan to stop if improvement (new best score) is lower than a threshold
+				if (delta < 0.00001) {
+					worsening_counter++;
+				}
+				else {
+					worsening_counter = 0;
 				}
 			}
+
+			// stop at given temperature if improvements are negligible
+			if (worsening_counter > 1000) {
+				break;
+			}
+
 			// keep current score for the next cycle
 			old_score = new_score;
 			old_individual = new_individual;
 		}
 
+		// stop whole process if no improvement is found for all temperatures
+		// in a long time
+		if (worsening_counter > 10000) {
+			break;
+		}
+
+		// save current best score in output file
+		milliseconds current_time
+			= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	  progress_file << (current_time - begin_time).count() << ","
+									<< best_score << "\n";
+
 		// update temperature for new round
 		this->temperature = new_temperature();
 	}
-
+	progress_file.close();
 	return best_v;
 }

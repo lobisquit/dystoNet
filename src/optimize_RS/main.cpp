@@ -1,19 +1,11 @@
-#include "Network.h"
 #include <iostream>
 #include "soliton.h"
 #include <algorithm>
+#include "functionCSV.h"
+#include "FC.h"
+#include "vector_utils.h"
 
 using namespace std;
-
-vector<double> linspace(double start, double stop, int num) {
-	vector<double> out;
-	double step = (stop - start) / (num - 1);
-
-	for (int i = 0; i < num; i++) {
-		out.push_back(start + i*step);
-	}
-	return out;
-}
 
 double max(vector<double> v) {
 	double max_value = -1 * numeric_limits<double>::infinity();
@@ -65,13 +57,12 @@ int main(int argc, char* argv[]) {
 		indeces.push_back(i);
 	}
 
-	// store successful decoding probability of each (c, eta) couple
-	vector<vector<double>> dec_probabilities
-		(number_of_cs, vector<double>(number_of_decoding_ratios, 0));
-
 	for (unsigned int c_index = 0; c_index < cs.size(); c_index++) {
 		double c = cs[c_index];
 		cout << "c index = " << c_index << "/" << cs.size() << "\n";
+
+		// store successful decoding probability of each (c, eta) couple
+		vector<double> dec_probabilities(number_of_decoding_ratios, 0);
 
 		for (unsigned int eta_index = 0; eta_index < etas.size(); eta_index++) {
 			cout << "eta index = " << eta_index << "/" << etas.size() << "\n";
@@ -79,9 +70,9 @@ int main(int argc, char* argv[]) {
 
 			double mean_dec_probability = 0;
 			for (int trial = 0; trial < number_of_trials; trial++) {
-				cout << "trial " << trial << "\r";
+				// cout << "trial " << trial << "\r";
 
-				RobustSoliton rs = RobustSoliton(c, delta, K, seed);
+				RobustSoliton rs = RobustSoliton(c, delta, K, trial);
 
 				// populate coding matrix
 				vector<vector<int>> coding_matrix(max_rows, vector<int>(K, 0));
@@ -100,14 +91,20 @@ int main(int argc, char* argv[]) {
 			}
 			mean_dec_probability /= number_of_trials;
 
-			dec_probabilities[c_index][eta_index] = mean_dec_probability;
+			dec_probabilities[eta_index] = mean_dec_probability;
 		}
-	}
 
-	for (vector<double> row: dec_probabilities) {
-		for (double p: row) {
-			cout << p << ", ";
-		}
-		cout << "\n";
+		// for every c, output results
+		ostringstream file_name_stream;
+		file_name_stream << "results/optimize_c/trials"
+										 << "-K=" << K
+										 << "-N=" << N
+										 << "-c=" << c
+										 << "-etas=" << etas.front()
+										 << "," << etas.back()
+										 << "," << etas.size()
+										 << "-delta=" << delta
+										 << ".csv";
+		writeCSV(dec_probabilities, file_name_stream.str());
 	}
 }

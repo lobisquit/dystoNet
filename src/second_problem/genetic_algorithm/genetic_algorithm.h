@@ -72,7 +72,7 @@ class GeneticAlgorithm : public SecondProblem {
 
 		vector<double> get_individual();
 
-		vector<double> run_search();
+		vector<double> run_search(string progress_file_name);
 };
 
 #endif

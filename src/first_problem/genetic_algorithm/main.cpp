@@ -48,7 +48,18 @@ int main(int argc, char* argv[]) {
 	cout << GA << "\n";
 
 	vector<double> no_redundancy(K, 1);
-	vector<double> best_redundancy = GA.run_search();
+
+	ostringstream progress_name_stream;
+	progress_name_stream << "results/EDFC-progress/GA"
+											 << "-K=" << K
+											 << "-N=" << N
+											 << "-c=" << c
+											 << "-delta=" << delta
+											 << "-seed=" << seed
+											 << ".csv";
+
+	vector<double> best_redundancy = GA.run_search(progress_name_stream.str());
+
 	cout << "Arriving to score "
 		<< (
 			GA.objective_function(best_redundancy) / GA.objective_function(no_redundancy)

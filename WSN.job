@@ -11,5 +11,8 @@ cd ~/dystoNet/
 
 # example of execution
 date
-python3 make.py --deps first_problem utils --package first_problem/genetic_algorithm --mode run --configs sample.json
+
+source venv/bin/activate
+python make.py --package simulator --deps utils first_problem second_problem
+
 date

@@ -49,7 +49,17 @@ int main(int argc, char* argv[]) {
 
 	std::cout << JB << "\n";
 
-	vector<double> best_redundancy = JB.run_search();
+	ostringstream progress_name_stream;
+	progress_name_stream << "results/EDFC-progress/JB"
+											 << "-K=" << K
+											 << "-N=" << N
+											 << "-c=" << c
+											 << "-delta=" << delta
+											 << "-seed=" << seed
+											 << ".csv";
+
+	vector<double> best_redundancy = JB.run_search(progress_name_stream.str());
+
 	std::cout << "g1 = "
 						<< (
 								JB.objective_function(best_redundancy) /

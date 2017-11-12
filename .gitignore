@@ -29,3 +29,6 @@
 *.app
 
 doc/html/*
+
+# Python virtualenv
+venv/

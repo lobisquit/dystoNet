@@ -1,7 +1,14 @@
+#include <iostream>
+#include <fstream>
+
+#include "functionCSV.h"
 #include "Network.h"
 #include "Node.h"
-#include "functionCSV.h"
-#include <iostream>
+#include "FC.h"
+#include "vector_utils.h"
+#include "first_problem.h"
+#include "second_problem.h"
+#include "soliton.h"
 
 int main(int argc, char* argv[]) {
 	int K;
@@ -37,11 +44,14 @@ int main(int argc, char* argv[]) {
 	istringstream sneigh_threshold(argv[8]);
 	if (!(sneigh_threshold >> neigh_threshold)) { cerr << "Invalid neigh_treshold " << argv[8] << '\n'; }
 
+	char* problem = argv[9]; // problem to solve (EDFC or ADFC)
+	char* solver = argv[10]; // solver employed to solve problem
+
 	ostringstream file_name_stream;
 	file_name_stream << "results/"
-									 << argv[9] // problem to solve (EDFC or ADFC)
+									 << problem
 									 << "/"
-									 << argv[10] // solutor employed to solve problem
+									 << solver
 									 << "-K=" << K
 									 << "-N=" << N
 									 << "-c=" << c
@@ -49,58 +59,153 @@ int main(int argc, char* argv[]) {
 									 << "-seed=" << seed
 									 << ".csv";
 
+	// check if file exists
+	ifstream infile(file_name_stream.str());
+	if (!infile.good()) {
+		cerr << "File not accessible!\n";
+		exit(0);
+	}
+
+	// save to CSV file the setting for current run of simulator
+	string summary_file_name = "results/simulator-configurations.csv";
+
+	// check wheather file already exists or not
+	ifstream summary_inspect(summary_file_name);
+	bool file_exists = summary_inspect.good();
+	summary_inspect.close();
+
+	// actually open it in writing mode
+	ofstream summary_file;
+	if (file_exists) {
+		cout << "____> append mode!\n";
+		summary_file.open(summary_file_name, ofstream::app);
+	}
+	else {
+		cout << "____> out mode!\n";
+		summary_file.open(summary_file_name, ofstream::out);
+
+		// if file was not already there, put titles
+		summary_file
+			<< "Problem, Solver, K, N, c, delta, g_1, g_2,"
+			<< "Lrw, npkt, ntx\n";
+	}
+
+	summary_file << problem << ","
+							 << solver << ","
+							 << K << ","
+							 << N << ","
+							 << c << ","
+							 << delta << ",";
+
+	cout
+		<< "... working on "
+		<< file_name_stream.str()
+		<< " - ";
+
 	vector<double> x = readCSV(file_name_stream.str());
 
 	Distribution* d = NULL;
 	if (string(argv[9]).compare("EDFC") == 0) {
-	  d = new OverheadRobustSoliton(x, c, delta, K, seed);
+		d = new OverheadRobustSoliton(x, c, delta, K, seed);
+
+		// distribution with no overhead
+		vector<double> no_redundancy(K, 1);
+
+		// print reference objective function
+		FirstProblem problem = FirstProblem(
+																				K,
+																				N,
+																				new RobustSoliton(c, delta, K, seed),
+																				0.05);
+
+		double g1 = problem.objective_function(x) / problem.objective_function(no_redundancy);
+
+		summary_file << g1 << ",,";
+
+		if (g1 > 10) {
+			cout << "Score too bad, exiting! \n";
+
+			// add empty columns for L_rw and n_pkt
+			summary_file << ",,\n";
+			summary_file.close();
+			exit(0);
+		}
 	}
 	else if (string(argv[9]).compare("ADFC") == 0) {
-	  d = new Distribution(x, seed);
+		// optimal degree distribution
+		d = new Distribution(x, seed);
+
+		// reference degree distribution
+		RobustSoliton* rs = new RobustSoliton(c, delta, K, seed);
+
+		double g2 = d->expectation() / rs->expectation();
+		summary_file << "," << g2 << ",";
+
+		if (g2 > 10) {
+			cout << "Score too bad, exiting! \n";
+
+			// add empty columns for L_rw and n_pkt
+			summary_file << ",,\n";
+			summary_file.close();
+			exit(0);
+		}
 	}
 	else {
 		cerr << "Invalid problem: " << argv[9] << "\n";
 	}
 
+	// create Network and perform encoding
 	Network net = Network(N, K, len_x, len_y, neigh_threshold, d);
 
-	net.spread_packets();
+	double random_walk_length = net.spread_packets();
+	summary_file << random_walk_length << ",";
 
-	Node* nodes = net.get_nodes();
-	for (int i=0; i<net.get_nodes_size(); i++) {
-		cout
-			<< nodes[i]
-			<< " -> "
-			<< nodes[i].get_packets().size()
-			<< "\n";
-	}
+	// add to report number of packets spread in the network
+	// and total transmission
+	summary_file << net.get_packets_size() << ",";
+	summary_file << random_walk_length * net.get_packets_size();
 
-	cout << "N = " << N << ", K = " << K << ", Ps = [";
-	/** Number of times in which I pick randomly h nodes */
-	int m = 10;
-	/** Number of times I repeat the random process, to ensure the convergence,
-	* take the mean of the set of taken measures */
-	int t = 10;
-	int ms, h, steps = 16;
-	/** Compute delta to build the linspace */
-	double delta_step = (2.5 - 1)/(steps - 1);
-	for (int j = 0; j<steps; j++) {
-		cout << "j= " << j << "\n";
-		h = round(K * (1+j*delta_step));
+	int number_of_etas = 10;
+	int number_of_trials = 100;
+
+	vector<double> decoding_probs;
+
+	// loop through all eta values wanted, e.g. 10
+	for (double eta: linspace(1, 2.5, number_of_etas)) {
+		cerr << "testing eta = " << eta << "\n";
+		double decoding_prob = 0;
+
 		vector<vector<int>> en_matrix;
-		/** Random number generator used in random_shuffle function */
-		srand(time(0));
-		double mean = 0;
-		for(int z = 0; z < t; z++){
-			cout << "z= " << z << "\r";
-			ms = 0;
-			for(int i = 0; i < m; i++){
-				en_matrix = net.collector(h);
-				ms += message_passing(h, en_matrix);
-			}
-			mean += (double)ms/m;
+		unsigned int h = (unsigned int) K * eta;
+
+		// repeat process many times, to compute successful probability
+		for (int i=0; i<number_of_trials; i++) {
+			// collect packets from h nodes randomly across N
+			en_matrix = net.collector(h);
+			decoding_prob += message_passing(h, en_matrix) ? 1 : 0;
 		}
-		cout << mean/t << ", ";
+		decoding_prob /= number_of_trials;
+
+		// add probability to output vector
+		decoding_probs.push_back(decoding_prob);
 	}
-	cout << "]\n";
+
+	ostringstream output_file_stream;
+	output_file_stream << "results/simulator/"
+										 << "etas"
+										 << "-problem=" << argv[9]  // problem to solve (EDFC or ADFC)
+										 << "-solver=" << argv[10] // solver employed for the problem
+										 << "-K=" << K
+										 << "-N=" << N
+										 << "-c=" << c
+										 << "-delta=" << delta
+										 << "-seed=" << seed
+										 << ".csv";
+
+	cout << "written file " << output_file_stream.str() << "\n";
+
+	writeCSV(decoding_probs, output_file_stream.str());
+
+	summary_file << "\n";
+	summary_file.close();
 }

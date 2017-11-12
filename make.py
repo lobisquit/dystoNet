@@ -29,7 +29,7 @@ def exec_command(command, **env_variables):
 	env = dict(os.environ)
 	env.update(env_variables)
 
-	print('------> ', command)
+	print('------> ', command, file=sys.stderr)
 	return subprocess.call(command,
 		shell=True,
 		# load all environment variable and add new wanted ones
@@ -227,7 +227,7 @@ if __name__ == '__main__':
 						configurations = iter_options(params)
 						for index, configuration in enumerate(configurations):
 							print('------> Running {} of section {} of {}: {}/{}'.format(
-								configuration, section, config_file, index+1, len(configurations)))
+								configuration, section, config_file, index+1, len(configurations)), file=sys.stderr)
 
 							if cmd_args.mode != 'dry-run':
 								# run current configuration

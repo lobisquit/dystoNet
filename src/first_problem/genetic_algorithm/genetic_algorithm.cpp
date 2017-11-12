@@ -5,12 +5,15 @@
 #include <stdexcept>
 #include <random>
 #include <algorithm>
+#include <chrono>
+#include <fstream>
+
+using namespace std::chrono;
+using namespace std;
 
 #include "soliton.h"
 #include "genetic_algorithm.h"
 #include "first_problem.h"
-
-using namespace std;
 
 GeneticAlgorithm::GeneticAlgorithm(int K,
 									int N,
@@ -45,8 +48,16 @@ vector<vector<double>> GeneticAlgorithm::get_initial_population() {
 	return population;
 }
 
-vector<double> GeneticAlgorithm::run_search() {
+vector<double> GeneticAlgorithm::run_search(string progress_file_name) {
 	int generation = 0;
+
+	// prepare stream for output timing file
+	ofstream progress_file;
+	progress_file.open(progress_file_name);
+	progress_file << "Time,score" << "\n";
+
+	milliseconds begin_time
+		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
 	vector<vector<double>> population = get_initial_population();
 	/** Selection */
@@ -58,21 +69,18 @@ vector<double> GeneticAlgorithm::run_search() {
 
 	vector<double> no_redundancy(this->K, 1);
 
-	double b0 = objective_function(no_redundancy);
+	// keep memory of best result of last iteration
+	double current_g1 = 0;
+	int worsening_counter = 0;
 
 	while(generation < this->num_generations){
-		cout << generation << "/" << this->num_generations << "\n";
+		current_g1 = this->objective_function(population[0]) / this->objective_function(no_redundancy);
+
 		/** Sorting of the population */
 		std::sort(population.begin(), population.end(),
 			[this](vector<double> s1, vector<double> s2) -> bool {
 				return this->objective_function(s1) < this->objective_function(s2);
 			});
-
-		// cerr << "=====> "
-		// 	<< generation << "/" << this->num_generations
-		// 	<< " ==> g1 = "
-		// 	/** Best score for this generation, since vectors are sorted */
-		// 	<< this->objective_function(population[0]) / b0 << "\n";
 
 		/** Copy the best individuals in the population, and then
 		* perturbe them checking constraints are still met.
@@ -116,8 +124,37 @@ vector<double> GeneticAlgorithm::run_search() {
 				population[j * part_size + i] = candidate;
 			}
 		}
+
+		/**
+		 * If improvement is too small for too many iterations, stop.
+		 */
+		double new_g1 = this->objective_function(population[0]) / this->objective_function(no_redundancy);
+		if (new_g1 > current_g1 - 0.00001) {
+			worsening_counter++;
+		}
+		else {
+			worsening_counter = 0;
+		}
+		if (worsening_counter > 100) {
+			break;
+		}
+
+		cerr << "=====> "
+				 << generation << "/" << this->num_generations
+				 << " ==> g1 = " << current_g1
+				 << " ==> new_g1 = " << new_g1
+				 << " ==> worsening_steps = " << worsening_counter << "\n";
+
+		// save current best score in output file
+		milliseconds current_time
+			= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+		progress_file << (current_time - begin_time).count() << ","
+									<< new_g1 << "\n";
+
 		generation++;
 	}
+	progress_file.close();
+
 	return population[0];
 }
 
