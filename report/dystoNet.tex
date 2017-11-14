@@ -21,9 +21,9 @@
 \makeatother
 
 % change default font to charter
-\usepackage{charter}
-\usepackage[bitstream-charter]{mathdesign}
-\usepackage{XCharter}
+% \usepackage{charter}
+% \usepackage[bitstream-charter]{mathdesign}
+% \usepackage{XCharter}
 \usepackage{amsfonts}
 
 % Fixing IEEEtran.cls bug with [english]{babel}
@@ -464,7 +464,13 @@ This was unfeasible for big network configurations, where heuristic search proce
 In paper\cite{Lin2007}, the proposal was to drop the contribute of coefficients after index $K/R$, since reference Robust Soliton distribution probability is considered irrelevant in that region.
 
 %TODO Davide scrivi quello che hai fatto per l'update della objective function
-We discard this hypothesis, proposing an adaptive strategy, ...
+We discard this hypothesis, proposing an adaptive strategy.
+
+Since all the optimization algorithms perturb only 2 components of the solution array, we can update only the members of the sum in \autoref{eq:sp} that change with these two components.
+Given \textit{first\_d} and \textit{second\_d} the perturbated components of the solution array, we have to remove from the sum the contributes of the values of \textit{first\_d} and \textit{second\_d} before the perturbation and add the contributes of their values after the perturbation.
+This shrewdness decrease the computational complexity from $O(K^2)$ to $O(K)$.
+
+Furthermore, since the objective function is calculated as the square sum of $\nu^\prime(i) - \mu(i)$ for $i=1 \dots K$, if the increment becomes negligible, we accept the current value of the sum as a good approximation of the real objective function.
 
 As can be seen in \autoref{fig:progress-adfc}, the best solver for \gls{adfc} problem is clearly \gls{ga}, because \gls{jb} and \gls{sa} solutions were highly suboptimal in some contexts, e.g. \emph{a)}, or the path to reach them was rough, far from the optimal region of the solution space.
 Again, we think that \gls{ga} heuristic was more powerful and fit to the problem.
