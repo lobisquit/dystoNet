@@ -41,8 +41,7 @@ SimulatedAnnealing::SimulatedAnnealing(
 }
 
 vector<double> SimulatedAnnealing::get_neighbour(vector<double> x) {
-
-	// initializa distributions
+	// initialize distributions
 	uniform_real_distribution<double>
 		perturbation(- this->temperature*2, this->temperature);
 	uniform_int_distribution<int> index_choice(0, this->K-1);

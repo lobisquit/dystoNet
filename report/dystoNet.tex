@@ -219,7 +219,7 @@ For a good packet spreading, \gls{edfc} and \gls{adfc} spreading algorithms requ
 \smallbreak
 According to \gls{edfc} algorithm, a node of chosen degree $d$ should receive, at the end of the spreading phase, $x_d d$ packets, where $x_d$ is called \emph{redundancy coefficient}.
 
-The following optimization problem, aims to reduce at the minimum the transmission cost introduced by this approach, guaranteeing at the same time an upper bound to the failure probability $\delta$.\cite{Lin}
+The following optimization problem, aims to reduce at the minimum the transmission cost introduced by this approach, guaranteeing at the same time an upper bound to the failure probability $\delta$.\cite{Lin2007}
 
 \begin{equation}
 	\label{eq:fp}
@@ -258,18 +258,58 @@ The following optimization problem, aims to reduce at the minimum the transmissi
 			E = \sum_{i = 1}^{K} \nu(d) d
 		\end{dcases}
 	\end{split}
-\end{equation}
-
-\bigbreak
+\end{equation} \vspace{0cm}
 
 We can notice immediately that \autoref{eq:fp} and \autoref{eq:sp} are not solvable with \emph{convex optimization} techniques, as they don't minimize convex objective functions over convex sets.
 
 To overcome this issue, we chose some heuristic approaches, whose convergence to the optimum is not guaranteed in polynomial time, but whose effectiveness has been proven in many fields \cite{Edelkamp2010} where traditional tools (such as \emph{simplex} or \emph{gradient descent}) cannot be applied.
 
-%TODO put here primitives of heuristic search? (now in SA chapter)
+\subsection{Perturbation strategies}
+Each heuristic technique requires, in order to explore problem solution space effectively, a primitive function, called \emph{perturbation}.
+Given a valid parameter configuration, this routine should provide a new point \emph{nearby} the current one that satisfies problem constraints.
+Such candidate solution is then accepted or rejected given its objective function value, according to the various research algorithms.
 
+\smallbreak
+The two considered problems are very different with respect to their constraints, so we developed two different strategies, whose pseudocode is available in \autoref{algo:perturb_edfc} and \autoref{algo:perturb_adfc} respectively.
+
+\begin{algorithm}[htp]
+\caption{\gls{edfc} perturbation} \label{algo:perturb_edfc}
+	\KwIn{Primitive \emph{respect constraints} for \gls{edfc}, $\vec{x}_{old}$}
+	\KwOut{$\vec{x}_{new}$}
+
+	\Repeat{$\vec{x}_{new}$ \emph{respects constraints}} {
+		$\vec{x}_{new}$ $\gets$ copy($\vec{x}_{old}$) \\
+		pick an integer $d \sim \mathcal{U}([1, K])$ \\
+		pick a real number $\Delta \sim \mathcal{U}([-2T, T])$ \\
+		$\vec{x}_{new}$[d] = $\vec{x}_{new}$[d] + $\Delta$
+	}
+	\Return{$\vec{x}_{new}$}
+\end{algorithm}
+
+\begin{algorithm}[htp]
+\caption{\gls{adfc} perturbation} \label{algo:perturb_adfc}
+	\KwIn{Primitive \emph{respect constraints} for \gls{adfc}, vector of probabilities $\nu_{old}$}
+	\KwOut{vector of probabilities $\nu_{new}$}
+	\Repeat{$\nu_{new}$ \emph{respects constraints}} {
+		$\nu_{new} \gets$ copy($\nu_{old}$) \\
+		\Repeat{$\nu_{new}[d_1] \ne 0$}{
+			pick $d_1 \sim \mathcal{U}([1, K])$
+		}
+
+		\Repeat{$d_1 \neq d_2 ~\land~ \nu_{new}[d_1] + \nu_{new}[d_2] < 1$}{
+			pick $d_2 \sim \mathcal{U}([1, K])$ \\
+		}
+
+		pick a real number $\Delta \sim \mathcal{U}([0, \min\{\nu_{new}[d_1], \nu_{new}[d_2]\}])$ \\
+
+		$\nu_{new}[d_1] \gets \nu_{new}[d_1] - \Delta$ \\
+		$\nu_{new}[d_2] \gets \nu_{new}[d_2] + \Delta$ \\
+	}
+	\Return{$\nu_{new}$}
+\end{algorithm}
+
+\clearpage
 \subsection{Simulated Annealing}
-
 The first algorithm we implement is known as \gls{sa}.
 \gls{sa} is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects.
 In this physical process a piece of metal is warmed at high temperatures and then slowly cooled. In this way it is possible to achieve the molecular equilibrium inside the material itself.
@@ -305,10 +345,10 @@ The algorithm is provided as pseudocode in \autoref{algo:SA}.
 		Initial Temperature,
 		Maximum number of steps,
 		Steps Coefficient,
-		Acceptance Coefficient}
+		Acceptance Coefficient,
+		Perturb function}
 \KwOut{Optimal solution}
 \caption{Simulated Annealing} \label{algo:SA}
-
 $T \gets$ Initial Temperature \\
 $x \gets$ Random valid point() \\
 $x_{best} \gets x$ \\
@@ -319,7 +359,7 @@ $N_S^{MAX} \gets $ Maximum number of steps \\
 \While{$N_S < N_S^{MAX}$} {
 	$C_S \gets$ Steps coefficient ($T$) \\
 	\For{$i = 1$ to $C_S$} {
-		$\vec{x}_{new} \gets$ Neighbour$(\vec{x})$\\
+		$\vec{x}_{new} \gets$ Perturb$(\vec{x})$\\
 		$P_A \gets$ Acceptance probability($\vec{x}$, $\vec{x}_{new}$, $C_A$) \\
 		\wpPa {
 			$\vec{x} \gets \vec{x}_{new}$\\
@@ -463,14 +503,10 @@ This was unfeasible for big network configurations, where heuristic search proce
 
 In paper\cite{Lin2007}, the proposal was to drop the contribute of coefficients after index $K/R$, since reference Robust Soliton distribution probability is considered irrelevant in that region.
 
-%TODO Davide scrivi quello che hai fatto per l'update della objective function
 We discard this hypothesis, proposing an adaptive strategy.
-
-Since all the optimization algorithms perturb only 2 components of the solution array, we can update only the members of the sum in \autoref{eq:sp} that change with these two components.
-Given \textit{first\_d} and \textit{second\_d} the perturbated components of the solution array, we have to remove from the sum the contributes of the values of \textit{first\_d} and \textit{second\_d} before the perturbation and add the contributes of their values after the perturbation.
-This shrewdness decrease the computational complexity from $O(K^2)$ to $O(K)$.
-
-Furthermore, since the objective function is calculated as the square sum of $\nu^\prime(i) - \mu(i)$ for $i=1 \dots K$, if the increment becomes negligible, we accept the current value of the sum as a good approximation of the real objective function.
+Since the proposed perturbation strategy for \gls{adfc} modifies only two components of the solution array at a time, we decided to update only the correspoding terms of the sum in \autoref{eq:sp}.
+This approach neglects the other $K-2$ terms of the sum, supposing they are almost unchanged.
+This hypothesis has proven correct in practice, where error with respect to correct computation is negligible, but computational complexity is reduced from $O(K^2)$ to $O(K)$.
 
 As can be seen in \autoref{fig:progress-adfc}, the best solver for \gls{adfc} problem is clearly \gls{ga}, because \gls{jb} and \gls{sa} solutions were highly suboptimal in some contexts, e.g. \emph{a)}, or the path to reach them was rough, far from the optimal region of the solution space.
 Again, we think that \gls{ga} heuristic was more powerful and fit to the problem.
