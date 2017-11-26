@@ -127,9 +127,9 @@
 \graphicspath{{./figures/}}
 
 \title{Heuristic optimization of Distributed Storage Network techniques}
-\author{\IEEEauthorblockN{Federico Mason, Davide Peron, Enrico Lovisotto}\\
+\author{\IEEEauthorblockN{Enrico Lovisotto, Federico Mason, Davide Peron}\\
 \small{{Department of Information Engineering, University of Padova -- Via Gradenigo, 6/b, 35131 Padova, Italy\\
-Email: {\tt\{masonfed, perondav, lovisott\}@dei.unipd.it}\\}}
+Email: {\tt\{lovisott, masonfed, perondav\}@dei.unipd.it}\\}}
 }
 
 % Reduce the space below figs.
@@ -138,7 +138,7 @@ Email: {\tt\{masonfed, perondav, lovisott\}@dei.unipd.it}\\}}
 \renewcommand{\equationautorefname}{Eq.}
 
 %% Glossary
-\newacronym{dsn}{DSN}{Distributed Storage Network}
+\newacronym{dsn}{DSN}{Distributed Storage Networks}
 \newacronym{edfc}{EDFC}{Exact Decentralized Fountain Codes}
 \newacronym{adfc}{ADFC}{Approximate Decentralized Fountain Codes}
 \newacronym{sa}{SA}{Simulated Annealing}
@@ -175,9 +175,10 @@ Email: {\tt\{masonfed, perondav, lovisott\}@dei.unipd.it}\\}}
 \makeatother
 
 \maketitle
+\thispagestyle{empty}
 
 \begin{abstract}
-In some previous works about \gls{dsn}, two packet spreading algorithm are proposed, \gls{edfc} and \gls{adfc}.
+In a previous work about \gls{dsn}, two packet spreading algorithm are proposed, \gls{edfc} and \gls{adfc}.\cite{Lin2007}
 
 Unfortunately the tuning procedure of their fundamental parameters, $x_d$ and $\nu$ respectively, was not thoroughly investigated.
 We try then to explore these parameter spaces using heuristic optimization techniques, such as \emph{Simulated Annealing} and \emph{Genetic Algorithm}, to find suitable values for a broad range of network configurations.
@@ -186,23 +187,21 @@ We try then to explore these parameter spaces using heuristic optimization techn
 \glsresetall
 \section{Introduction} \label{sec:introduction}
 In our setup, we consider a \gls{wsn} whose nodes are distributed over a known spatial region.
-Some of them, called \textit{sensing nodes}, collect and deploy data from the environment (temperature, pressure, motion data, \ldots) while the others, called \textit{caching nodes}, simply store data coming from \textit{sensing nodes}.
+Some of them, called \textit{sensing nodes}, collect and deploy data from the environment (temperature, pressure, motion data, \ldots) while the others, called \textit{caching nodes}, simply store data coming from the former.
 
-In literature, a \gls{wsn} often has a central node, a powered sink connected to the internet.
+In literature, a \gls{wsn} often has a central node, a powered sink connected to the Internet.
 Such special node receives all information collected by the network and provides it to the users.
 
-owever, following our reference paper\cite{Lin2007}, we get rid of this assumption.
+However, following our reference paper\cite{Lin2007}, we get rid of this assumption.
 Users then must collect the data stored in the network visiting the geographical region where system is located.
 
-In such a scenario, user visits only a certain number $h$ of nodes of the network.
-To guarantee source packets decodability, \emph{Random Fountain Codes} are employed: $K$ source packets across $N$ total nodes are spread and combined such that, using any group of $K+\epsilon$ of them (with $\epsilon$ constant in $K$), the original information can be successfully retrieved with high probability.\cite{Luby}
+To guarantee source packets decodability, \emph{Random Fountain Codes} are employed: $K$ source packets across $N$ total nodes are spread and combined such that, collecting any group of $K+\epsilon$ of them (with $\epsilon$ constant in $K$), the original information can be successfully retrieved with high probability.\cite{Luby}
 
-The challenge here is to minimize the communication costs keeping a low and bounded failure probability.
-
+Our endeavor consists in minimizing the communication costs keeping a low and bounded failure probability.
 Traditional but expensive \mbox{two-way} packet delivery is then discarded, in favor of \mbox{one-way} \emph{random walks}.
 Packet routes are designed according to \emph{Metropolis algorithm} such that the number of packets reaching each node resembles the Robust Soliton distribution, whose optimal decoding properties are known.\cite{Luby}
 
-In this paper, we are going to find the optimal $x_d$ and $\nu$ parameters for \gls{edfc} and \gls{adfc} respectively with three different heuristics and then test them with a network simulator, where further analysis is performed.
+In this paper we are going to find the optimal $x_d$ and $\nu$ parameters for \gls{edfc} and \gls{adfc} respectively with three different heuristics and then test them with a network simulator, where further analysis is performed.
 
 \smallbreak
 This procedure is outlined in the following two sections.
@@ -213,13 +212,12 @@ In \autoref{sec:results} we show how the optimal configurations provided by the 
 
 \section{Technical Approach}
 \label{sec:tech_approach}
-For a good packet spreading, \gls{edfc} and \gls{adfc} spreading algorithms require their parameters $x_d$ and $\nu$ to be carefully set before execution.
-% rimandiamo al paper per una descrizione migliore: qua ne parliamo solo un attimo per far capire cosa abbiamo fatto
+To spread packets properly, \gls{edfc} and \gls{adfc} algorithms require their parameters $x_d$ and $\nu$ to be carefully set before execution.
 
 \smallbreak
-According to \gls{edfc} algorithm, a node of chosen degree $d$, realization of the reference \emph{Robust Soliton Distribution}, should receive at the end of the spreading phase $x_d \, d$ packets, where $x_d$ is called \emph{redundancy coefficient}.
+According to \gls{edfc} algorithm a node of chosen degree $d$, realization of the reference \emph{Robust Soliton Distribution}, should receive at the end of the spreading phase $x_d \, d$ packets, where $x_d$ is called \emph{redundancy coefficient}.
 
-The following optimization problem aims to reduce at the minimum the transmission cost introduced by this approach, ensuring at the same time an upper bound to the failure probability $\delta$.\cite{Lin2007}
+The following optimization problem aims to minimize the transmission cost introduced by this approach, ensuring at the same time an upper bound to failure probability $\delta$.\cite{Lin2007}
 
 \begin{equation}
 	\label{eq:fp}
@@ -240,7 +238,7 @@ The following optimization problem aims to reduce at the minimum the transmissio
 
 \bigbreak
 
-\gls{adfc} optimization problem tries instead to find a suitable probability distribution $\nu$ for nodes degree such that, after package spread, the resulting degree distribution $\nu^\prime$ across the network is as close as possible to the reference distribution.
+\gls{adfc} optimization problem tries instead to find a suitable probability distribution $\nu$ for nodes degree such that, after package spread, the resulting distribution $\nu^\prime$ of received packets across the network is as close as possible to the reference distribution $\mu$.
 
 \begin{equation}
 	\label{eq:sp}
@@ -262,31 +260,35 @@ The following optimization problem aims to reduce at the minimum the transmissio
 
 We can notice immediately that \autoref{eq:fp} and \autoref{eq:sp} are not solvable with \emph{convex optimization} techniques, as they don't minimize convex objective functions over convex sets.
 
-Since traditional tools (such as \emph{simplex} or \emph{gradient descent}) cannot be applied, we chose some heuristic approaches, whose convergence to the optimum is not guaranteed in polynomial time, but whose effectiveness has been proven in many fields.\cite{Edelkamp2010}.
+Since traditional tools (such as \emph{simplex} or \emph{gradient descent}) cannot be applied, we chose some heuristic approaches whose convergence to the optimum is not guaranteed in polynomial time, but whose effectiveness has been proven in many fields.\cite{Edelkamp2010}.
 
 \subsection{Perturbation strategies} \label{sec:perturbations}
-In order to explore problem solution space effectively, each heuristic technique requires a primitive function called \emph{perturbation}.
+In order to explore valid solution space effectively, each heuristic technique requires a primitive function called \emph{perturbation}.
 Given a valid parameter configuration, this routine should provide a new point \emph{nearby} the current one that satisfies problem constraints.
-Such candidate solution is then accepted or rejected given its objective function value, according to the various research algorithms.
 
 \smallbreak
-Since the two considered problems are very different with respect to their constraints, we developed two different strategies, whose pseudocode is available in \autoref{algo:perturb_edfc} and \autoref{algo:perturb_adfc} respectively.
+Since the two considered problems \autoref{eq:fp} and \autoref{eq:sp} are very different, we developed two different strategies, whose pseudocode is available in \autoref{algo:perturb_edfc} and \autoref{algo:perturb_adfc} respectively.
 
-Exploiting this primitive, all heuristic search tecniques detailed later in this paper refer to a general problem, abstracting from \gls{adfc} and \gls{edfc} peculiarities.
+The former reduces a randomly picked redundancy coefficient $x_d$ of an uniform variation, depending on progress parameter $P$, whereas the latter modifies probability distribution $\nu$ moving some probability from one degree to another.
 
-\clearpage
+Exploiting this primitive, all heuristic search tecniques detailed later in this paper refer to a general optimization problem, abstracting from \gls{adfc} and \gls{edfc} peculiarities.
+
 \begin{algorithm}[htp]
 \caption{\gls{edfc} perturbation} \label{algo:perturb_edfc}
-	\KwIn{Primitive \emph{respect constraints} for \gls{edfc}, $\vec{x}_{old}$}
-	\KwOut{vector of redundancy coefficients $\vec{x}_{new}$}
+\KwIn{
+	Primitive \emph{respect constraints} for \gls{edfc},
+	Previous point $\vec{x}_{old}$,
+	Perturbation extent $P$
+}
+\KwOut{vector of redundancy coefficients $\vec{x}_{new}$}
 
-	\Repeat{$\vec{x}_{new}$ \emph{respects constraints}} {
-		$\vec{x}_{new}$ $\gets$ copy($\vec{x}_{old}$) \\
-		pick an integer $d \sim \mathcal{U}([1, K])$ \\
-		pick a real number $\Delta \sim \mathcal{U}([-2T, T])$ \\
-		$\vec{x}_{new}$[d] = $\vec{x}_{new}$[d] + $\Delta$
-	}
-	\Return{$\vec{x}_{new}$}
+\Repeat{$\vec{x}_{new}$ \emph{respects constraints}} {
+	$\vec{x}_{new}$ $\gets$ copy($\vec{x}_{old}$) \\
+	pick an integer $d \sim \mathcal{U}([1, K])$ \\
+	pick a real number $\Delta \sim \mathcal{U}([-2P, P])$ \\
+	$\vec{x}_{new}$[d] = $\vec{x}_{new}$[d] + $\Delta$
+}
+\Return{$\vec{x}_{new}$}
 \end{algorithm}
 
 \begin{algorithm}[htp]
@@ -314,7 +316,7 @@ Exploiting this primitive, all heuristic search tecniques detailed later in this
 
 \clearpage
 \subsection{Simulated Annealing}
-The first algorithm we implement is known as \gls{sa}.
+The first algorithm we implemented is known as \gls{sa}.
 It is a probabilistic technique that takes ispiration from annealing in metallurgy, a process that aims to reduce materials defects.
 In this physical process a piece of metal is warmed at high temperatures and then slowly cooled. In this way it is possible to achieve the molecular equilibrium inside the material itself.
 
@@ -323,8 +325,8 @@ As in the physical process we want to reduce the function energy and slowly brin
 
 \gls{sa} behaviour is dependent on a parameter called \gls{t}: relevant for the search are \gls{sc} and \gls{ac}, the number of points to inspect for given \gls{t} and the probability $P_A$ of accepting a point worse than the current, respectively. At the beginning \gls{t} is initialized at a sufficient high value and then it is reduced at each algorithm step.
 
-The process starts at a random configuration $\vec{\gamma} = [\gamma_1, \ldots, \gamma_K]$ respecting problem constraints.
-Then, each new point $\vec{\gamma}_{new}$ is found \emph{perturbing} previous vector $\vec{\gamma}$, as described in \autoref{sec:perturbations} for \gls{adfc} and \gls{edfc} algorithms.
+The process starts at a random configuration $\gamma$ respecting problem constraints.
+Then, each new point $\gamma_{new}$ is found \emph{perturbing} previous one $\gamma$, as described in \autoref{sec:perturbations} for \gls{adfc} and \gls{edfc} algorithms, with extent $P=T$.
 
 The proposed solution is kept or rejected according to the \gls{ap}, whose expression is the following.
 \begin{equation*} \label{accept_prob}
@@ -337,7 +339,7 @@ The proposed solution is kept or rejected according to the \gls{ap}, whose expre
 \end{equation*}
 
 The best point among all the explored ones is kept across the path and it is returned at the end of the computation.
-A pseudocode for this procedure can be found in \autoref{algo:SA}.
+A pseudocode for this procedure is provided in \autoref{algo:SA}.
 
 \begin{algorithm}
 	\KwIn{Objective function $f$ and constraints,
@@ -376,6 +378,7 @@ $N_S^{MAX} \gets $ Maximum number of steps \\
 \Return{$\gamma_{best}$}
 \end{algorithm}
 
+\clearpage
 \subsection{Jumping Ball}
 
 Our second search algorithm is a variation of \gls{sa}, called \gls{jb}, designed and implemented by our group.
@@ -387,7 +390,7 @@ So, we develop the heuristic of \emph{jumps}, whose aim is to overcome this issu
 $N_{WS}^{MAX}$ has to be initialized properly: a value too low would lead the algorithm to jump indefinitely without ever stabilizing in a single area, but a value too high would make jumps impossible, making pointless this variation.
 A proper value instead enhances the exploration space of the \gls{sa} algorithm, leading to hopefully better results in our variant \gls{jb}.
 
-The pseudocode for \gls{jb} is the same as \gls{sa}, the different \emph{Perturb} function is described in \autoref{algo:JB_neigh}.
+The pseudocode for \gls{jb} is the same as \gls{sa} and the different \emph{Perturb} function is described in \autoref{algo:JB_neigh}.
 
 \begin{algorithm}
 	\caption{Jumping Ball \emph{Perturb}}\label{algo:JB_neigh}
@@ -465,12 +468,13 @@ Our \gls{ga} can be tuned with the following parameters.
 In this section we compare the proposed spreading algorithms, \gls{edfc} and \gls{adfc}, in different scenarios, spanning from smaller neworks of hundreds of elements to bigger ones with thousands of nodes.
 We followed our reference papers \cite{Lin2007} \cite{Aly2008} with respect to degree distribution parameters, as well as system fault tolerance, to obtain consistent results.
 
-All network configurations details, as well as the main numerical results, can be retrieved in \autoref{tab:results} and following plots.
+All considered network configurations are marked with a letter and their description, as well as the main numerical results, can be retrieved in \autoref{tab:results}.
 
 \subsection{Optimization}
 First of all, we solved the two optimization problems for the various parameter settings using the three heuristics described in \autoref{sec:tech_approach}.
 
-Along each network parameters, \autoref{tab:results} provides overhead coefficients $g_1$ and $g_2$ of problems \autoref{eq:fp} and \autoref{eq:sp} respectively, for each optimal solution for $\vec{x}$ and $\nu$.\cite{Lin2007}
+Along each network parameters, \autoref{tab:results} provides overhead coefficients $g_1$ and $g_2$ of problems \autoref{eq:fp} and \autoref{eq:sp} respectively, for each optimal solution for $\vec{x}$ and $\nu$.
+This is the proposed way to assess the quality of the solutions found, as outlined in our reference paper.\cite{Lin2007}
 
 \begin{equation*}
 	\openup 1\jot % increase spacing between lines
@@ -480,18 +484,18 @@ Along each network parameters, \autoref{tab:results} provides overhead coefficie
 	\end{split}
 \end{equation*} \vspace{0cm}
 
-Note that some results of \gls{sa} and \gls{jb} for configuration \emph{a)} are omitted in \autoref{tab:results}, because solutions found in the \gls{adfc} framework were highly sub-optimal with respect to overhead parameter $g_2$.
+In the simpler context of \gls{edfc}, optimal points provided by the three heuristics are very close with respect to cost coefficient $g_1$.
+However, \gls{ga} is the clear  winner in \gls{adfc} context, where it is more robust than the others and provides always a good result.
 
-Moreover, \gls{ga} is the clear  winner in \gls{adfc} context, where it is more robust than the others and provides always a good result.
-We think dynamic heuristic of \gls{ga} is more suitable to explore this complex solution space, while simpler approach employed in the others tends to stay always close to the starting point.
+In fact, some results of \gls{sa} and \gls{jb} for configuration \emph{a)} are even omitted in \autoref{tab:results}, because solutions found in the \gls{adfc} framework were highly sub-optimal with respect to their overhead.
 
-This observation is confirmed by our work, since in the simpler situation of \gls{edfc} the optimal points provided by the three heuristics are very close respect to cost coefficient $g_1$.
+We think dynamic heuristic of \gls{ga} is more suitable to explore this complex solution space, while simpler approach employed in the other search techniques tends to stay always close to the starting point.
 
-\smallbreak
-Regarding computation time of \gls{edfc} optimization, \gls{jb} was slightly faster to reach convergence than \gls{sa}, thanks to our jumping heuristic that allowed to a more aggressive strategy at the beginning, in highly suboptimal regions of solutions space.
+\bigbreak
+As shown in \autoref{fig:progress-edfc}, \gls{jb} was slightly faster to reach convergence than \gls{sa} in \gls{edfc} context, thanks to our jumping heuristic that allowed to a more aggressive strategy at the beginning, in highly suboptimal regions of solutions space.
 Both were still slower though than \gls{ga} in all configurations, except big network \emph{a)}, but by a small margin.
 
-The second problem, \gls{adfc} has been much more difficult to deal with, because of the computational complexity of its objective function: while in \gls{edfc} the scalar product in $\mathbb{R}^K$ requires time $O(K)$, the double sum of \autoref{eq:sp} requires time $O(K^2)$.
+The second problem, related to \gls{adfc} algorithm, has been much more difficult to deal with, because of the computational complexity of its objective function: while in \gls{edfc} the scalar product in $\mathbb{R}^K$ requires time $O(K)$, the double sum of \autoref{eq:sp} is $O(K^2)$.
 
 This was unfeasible for big network configurations, where heuristic search process took too long to obtain a solution in reasonable time, so we decided to speed up the process at the cost of an approximated value for the objective function.
 
@@ -509,27 +513,28 @@ Again, we think that \gls{ga} heuristic was more powerful and fit to the problem
 \gls{adfc} and \gls{edfc} were then run in our network simulator, to test all degree distributions found at optimization step.
 We supposed a fully reliable channel and implemented then a network layer simulator: this was done to assess the viability of the coding scheme in a general context, regardless of physical and medium access protocol peculiarities.
 
+This simulator was written from scratch by our group in C++ programming language: that made our program much faster than similar tools, such as MATLAB\textregistered\ and allowed to test bigger networks.
+
 As customary in literature, wireless sensors were modeled as a set of points uniformly spread in a reference area where each one could communicate only with all near nodes, according to a distance parameter.
 
+\clearpage
 \subsubsection{Transmission cost}
-For each run of our simulation, we report in \autoref{tab:results} relevant spreading quantities, in particular average length $L_{rw}$ of random walks taken by each packet, number of packets $n_{pkt}$ spread across the network and total number $n_{tx}$ of packet transmissions.
+For each run of our simulation, we report in \autoref{tab:results} relevant spreading quantities, in particular average length $L_{rw}$ of random walks taken by each packet, number of packets $n_{pkt}$ disseminated across the network by all sensing nodes and total number $n_{tx}$ of packet transmissions.
 We focused on these few scores to highlight the total cost of each algorithm with the solutions provided by our heuristics.
 
 \smallbreak
-With respect to \gls{edfc} solutions, we noticed that our three heuristics find similar points, except in network \emph{a)}, where \gls{ga} is the best one by a significant margin.
+With respect to \gls{edfc} solutions, we noticed that our three heuristics find similar points, except in network \emph{a)} where \gls{ga} is the best one by a significant margin.
+All of these are tough much more expensive than solutions provided by \gls{adfc}, especially \gls{ga}, that allow for an impressive reduction of packet transmissions.
 
-\gls{adfc} solutions, instead, provided the lowest transmission cost, expecially
-for \gls{ga}, that is the clear winner across all network setups and spreading tecniques.
-
-\smallbreak
-Our best scores, with respect to overhead parameters $g_1$ and $g_2$, on configuration \emph{a)} are very close to the ones obtained in our reference paper\cite{Lin2007}, confirming the results obtained by its research group.
+We observe that our best scores, with respect to overhead parameters $g_1$ and $g_2$, on configuration \emph{a)} are very close to the ones obtained in our reference paper\cite{Lin2007}, confirming the results obtained by its research group.
+Moreover, we proved that a bigger overhead coefficients $g_1$ or $g_2$ implies an higher number of transmissions $n_{tx}$, as expected from theoretical setting.
 
 \subsubsection{Successful decoding probability}
 Transmission cost, however, is only one side of the coin: in order to be effective, packets have to be recovered in reasonable time by the user.
 
 For the various network configurations labeled in \autoref{tab:results}, we then tested how average successful decoding probability changes with different decoding ratios $\eta$, defined as the number of packets collected by the user normalized by $K$.
 
-As can be see in \autoref{fig:eta_vs_prob_adfc_only}, \gls{adfc} solutions provided by \gls{sa} and \gls{jb} could not provide a working network in almost all conditions proposed, while \gls{ga} found suitable configurations, that are then compared to \gls{edfc} one in \autoref{fig:eta_vs_prob_reliable_ones}.
+As can be see in \autoref{fig:eta_vs_prob_adfc_only}, \gls{adfc} solutions obtained with \gls{sa} and \gls{jb} could not provide a working network in almost all conditions proposed, while \gls{ga} found suitable spread parameters, that are then compared to \gls{edfc} one in \autoref{fig:eta_vs_prob_reliable_ones}.
 
 Here it is clear that the reduce transmission cost provided by \gls{adfc} has a price: in some configurations, especially \emph{a)}, \emph{e)} and \emph{g)},  decoding probability is significantly worse than the others, albeit reducing the transmission cost up to three order of magnitudes.
 
@@ -545,13 +550,13 @@ Setting \emph{f)} is a prime example of this observation, where a similar succes
 
 \begin{figure}[htp]
 	\includegraphics[]{figures/progress-edfc.png}
-	\caption{For each configuration in \autoref{tab:results}, normalized ovearhead factor $g_2$ of \gls{adfc} algorithm solutions is plotted against computation time.}
+	\caption{For each configuration in \autoref{tab:results}, normalized score $g_1$ of \gls{edfc} algorithm solutions is plotted against computation time.}
 	\label{fig:progress-edfc}
 \end{figure}
 
 \begin{figure}[htp]
 	\includegraphics[]{figures/progress-adfc.png}
-	\caption{For each configuration in \autoref{tab:results}, normalized score $g_1$ of \gls{edfc} algorithm solutions is plotted against computation time.}
+	\caption{For each configuration in \autoref{tab:results}, normalized ovearhead factor $g_2$ of \gls{adfc} algorithm solutions is plotted against computation time.}
 	\label{fig:progress-adfc}
 \end{figure}
 
@@ -572,14 +577,13 @@ Setting \emph{f)} is a prime example of this observation, where a similar succes
 \section{Conclusions And Future Work}\label{sec:conclusions}
 In this work, we analyze the behaviour of two different spreading algorithms, \gls{adfc} and \gls{edfc}, to perform a network coding in \gls{wsn} as proposed in our reference paper.\cite{Lin2007}
 
-First of all, we solved the two related optimization problems, using well-known algorithms, Genetic Algorithm and Simulated Annealing, and a modified version of the latter, called Jumping Ball.
+First of all, we solved the two related optimization problems using well-known algorithms, Genetic Algorithm and Simulated Annealing, and a modified version of the latter, called Jumping Ball. The solution provided were then tested with a network layer simulator, created by our group.
 
-With the solution provided, we built a network simulator that took into account only the network layer of the ISO-OSI architecture, to generalize our result in various physical and \textsc{MAC} settings.
-This simulator was written from scratch by our group in C++ programming language: that made our program much faster than similar tools, such as MATLAB\textregistered.
+Our analysis confirms that \gls{adfc} achieves much lower network overhead than \gls{edfc}, in general at the cost of a lower successful decoding probability for small values of $\eta$.
 
-With our analysis, we confirmed that \gls{adfc} is confirmed to achieve much lower network overhead than \gls{edfc}, in general at the cost of a lower successful decoding probability for small values of $\eta$.
-We also stated that heuristic search tecniques are suitable to perform non-convex optimization for \emph{Fountain Code} network conding.
-Moreover, we think our results can be improved by the means of other search techniques or perturbation strategies that better fits each problem peculiarities.
+We also stated that heuristic search tecniques are suitable to perform non-convex optimization for \emph{Fountain Code} network coding, especially our version of Genetic Algorithm.
+
+Finally we think our results can be improved by the means of other search techniques or perturbation strategies that better fits each problem peculiarities.
 
 \bibliographystyle{IEEEtran}
 \bibliography{bibliography}
