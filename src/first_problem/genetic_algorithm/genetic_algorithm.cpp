@@ -49,6 +49,10 @@ vector<vector<double>> GeneticAlgorithm::get_initial_population() {
 }
 
 vector<double> GeneticAlgorithm::run_search(string progress_file_name) {
+	/**
+	* ------------------------
+	* ### Algorithm
+	*/
 	int generation = 0;
 
 	// prepare stream for output timing file
@@ -60,8 +64,7 @@ vector<double> GeneticAlgorithm::run_search(string progress_file_name) {
 		= duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
 	vector<vector<double>> population = get_initial_population();
-	/** Selection */
-	/** fraction of individuals picked for the next generation */
+	/** - Compute the number of individuals to keep from a generation to the other which is \f$ part\_size = \left \lceil{dim\_population \cdot survival\_rate}\right \rceil \f$ */
 	int part_size = ceil(this->dim_population * this->survival_rate);
 
 	uniform_real_distribution<double> mutation(-20, 20);
@@ -69,21 +72,28 @@ vector<double> GeneticAlgorithm::run_search(string progress_file_name) {
 
 	vector<double> no_redundancy(this->K, 1);
 
-	// keep memory of best result of last iteration
+	/**
+	* - keep memory of best result of last iteration
+	*/
 	double current_g1 = 0;
 	int worsening_counter = 0;
 
 	while(generation < this->num_generations){
 		current_g1 = this->objective_function(population[0]) / this->objective_function(no_redundancy);
 
-		/** Sorting of the population */
+		/**
+		* - sorting of the population
+		*/
 		std::sort(population.begin(), population.end(),
 			[this](vector<double> s1, vector<double> s2) -> bool {
 				return this->objective_function(s1) < this->objective_function(s2);
 			});
 
-		/** Copy the best individuals in the population, and then
-		* perturbe them checking constraints are still met.
+		/**
+		* - copy the best individuals in the rest of the population, and then
+		* perturb them checking constraints are still met.
+		* To perturb an individual, an increasing number of perturbations are introducted,
+		* the number of perturbations kept are those that takes to a lower objective function.
 		*/
 		for(int j = 1; j < round(1/this->survival_rate); j++){
 			for(int i = 0; i < part_size; i++){
@@ -91,7 +101,6 @@ vector<double> GeneticAlgorithm::run_search(string progress_file_name) {
 
 				vector<double> candidate;
 
-				/** Mutation of  */
 				do {
 					candidate = population[j * part_size + i];
 
@@ -126,7 +135,7 @@ vector<double> GeneticAlgorithm::run_search(string progress_file_name) {
 		}
 
 		/**
-		 * If improvement is too small for too many iterations, stop.
+		 * - if improvement is too small for too many iterations, stop.
 		 */
 		double new_g1 = this->objective_function(population[0]) / this->objective_function(no_redundancy);
 		if (new_g1 > current_g1 - 0.00001) {

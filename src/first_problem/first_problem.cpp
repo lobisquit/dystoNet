@@ -29,14 +29,19 @@ double FirstProblem::objective_function(vector<double> x) {
 }
 
 vector<double> FirstProblem::get_initial_solution() {
+	/**
+	* ---------------
+	* ### Algorithm
+	*/
 	vector<double> x(this->K, 1);
 	uniform_real_distribution<double> generator(1, 100);
 
 	while (!this->respect_constraints(x)) {
-		// create a new point ex-novo, until constrants are met
+		/** - create a new point ex-novo with real random values between 0 and 100*/
 		for(int j=0; j<this->K; j++){
 			x[j] = generator(this->rng);
 		}
+		/** - Check if constraints are respected, otherwise create a new random point*/
 	}
 	return x;
 }

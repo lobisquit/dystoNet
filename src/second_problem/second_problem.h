@@ -97,7 +97,6 @@ class SecondProblem : public HeuristicSearch {
 		*/
 		vector<double> normalize(vector<double> v);
 
-		// functions to implement in lower classes
 		/**
 		* Search for a neighbour solution, possible with a better objective function.
 		* This function is implemented in lower classes
