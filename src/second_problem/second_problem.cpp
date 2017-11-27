@@ -95,9 +95,9 @@ individual SecondProblem::update_objective_function(individual old_individual, v
 	}
 	E = old_E + (first_d+1)*(v[first_d] - old_individual.values[first_d]) + (second_d+1)*(v[second_d] - old_individual.values[second_d]);
 
-	/** Update objective function */
+	// Update objective function
 	for(int i = 1; i <= this->K; i++) {
-		/** ----- first_d ----- */
+		//----- first_d -----
 		double old_p = 1 - pow((1 - (first_d+1) / (this->N * old_E)), (this->N * old_E / this->K));
 		increment = old_individual.values[first_d] *
 			// compute pdf using difference of subsequent CDF
@@ -113,7 +113,7 @@ individual SecondProblem::update_objective_function(individual old_individual, v
 			new_individual.v_prime[i-1] += increment;
 		}
 
-		/** ----- second_d ----- */
+		//----- second_d -----
 		old_p = 1 - pow((1 - (second_d+1) / (this->N * old_E)), (this->N * old_E / this->K));
 		increment = old_individual.values[second_d] *
 			// compute pdf using difference of subsequent CDF
@@ -141,11 +141,15 @@ individual SecondProblem::update_objective_function(individual old_individual, v
 }
 
 vector<double> SecondProblem::get_initial_solution() {
+	/**
+	* ---------------
+	* ### Algorithm
+	*/
 	vector<double> v(this->K, 1);
 	uniform_real_distribution<double> generator(1, 100);
 
 	double sum = 0;
-	// create a new point ex-novo, until constrants are met
+	/** - create a new point ex-novo with real random values between 0 and 100 and normalize it */
 	for (int j=0; j<this->K; j++) {
 		v[j] = generator(this->rng);
 		sum += v[j];
@@ -155,8 +159,7 @@ vector<double> SecondProblem::get_initial_solution() {
 		v[j] /= sum;
 	}
 
-	// constraints are surely met, since components
-	// are > 0 and sum to 1 by construction
+	/** - constraints are surely met, since components are > 0 and sum to 1 by construction */
 	return v;
 }
 
@@ -188,7 +191,6 @@ bool SecondProblem::respect_constraints(vector<double> candidate_v) {
 
 vector<double> SecondProblem::normalize(vector<double> v){
 	double sum = 0;
-	/** Then normalize it */
 	for(int j=0; j<this->K; j++){
 		sum += v[j];
 	}

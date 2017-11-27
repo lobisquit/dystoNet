@@ -55,7 +55,7 @@ vector<double> SimulatedAnnealing::get_neighbour(vector<double> x) {
 		* ------------------------
 		* ### Algorithm
 		* Find new point candidate modifying previous solution.
-		* component \f$ d \sim \mathcal{U}[1, K] \f$ of \f$ \vec{x} \f$ is perturbed
+		* Component \f$ d \sim \mathcal{U}[1, K] \f$ of \f$ \vec{x} \f$ is perturbed
 		* summing it a quantity \f$ \xi \sim \mathcal{U}[-2T, T] \f$
 		*/
 		int chosen_d = index_choice(rng);
