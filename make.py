@@ -1,4 +1,12 @@
 #!/usr/bin/python
+
+'''
+Custom Makefile, written for Python 3.6 to
+run projects, i.e. subfolders of src/
+
+Give `python make.py --help` for further details
+'''
+
 from __future__ import print_function
 
 import argparse
@@ -166,13 +174,13 @@ if __name__ == '__main__':
 	parser.add_argument('--package',
 		dest='package',
 		default='first_coefficients',
-		help='package to compile')
+		help='Package to compile')
 
 	parser.add_argument('--deps',
 		dest='deps',
 		default=[],
 		nargs='*',
-		help='Packets that are needed to compile wanted package')
+		help='Packages that are needed to compile wanted package')
 
 	parser.add_argument('--configs',
 		dest='configs',

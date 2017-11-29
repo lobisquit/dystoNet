@@ -10,6 +10,7 @@
 #include "functionCSV.h"
 
 int main(int argc, char* argv[]) {
+	// read key parameters
 	int K;
 	int N;
 	double c;

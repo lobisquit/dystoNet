@@ -70,7 +70,7 @@ class SimulatedAnnealing : public FirstProblem {
 		using FirstProblem::objective_function;
 		using FirstProblem::respect_constraints;
 
-		// these are implemented in cpp
+		// this is implemented in cpp
 		vector<double> get_neighbour(vector<double> x);
 
 		double acceptance_probability(vector<double> old_x, vector<double> new_x);

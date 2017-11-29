@@ -12,7 +12,7 @@ struct individual{
 	double obj_function = 0;
 };
 
-/*!
+/**
 * Provide solution methods for Lin's paper problem in equation 18
 * (second problem in our study)
 * \authors Enrico Lovisotto, Davide Peron, Federico Mason
@@ -41,7 +41,7 @@ class SecondProblem : public HeuristicSearch {
 			RobustSoliton* robust_soliton,
 			double max_failure_probability);
 
-		/*!
+		/**
 		* Custom overload of << operator, to print debug info
 		*/
 		friend std::ostream& operator<<(std::ostream &strm, SecondProblem &obj) {
@@ -54,19 +54,19 @@ class SecondProblem : public HeuristicSearch {
 			return strm;
 		}
 
-		/*!
+		/**
 		* Computes in a non-optimized way the objective function for second problem.
 		* This method is really slow!
 		* \param v Vector on which the objective function is computed.
 		*/
 		double objective_function(vector<double> v);
-		/*!
+		/**
 		* Computes in an approximate way the objective function for second problem.
 		* This method is faster than \a objective_function but gives an approximate solution.
 		* \param v Vector on which the approximate objective function is computed.
 		*/
 		individual approximate_objective_function(vector<double> v);
-		/*!
+		/**
 		* Computes the objective function for second problem in a very optimized way.
 		* It exploit the last objective function computed updating only the terms of the sum
 		* that change changing two component of the original vector.
@@ -80,13 +80,13 @@ class SecondProblem : public HeuristicSearch {
 		*/
 		individual update_objective_function(individual old_individual, vector<double> v, int first_d, int second_d);
 
-		/*!
+		/**
 		* Create a random initial solution to start the searching algorithms.
 		*	\return Initial random solution
 		*/
 		vector<double> get_initial_solution();
 
-		/*!
+		/**
 		* Check if the input vector respects the constraints required in Equation 18 (Lin's Paper)
 		*/
 		bool respect_constraints(vector<double> candidate_v);

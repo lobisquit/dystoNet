@@ -15,23 +15,6 @@ class JumpingBall : public SimulatedAnnealing {
 		int max_worsening_steps;
 		double best_score;
 
-		/**
-		* Custom overload of << operator, to print debug info
-		*/
-		/*friend ostream& operator<<(ostream &strm, SimulatedAnnealing &obj) {
-			strm << "<SimulatedAnnealing("
-				"K="						<< obj.K 						<< ", " <<
-				"N="						<< obj.N 						<< ", " <<
-				"max_failure_probability=" 	<< obj.max_failure_probability 	<< ", " <<
-				"robust_soliton=" 			<< *obj.robust_soliton 			<< ", " <<
-				"temperature=" 				<< obj.temperature 				<< ", " <<
-				"cooling_rate=" 			<< obj.cooling_rate 			<< ", " <<
-				"max_iterations=" 			<< obj.max_iterations 			<< ", " <<
-				"steps_coefficient="		<< obj.steps_coefficient		<<
-				")>";
-			return strm;
-		}*/
-
 		JumpingBall(
 			int K,
 			int N,
@@ -44,7 +27,6 @@ class JumpingBall : public SimulatedAnnealing {
 			double acceptance_coefficient,
 			int max_worsening_steps);
 
-		// these functions are taken as they are from upper class
 		// these functions are taken as they are from upper class
 		using SecondProblem::objective_function;
 		using SecondProblem::respect_constraints;

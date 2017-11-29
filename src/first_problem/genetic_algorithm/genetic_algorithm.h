@@ -8,7 +8,7 @@
 
 using namespace std;
 
-/*!
+/**
 * Implements Genetic Algorithm to find a sub-optimal solution, here called \a individual,
 * for the first problem.
 *
