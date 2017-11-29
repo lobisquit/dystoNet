@@ -1,5 +1,5 @@
 # dystoNet
-Course project for Wireless Communication.
+Course project of Wireless Communication.
 
 ## Aim
 Project aim is to assess performance of linear network coding,
@@ -38,6 +38,10 @@ Example here is given to run simulated annealing and jumping ball on first probl
 python make.py --mode run --package first_problem/simulated_annealing --deps first_problem utils --configs configs.json
 python make.py --mode run --package first_problem/jumping_ball --deps first_problem/simulated_annealing first_problem utils --configs configs.json
 ```
+
+### src/plots/
+Unlike other `src/` sub-directories, this is not a C++ package but contains some R code to plot results in csv files.
+Those scripts should be run from project root directory.
 
 ### test/
 Each subdirectory of this folder contains a bunch of tests for a package (of `src/`). They can be run giving, for package `utils`, this command
