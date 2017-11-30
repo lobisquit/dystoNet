@@ -61,6 +61,9 @@ class Network {
 		Node* get_nodes();
 		Packet* get_packets();
 
+		/**
+		* Spread packets in the network using random walks
+		*/
 		double spread_packets();
 
 		/** Visit to the network */

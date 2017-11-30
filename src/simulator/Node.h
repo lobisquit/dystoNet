@@ -31,6 +31,13 @@ class Node {
 	public:
 		Node();
 
+		/**
+		* Create a node
+		* @param x coordinate x of the node
+		* @param y coordinate y of the node
+		* @param degree degree of the node
+		* @param pi \f$ \pi_d \f$ = probability that a random walk stops at current node
+		*/
 		Node(double x, double y, int degree, double pi);
 
 		double get_x();
@@ -43,7 +50,9 @@ class Node {
 		void add_neighbour(Node* other);
 		void add_packet(Packet* new_pkt);
 
-		// filter away packets that exceed degree
+		/**
+		* Filter away packets that exceed degree
+		*/
 		void filter_packets();
 
 		/**
