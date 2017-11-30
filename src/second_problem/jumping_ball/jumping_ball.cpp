@@ -43,26 +43,39 @@ JumpingBall::JumpingBall(
 }
 
 individual JumpingBall::get_neighbour(individual old_individual) {
+
 	// copy x to new array before perturbation
 	vector<double> candidate = old_individual.values;
+
+	// initialize the parameters
 
 	individual new_individual;
 
 	int first_d = 0;
 	int second_d = 0;
 
-	// count number of steps taken that lead to a
-	// solution worse than the current top
 	do {
-		// setup random variables
+
+		// initialize distributions
 
 		uniform_int_distribution<int> index_choice(0, this->K-1);
-
 		uniform_int_distribution<int> number_of_variations(0, this->K-1);
 
-		// if we were are not improving for too long, jump!
+		/**
+		* ------------------------
+		* ### Algorithm
+		* Find new point candidate modyfing previous solution.
+		* The search mode of the candidate depends on the number of time
+		* the candidate did not improve.
+		* If \f$ worsening_steps > max_worsening_steps \f$, I make the jump.
+		* If not I proceed with the normal search method.
+		*/
+
+
 		if (this->worsening_steps > this->max_worsening_steps) {
-			cerr << "JUMP" << '\n';
+
+			// A set of random components of the candidate is perturbed.
+
 			while (!respect_constraints(candidate)) {
 				for(int i=0; i<number_of_variations(this->rng); i++) {
 					do {
@@ -75,6 +88,9 @@ individual JumpingBall::get_neighbour(individual old_individual) {
 						// end_d can't go beyond 1 after move
 					} while(second_d == first_d || candidate[first_d] + candidate[second_d] > 1);
 
+					// "move" some probability from start to end point
+					// I do this for number_of_variations times
+
 					uniform_real_distribution<double> perturbation(0, min(candidate[first_d], candidate[second_d]));
 
 					double delta = perturbation(this->rng);
@@ -83,10 +99,15 @@ individual JumpingBall::get_neighbour(individual old_individual) {
 					candidate[second_d] -= delta;
 				}
 			}
+
+			// After the jump I reset the parameter worsening_steps;
+
 			this->worsening_steps = 0;
 		}
 		else {
-			// classic step if counter is too low
+
+			// Only one component of the candidate is perturbed.
+
 			do {
 				first_d = index_choice(rng);
 				// start_d must have a non-zero probability
@@ -96,6 +117,8 @@ individual JumpingBall::get_neighbour(individual old_individual) {
 				second_d = index_choice(rng);
 				// end_d can't go beyond 1 after move
 			} while(second_d == first_d || candidate[first_d] + candidate[second_d] > 1);
+
+			// "move" some probability from start to end point
 
 			uniform_real_distribution<double> perturbation(0, min(candidate[first_d], candidate[second_d]));
 

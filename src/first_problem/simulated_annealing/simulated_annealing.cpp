@@ -98,7 +98,7 @@ vector<double> SimulatedAnnealing::run_search(string progress_file_name) {
 	// prepare stream for output timing file
 	ofstream progress_file;
 	progress_file.open(progress_file_name);
-  progress_file << "Time,score" << "\n";
+  	progress_file << "Time,score" << "\n";
 
 	// compute normalization factor for score
 	vector<double> no_redundancy(K, 1);

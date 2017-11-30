@@ -62,10 +62,8 @@ individual SimulatedAnnealing::get_neighbour(individual old_individual) {
 		} while(second_d == first_d || candidate[first_d] + candidate[second_d] > 1);
 
 		// "move" some probability from start to end point
-		uniform_real_distribution<double> perturbation(0,
-																									 min(candidate[first_d],
-																											 candidate[second_d]));
-
+		uniform_real_distribution<double> perturbation(0, min(candidate[first_d], candidate[second_d]));
+		
 		double delta = perturbation(rng);
 		candidate[first_d]  -= delta;
 		candidate[second_d] += delta;

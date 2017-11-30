@@ -48,27 +48,53 @@ vector<double> JumpingBall::get_neighbour(vector<double> x) {
 		// copy x to new array before perturbation
 		candidate = x;
 
-		// setup random variables
+		// initialize distributions
 		uniform_real_distribution<double>
 			perturbation(-2*this->temperature, this->temperature);
 		uniform_int_distribution<int> number_of_variations(0, this->K-1);
 		uniform_int_distribution<int> index_choice(0, this->K-1);
 
-		// if we were are not improving for too long, jump!
+
+		/**
+		* ------------------------
+		* ### Algorithm
+		* Find new point candidate modyfing previous solution.
+		* The search mode of the candidate depends on the number of time
+		* the candidate did not improve.
+		* If \f$ worsening_steps > max_worsening_steps \f$, I make the jump.
+		* If not I proceed with the normal search method.
+		*/
+
 		if (worsening_steps > this->max_worsening_steps) {
 			while (!respect_constraints(candidate)) {
-				// perturb an uniformly distributed number of components
+
+				// A set of random components of the candidate is perturbed.
+
 				for(int i=0; i<number_of_variations(this->rng); i++) {
+
+					/*
+					* Component \f$ d \sim \mathcal{U}[1, K] \f$ of \f$ \vec{x} \f$ is perturbed
+					* summing it a quantity \f$ \xi \sim \mathcal{U}[-2T, T] \f$
+					* I do this for number_of_variations times.
+					*/
+
 					int chosen_d = index_choice(this->rng);
 					candidate[chosen_d] = x[chosen_d] + perturbation(this->rng);
 				}
 			}
-			// reset step counter after the jump
+			// After the jump I reset the parameters worsening_steps and num_jump.
+
 			this->worsening_steps = 0;
 			this->num_jump = this->num_jump+1;
 		}
 		else {
-			// classic step if counter is too low
+
+			/*
+			* Only one component of the candidate is perturbed.
+			* Component \f$ d \sim \mathcal{U}[1, K] \f$ of \f$ \vec{x} \f$ is perturbed
+			* summing it a quantity \f$ \xi \sim \mathcal{U}[-2T, T] \f$
+			*/
+
 			uniform_real_distribution<double>
 				perturbation(-2*this->temperature, this->temperature);
 			uniform_int_distribution<int> index_choice(0, K-1);

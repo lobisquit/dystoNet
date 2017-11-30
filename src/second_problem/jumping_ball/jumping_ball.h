@@ -11,8 +11,11 @@ using namespace std;
 
 class JumpingBall : public SimulatedAnnealing {
 	public:
+		// Counter of consecutive perturbations without improvements
 		int worsening_steps;
+		// Limit of consecutive perturbations without improvements
 		int max_worsening_steps;
+		// The best result obtained so far
 		double best_score;
 
 		JumpingBall(
@@ -32,6 +35,8 @@ class JumpingBall : public SimulatedAnnealing {
 		using SecondProblem::respect_constraints;
 		using SecondProblem::get_initial_solution;
 		using SimulatedAnnealing::acceptance_probability;
+
+		// these functions are implemented in cpp
 
 		vector<double> run_search(string progress_file_name);
 		individual get_neighbour(individual old_individual);
