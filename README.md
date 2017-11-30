@@ -39,6 +39,12 @@ python make.py --mode run --package first_problem/simulated_annealing --deps fir
 python make.py --mode run --package first_problem/jumping_ball --deps first_problem/simulated_annealing first_problem utils --configs configs.json
 ```
 
+Simulator can be run instead on all network configurations set in `configs.json` this way.
+```
+python make.py --mode run --package simulator --deps utils first_problem second_problem --configs configs.json
+```
+Please note that simulator is written once for both spreading algorithms, since the only difference is given by degree distributions, while random walks and packet selection is the same for both.
+
 ### src/plots/
 Unlike other `src/` sub-directories, this is not a C++ package but contains some R code to plot results in csv files.
 Those scripts should be run from project root directory.
